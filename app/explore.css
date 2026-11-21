@@ -6,11 +6,11 @@
 .explore-search input {
   width: 100%;
   min-height: 40px;
-  border: 1px solid #ded9e2;
+  border: 1px solid var(--color-border-strong);
   border-radius: 7px;
   padding: 0 30px 0 12px;
-  background: #fbfafc;
-  color: #333;
+  background: var(--color-page);
+  color: var(--color-text);
   font: inherit;
   font-size: 11px;
 }
@@ -49,8 +49,8 @@
   line-height: 1;
 }
 .explore-search input:focus {
-  border-color: var(--purple);
-  outline: 3px solid #eee8ff;
+  border-color: var(--color-brand);
+  outline: 2px solid var(--color-brand);
 }
 .explore-search button {
   position: absolute;
@@ -59,7 +59,7 @@
   height: 100%;
   border: 0;
   background: transparent;
-  color: #777;
+  color: var(--color-text-muted);
   font-size: 16px;
   cursor: pointer;
 }
@@ -74,7 +74,7 @@
 }
 .explore-welcome > p:last-child {
   margin: 0;
-  color: #706b73;
+  color: var(--color-text-muted);
   font-size: 12px;
 }
 .vibe-panel {
@@ -83,9 +83,9 @@
   gap: 16px 28px;
   align-items: center;
   margin: 32px 0 48px;
-  border: 1px solid #dfd4f1;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: #fbf9ff;
+  background: var(--color-brand-soft);
   padding: 20px;
 }
 .vibe-panel > div {
@@ -94,7 +94,7 @@
   gap: 12px;
 }
 .vibe-sparkle {
-  color: var(--purple);
+  color: var(--color-brand);
   font-size: 22px;
 }
 .vibe-panel h2 {
@@ -103,7 +103,7 @@
 }
 .vibe-panel p {
   margin: 0;
-  color: #706b73;
+  color: var(--color-text-muted);
   font-size: 10px;
   line-height: 1.45;
 }
@@ -114,19 +114,19 @@
 .vibe-panel input {
   min-width: 0;
   flex: 1;
-  border: 1px solid #d9c8ff;
+  border: 1px solid var(--color-border-strong);
   border-radius: 6px;
   padding: 10px;
-  background: white;
-  color: #333;
+  background: var(--color-surface);
+  color: var(--color-text);
   font: inherit;
   font-size: 10px;
 }
 .vibe-panel button {
   border: 0;
   border-radius: 6px;
-  background: var(--purple);
-  color: white;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   padding: 0 13px;
   font: inherit;
   font-size: 10px;
@@ -134,7 +134,7 @@
 }
 .vibe-panel small {
   grid-column: 2;
-  color: #918a99;
+  color: var(--color-text-muted);
   font-size: 9px;
 }
 .category-section {
@@ -153,47 +153,29 @@
   align-items: flex-start;
   justify-content: center;
   gap: 8px;
-  border: 1px solid #e5e0e9;
+  border: 1px solid var(--color-border);
   border-radius: 9px;
-  background: white;
+  background: var(--color-surface);
   padding: 12px;
-  color: #27212b;
+  color: var(--color-text);
   text-align: left;
   cursor: pointer;
 }
 .category-card span {
-  color: var(--purple);
+  color: var(--color-brand);
   font-size: 20px;
 }
 .category-card strong {
   font-size: 10px;
 }
-.category-card--lavender {
-  background: #f2e9fc;
-}
-.category-card--peach {
-  background: #fcede8;
-}
-.category-card--sage {
-  background: #e7f3eb;
-}
-.category-card--butter {
-  background: #fff1da;
-}
-.category-card--blue {
-  background: #e7effc;
-}
-.category-card--pink {
-  background: #f8e8ef;
-}
 .category-card:hover,
 .category-card--active {
-  border-color: var(--purple);
+  border-color: var(--color-brand);
 }
 .event-relevance {
   display: block;
   margin-bottom: 5px;
-  color: var(--purple);
+  color: var(--color-brand);
   font-size: 8px;
 }
 .explore-results {
@@ -212,14 +194,14 @@
 }
 .results-heading p {
   margin: 0;
-  color: #77717b;
+  color: var(--color-text-muted);
   font-size: 10px;
 }
 .results-heading button,
 .explore-empty button {
   border: 0;
   background: transparent;
-  color: var(--purple);
+  color: var(--color-brand);
   font: inherit;
   font-size: 10px;
   cursor: pointer;
@@ -233,23 +215,23 @@
 }
 .subcategory-pill,
 .criteria-row button {
-  border: 1px solid #d8c8f5;
+  border: 1px solid var(--color-border-strong);
   border-radius: 999px;
   padding: 6px 9px;
-  background: white;
-  color: #6d50be;
+  background: var(--color-surface);
+  color: var(--color-brand);
   font: inherit;
   font-size: 9px;
   cursor: pointer;
 }
 .subcategory-pill--active,
 .criteria-row button {
-  background: #eee7ff;
+  background: var(--color-brand-soft);
 }
 .explore-empty {
-  border: 1px dashed #cfc4dd;
+  border: 1px dashed var(--color-border-strong);
   border-radius: 10px;
-  background: #fcfaff;
+  background: var(--color-surface);
   padding: 46px 20px;
   text-align: center;
 }
@@ -259,7 +241,7 @@
 }
 .explore-empty p {
   margin: 0 0 14px;
-  color: #77717b;
+  color: var(--color-text-muted);
   font-size: 10px;
 }
 @media (max-width: 800px) {

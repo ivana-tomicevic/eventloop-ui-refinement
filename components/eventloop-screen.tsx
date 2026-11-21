@@ -13,7 +13,7 @@ import {
   MapPin,
   Heart,
   ArrowUpRight,
-  Sparkles,
+  Search,
 } from "lucide-react";
 import SiteNav from "./site-nav";
 import {
@@ -36,6 +36,53 @@ const categories = [
   { id: "social", label: "Social", icon: Users, tone: "#ba6c8d" },
   { id: "food", label: "Food & Drink", icon: UtensilsCrossed, tone: "#b76c50" },
 ];
+type TimeFilter = "tonight" | "tomorrow" | "weekend" | "all";
+const timeOptions: {
+  id: TimeFilter;
+  label: string;
+  title: string;
+  empty: string;
+}[] = [
+  {
+    id: "tonight",
+    label: "Večeras",
+    title: "Večeras u Sarajevu",
+    empty: "Večeras nema događaja.",
+  },
+  {
+    id: "tomorrow",
+    label: "Sutra",
+    title: "Sutra u Sarajevu",
+    empty: "Sutra nema događaja.",
+  },
+  {
+    id: "weekend",
+    label: "Vikend",
+    title: "Ovaj vikend u Sarajevu",
+    empty: "Ovaj vikend nema događaja.",
+  },
+  { id: "all", label: "Sve", title: "Svi događaji", empty: "" },
+];
+const dayStart = (d: Date, offset = 0, hour = 0) =>
+  new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset, hour);
+/** Poluotvoreni interval [od, do) u lokalnom vremenu, ili null za "Sve". */
+function timeRange(filter: TimeFilter, now: Date): [Date, Date] | null {
+  if (filter === "tonight") return [dayStart(now, 0, 17), dayStart(now, 1)];
+  if (filter === "tomorrow") return [dayStart(now, 1), dayStart(now, 2)];
+  if (filter === "weekend") {
+    // Najbliža subota i nedjelja; u nedjelju je to tekući vikend.
+    const day = now.getDay();
+    const saturday = dayStart(now, day === 0 ? -1 : 6 - day);
+    return [saturday, dayStart(saturday, 2)];
+  }
+  return null;
+}
+function matchesTime(e: EventRecord, range: [Date, Date] | null) {
+  if (!range) return true;
+  const start = e.start ? new Date(e.start) : null;
+  if (!start || Number.isNaN(start.getTime())) return false;
+  return start >= range[0] && start < range[1];
+}
 function Card({
   event,
   saved,
@@ -103,6 +150,8 @@ export default function EventloopScreen({
   const [category, setCategory] = useState("");
   const [vibe, setVibe] = useState("");
   const [activeVibe, setActiveVibe] = useState("");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const activeTime = timeOptions.find((o) => o.id === timeFilter)!;
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
   useEffect(() => {
@@ -138,73 +187,84 @@ export default function EventloopScreen({
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-  const filtered = useMemo(
-    () =>
-      events
-        .filter(
-          (e) =>
-            e.status !== "Draft" &&
-            (!savedOnly || saved.includes(String(e.id))) &&
-            (!category || e.category === category) &&
-            (!search || searchable(e).includes(search.toLowerCase())) &&
-            (!activeVibe ||
-              activeVibe
-                .toLowerCase()
-                .split(/\s+/)
-                .some(
-                  (word) => word.length > 2 && searchable(e).includes(word),
-                )),
-        )
-        .sort((a, b) => {
-          const score = (e: EventRecord) =>
-            interests.filter((i) => searchable(e).includes(i.toLowerCase()))
-              .length;
-          return score(b) - score(a);
-        }),
-    [events, search, category, activeVibe, saved, savedOnly, interests],
-  );
+  const filtered = useMemo(() => {
+    const range = timeRange(timeFilter, new Date());
+    return events
+      .filter(
+        (e) =>
+          e.status !== "Draft" &&
+          matchesTime(e, range) &&
+          (!savedOnly || saved.includes(String(e.id))) &&
+          (!category || e.category === category) &&
+          (!search || searchable(e).includes(search.toLowerCase())) &&
+          (!activeVibe ||
+            activeVibe
+              .toLowerCase()
+              .split(/\s+/)
+              .some((word) => word.length > 2 && searchable(e).includes(word))),
+      )
+      .sort((a, b) => {
+        const score = (e: EventRecord) =>
+          interests.filter((i) => searchable(e).includes(i.toLowerCase()))
+            .length;
+        return score(b) - score(a);
+      });
+  }, [
+    events,
+    search,
+    category,
+    activeVibe,
+    saved,
+    savedOnly,
+    interests,
+    timeFilter,
+  ]);
   return (
     <main className="eventloop-shell">
       <SiteNav />
       <div className="eventloop-content explore-content">
-        <section className="el-hero">
-          <div className="el-hero-copy">
-            <p className="el-kicker">THE CITY IS YOURS TO EXPLORE</p>
-            <h1 className="hero-statement">
-              <span className="hero-line-first">Find something</span>
-              <span className="hero-line-worth">WORTH</span>
-              <span className="hero-line-last">going to.</span>
-            </h1>
-            <p>Good plans start here. Discover what’s happening around you.</p>
-          </div>
-          <div className="el-ai-search">
-            <div className="el-ai-heading">
-              <div className="el-ai-heading-text">
-                <h2>Describe your vibe</h2>
-                <p>Tell us what you’re in the mood for.</p>
-              </div>
-
-              <span className="el-ai-label">
-                <Sparkles size={12} />
-                AI
-              </span>
-            </div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setActiveVibe(vibe.trim());
-              }}
-            >
-              <input
-                value={vibe}
-                onChange={(e) => setVibe(e.target.value)}
-                placeholder="A cozy jazz night, a creative workshop..."
-              />
-              <button type="submit" aria-label="Find matching events">
-                <ArrowUpRight size={22} strokeWidth={3} />
+        <section className="el-explore-header" aria-labelledby="explore-title">
+          <h1 id="explore-title" aria-live="polite">
+            {activeTime.title}
+          </h1>
+          <form
+            className="el-search-pill"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setActiveVibe(vibe.trim());
+            }}
+          >
+            <label htmlFor="explore-search" className="sr-only">
+              Pretraži događaje
+            </label>
+            <Search
+              size={20}
+              aria-hidden="true"
+              className="el-search-pill__icon"
+            />
+            <input
+              id="explore-search"
+              type="search"
+              value={vibe}
+              onChange={(e) => setVibe(e.target.value)}
+              placeholder="Opiši šta tražiš, npr. opušten jazz i besplatno"
+            />
+            <button type="submit" aria-label="Traži događaje">
+              <ArrowUpRight size={20} strokeWidth={2.5} aria-hidden="true" />
+            </button>
+          </form>
+          <div className="el-time-filter" role="group" aria-label="Kada">
+            {timeOptions.map((o) => (
+              <button
+                type="button"
+                key={o.id}
+                aria-pressed={timeFilter === o.id}
+                onClick={() => setTimeFilter(o.id)}
+              >
+                {o.label}
               </button>
-            </form>
-            <p className="el-search-disclaimer">Search by mood or keywords.</p>
+            ))}
           </div>
         </section>
         {!savedOnly && (
@@ -277,7 +337,19 @@ export default function EventloopScreen({
               />
             ))}
           </div>
-          {!filtered.length && (
+          {!filtered.length && timeFilter !== "all" && (
+            <div className="explore-empty">
+              <h3>{activeTime.empty}</h3>
+              <button
+                type="button"
+                className="el-time-reset"
+                onClick={() => setTimeFilter("all")}
+              >
+                Prikaži sve
+              </button>
+            </div>
+          )}
+          {!filtered.length && timeFilter === "all" && (
             <div className="explore-empty">
               <h3>
                 {savedOnly ? "No saved events yet" : "No matching events"}

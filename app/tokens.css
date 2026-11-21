@@ -1,0 +1,98 @@
+/*
+ * Eventloop design tokens — the single source for colors, radii, spacing,
+ * type scale and shadows. Components use these variables; never hard-code values.
+ *
+ * `@theme static` makes Tailwind always emit these as CSS variables on :root
+ * and also generates utilities (bg-brand, text-text-muted, rounded-card, text-page-title, ...).
+ *
+ * Contrast (WCAG AA, 4.5:1 for text), checked:
+ *   text        #15141A on page 17.5:1
+ *   text-muted  #6B6760 on page 5.4:1, on surface 5.6:1, on brand-soft 4.9:1
+ *   on-brand    #FFFFFF on brand 5.3:1, on brand-hover 7.0:1
+ *   brand       #6C47FF as text on surface 5.3:1, on brand-soft 4.6:1
+ *   free        #1A7146 on surface 6.0:1, on free-soft 5.4:1
+ *   urgent      #FF6B4A is a BACKGROUND only, with on-urgent text (6.5:1).
+ *               Never use it as text on white (2.8:1).
+ */
+@theme static {
+  /* Surfaces */
+  --color-page: #fbfaf8; /* warm near-white page background */
+  --color-surface: #ffffff; /* cards, header, inputs */
+
+  /* Text */
+  --color-text: #15141a;
+  --color-text-muted: #6b6760; /* warm grey */
+
+  /* Borders */
+  --color-border: #ece9e4;
+  --color-border-strong: #d9d4cc; /* inputs, secondary buttons */
+
+  /* Brand */
+  --color-brand: #6c47ff;
+  --color-brand-hover: #5835e0;
+  --color-brand-soft: #f2eeff; /* selected / hover states */
+  --color-on-brand: #ffffff;
+
+  /* Urgency accent — backgrounds/badges only (e.g. "Tonight") */
+  --color-urgent: #ff6b4a;
+  --color-on-urgent: #15141a;
+
+  /* "Free" */
+  --color-free: #1a7146;
+  --color-free-soft: #e8f5ee;
+
+  /* Radii */
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-pill: 9999px;
+
+  /* Type */
+  --font-sans: Arial, Helvetica, sans-serif;
+  --text-page-title: clamp(32px, 3.6vw, 48px);
+  --text-section-title: 24px;
+  --text-card-title: 19px;
+  --text-meta: 12px;
+  --text-price: 16px;
+
+  /* Shadows */
+  --shadow-card: 0 3px 10px rgb(21 20 26 / 0.06);
+  --shadow-raised: 0 4px 18px rgb(21 20 26 / 0.04);
+  --shadow-popover: 0 12px 30px rgb(21 20 26 / 0.11);
+  --shadow-focus: 0 0 0 3px rgb(108 71 255 / 0.18);
+
+  /* shadcn/ui names, mapped onto the tokens above */
+  --color-background: var(--color-page);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-primary: var(--color-brand);
+  --color-primary-foreground: var(--color-on-brand);
+  --color-secondary: var(--color-surface);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-page);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-input: var(--color-border-strong);
+  --color-ring: var(--color-brand);
+}
+
+:root {
+  color-scheme: light;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Legacy aliases used by older screens — they now resolve to the tokens */
+  --ink: var(--color-text);
+  --muted-ink: var(--color-text-muted);
+  --line: var(--color-border);
+  --canvas: var(--color-page);
+  --white: var(--color-surface);
+  --purple: var(--color-brand);
+}
