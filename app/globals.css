@@ -13,6 +13,7 @@
 @import './explore.css';
 @import './eventloop-polish.css';
 @import './event-card.css';
+@import './explore-header.css';
 
 @custom-variant dark (&:is(.dark *));
 

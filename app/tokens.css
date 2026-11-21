@@ -23,6 +23,7 @@
   /* Text */
   --color-text: #15141a;
   --color-text-muted: #6b6760; /* warm grey */
+  --color-text-secondary: #5f5c66; /* nav links, unselected segments (6.6:1 on surface) */
 
   /* Borders */
   --color-border: #ece9e4;
@@ -59,7 +60,13 @@
 
   /* Type */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  --text-page-title: clamp(32px, 3.6vw, 48px);
+  --text-page-title: 26px;
+  --text-page-title-mobile: 24px;
+  --text-logo: 16px;
+  --text-body: 14px; /* nav links, segments, buttons, empty-state copy */
+  --text-input: 15px;
+  --text-empty-title: 18px;
+  --tracking-title: -0.4px;
   --text-section-title: 24px;
   --text-card-title: 15px;
   --text-meta: 12px;
@@ -106,6 +113,31 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
+
+  /* Header + top of Explore (docs/explore-reference.html) */
+  --nav-padding: 14px 32px;
+  --nav-padding-mobile: 12px 16px;
+  --nav-gap: 22px;
+  --nav-gap-mobile: 14px;
+  --nav-mark-size: 24px;
+  --nav-mark-radius: 8px;
+  --avatar-size: 32px;
+  --page-max-width: 1040px;
+  --page-padding: 32px 24px 56px;
+  --page-padding-mobile: 20px 16px 40px;
+  --title-gap: 14px; /* h1 -> pill, pill -> segments */
+  --pill-input-padding: 8px 8px 8px 18px;
+  --control-icon-button: 36px; /* round search button */
+  --segment-padding: 7px 16px;
+  --segment-gap: 4px;
+  --segment-inset: 3px;
+  --button-padding: 8px 16px;
+  --empty-padding: 40px 24px;
+  --section-gap: 26px; /* space above each page section */
+  --pill-gap: 10px;
+  --icon-sm: 17px; /* icons inside buttons */
+  --icon-md: 19px; /* search glass */
+  --text-mark: 13px; /* the "e" in the logo mark */
 
   /* Event card (docs/explore-reference.html) */
   --card-media-ratio: 16 / 10;

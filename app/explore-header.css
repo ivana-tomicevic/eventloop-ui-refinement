@@ -1,0 +1,336 @@
+/* Header (.nav) and top of Explore — docs/explore-reference.html. Tokens only: see app/tokens.css. */
+
+/* ---------- Header ---------- */
+.el-nav {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: var(--nav-gap);
+  padding: var(--nav-padding);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.el-nav a {
+  text-decoration: none;
+}
+.el-nav :is(a, button):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.el-nav__logo {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--nav-mark-radius);
+  color: var(--color-text);
+  font-size: var(--text-logo);
+  font-weight: var(--font-weight-medium);
+}
+.el-nav__mark {
+  display: grid;
+  place-items: center;
+  width: var(--nav-mark-size);
+  height: var(--nav-mark-size);
+  border-radius: var(--nav-mark-radius);
+  background: var(
+    --color-accent
+  ); /* the only place the purple accent is used */
+  color: var(--color-on-accent);
+  font-size: var(--text-mark);
+  line-height: 1;
+}
+.el-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--nav-gap);
+}
+.el-nav__link {
+  border-radius: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+.el-nav__link:hover {
+  color: var(--color-text);
+}
+.el-nav__link--active {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+.el-nav__spacer {
+  flex: 1;
+}
+.el-nav .el-nav-search {
+  flex: 0 1 320px;
+  min-width: 0;
+}
+.el-nav__join {
+  flex-shrink: 0;
+  padding: var(--button-padding);
+  border-radius: var(--radius-button);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+}
+.el-nav__join:hover {
+  background: var(--color-brand-hover);
+}
+
+/* Signed-in (demo) state: avatar + click-to-open menu */
+.el-nav__account {
+  position: relative;
+  flex-shrink: 0;
+}
+.el-nav__avatar-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+.el-nav__avatar {
+  display: grid;
+  place-items: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: var(--text-meta);
+  font-weight: var(--font-weight-medium);
+}
+.el-nav__menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-popover);
+}
+.el-nav__menu a,
+.el-nav__menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--space-2);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+}
+.el-nav__menu a:hover,
+.el-nav__menu button:hover {
+  background: var(--color-brand-soft);
+}
+
+/* ---------- Page container ---------- */
+.eventloop-content.explore-content {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: var(--page-padding);
+}
+
+/* ---------- Title, search pill, segmented filter ---------- */
+.el-explore-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: var(--section-gap);
+}
+.el-explore-header h1 {
+  margin: 0 0 var(--title-gap);
+  color: var(--color-text);
+  font-size: var(--text-page-title);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-title);
+  line-height: 1.2;
+}
+.el-search-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--pill-gap);
+  padding: var(--pill-input-padding);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+.el-search-pill:focus-within {
+  box-shadow: var(--shadow-focus);
+}
+.el-search-pill__icon {
+  flex-shrink: 0;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--color-text-muted);
+}
+.el-search-pill input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-input);
+}
+.el-search-pill input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+.el-search-pill button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--control-icon-button);
+  height: var(--control-icon-button);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  cursor: pointer;
+}
+.el-search-pill button svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.el-search-pill button:hover {
+  background: var(--color-brand-hover);
+}
+.el-search-pill button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.el-time-filter {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: var(--segment-gap);
+  max-width: 100%;
+  margin-top: var(--title-gap);
+  padding: var(--segment-inset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+.el-time-filter button {
+  padding: var(--segment-padding);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.el-time-filter button:hover {
+  color: var(--color-text);
+}
+.el-time-filter button[aria-pressed="true"] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-weight: var(--font-weight-medium);
+}
+.el-time-filter button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Empty state for a time filter ---------- */
+.el-empty {
+  padding: var(--empty-padding);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  text-align: center;
+}
+.el-empty h2 {
+  margin: 0 0 6px;
+  color: var(--color-text);
+  font-size: var(--text-empty-title);
+  font-weight: var(--font-weight-medium);
+}
+.el-empty p {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+.el-empty__cta {
+  padding: var(--button-padding);
+  border: 0;
+  border-radius: var(--radius-button);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.el-empty__cta:hover {
+  background: var(--color-brand-hover);
+}
+.el-empty__cta:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 720px) {
+  .el-nav {
+    gap: var(--nav-gap-mobile);
+    padding: var(--nav-padding-mobile);
+  }
+  .el-nav__links {
+    gap: var(--nav-gap-mobile);
+  }
+  .el-nav .el-nav-search {
+    display: none;
+  }
+  .eventloop-content.explore-content {
+    width: 100%;
+    padding: var(--page-padding-mobile);
+  }
+  .el-explore-header h1 {
+    font-size: var(--text-page-title-mobile);
+  }
+  .el-time-filter {
+    align-self: stretch;
+  }
+  .el-time-filter button {
+    flex: 1;
+    padding-inline: var(--space-2);
+  }
+}
+/* Narrow phones: keep the links, drop the wordmark so nothing overflows (the logo link keeps its name). */
+@media (max-width: 480px) {
+  .el-nav__wordmark {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

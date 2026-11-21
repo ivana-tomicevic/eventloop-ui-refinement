@@ -9,7 +9,7 @@ import {
   BookOpen,
   Users,
   UtensilsCrossed,
-  ArrowUpRight,
+  Sparkles,
   Search,
 } from "lucide-react";
 import SiteNav from "./site-nav";
@@ -66,6 +66,7 @@ const timeOptions: {
   id: TimeFilter;
   label: string;
   title: string;
+  /** Empty-state heading; the description line is picked in the render. */
   empty: string;
 }[] = [
   {
@@ -123,8 +124,17 @@ export default function EventloopScreen({
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
   useEffect(() => {
-    setEvents(getEvents());
-    setSearch(new URLSearchParams(window.location.search).get("q") || "");
+    const loaded = getEvents();
+    const q = new URLSearchParams(window.location.search).get("q") || "";
+    setEvents(loaded);
+    // Explore opens on "Tonight" when something is on tonight, otherwise "All" — never an empty first view.
+    // A search handed over from another page (?q=) starts on "All" so its results aren't hidden.
+    if (!savedOnly && !q) {
+      const tonight = timeRange("tonight", new Date());
+      if (loaded.some((e) => e.status !== "Draft" && matchesTime(e, tonight)))
+        setTimeFilter("tonight");
+    }
+    setSearch(q);
     setSaved(getSavedIds());
     try {
       setInterests(
@@ -195,7 +205,7 @@ export default function EventloopScreen({
   ]);
   return (
     <main className="eventloop-shell">
-      <SiteNav />
+      <SiteNav showSearch={savedOnly} />
       <div className="eventloop-content explore-content">
         <section className="el-explore-header" aria-labelledby="explore-title">
           <h1 id="explore-title" aria-live="polite">
@@ -212,11 +222,7 @@ export default function EventloopScreen({
             <label htmlFor="explore-search" className="sr-only">
               Search events
             </label>
-            <Search
-              size={20}
-              aria-hidden="true"
-              className="el-search-pill__icon"
-            />
+            <Search aria-hidden="true" className="el-search-pill__icon" />
             <input
               id="explore-search"
               type="search"
@@ -225,7 +231,7 @@ export default function EventloopScreen({
               placeholder='Try "chill jazz, free entry"'
             />
             <button type="submit" aria-label="Search">
-              <ArrowUpRight size={20} strokeWidth={2.5} aria-hidden="true" />
+              <Sparkles aria-hidden="true" />
             </button>
           </form>
           <div className="el-time-filter" role="group" aria-label="When">
@@ -312,15 +318,16 @@ export default function EventloopScreen({
             ))}
           </div>
           {!filtered.length && timeFilter !== "all" && (
-            <div className="explore-empty">
-              <h3>
+            <div className="el-empty">
+              <h2>{activeTime.empty}</h2>
+              <p>
                 {timeFilter === "tonight" && tomorrowCount > 0
-                  ? "Quiet night. Tomorrow is packed."
-                  : activeTime.empty}
-              </h3>
+                  ? "Tomorrow is packed."
+                  : "Try another day."}
+              </p>
               <button
                 type="button"
-                className="el-time-reset"
+                className="el-empty__cta"
                 onClick={() => setTimeFilter("all")}
               >
                 Show all events
