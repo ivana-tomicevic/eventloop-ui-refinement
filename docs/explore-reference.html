@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eventloop Explore: design reference</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.42.0/dist/tabler-icons.min.css">
+<!--
+DESIGN REFERENCE for the Explore page. Not production code.
+Open in a browser and compare with localhost:3000/explore.
+Implement in Next.js with project tokens (tokens.css) and lucide-react icons, NOT these hard-coded values.
+Lucide equivalents: ti-search=Search, ti-sparkles=Sparkles, ti-heart=Heart, ti-music=Music, ti-flame=Flame,
+ti-leaf=Leaf, ti-palette=Palette, ti-book=BookOpen, ti-users=Users, ti-tools-kitchen-2=UtensilsCrossed.
+
+TOKENS (values used here)
+  page bg        #FBFAF8     card/surface   #FFFFFF     line     #ECE9E4
+  ink (primary)  #15141A     ink hover      #2A2933     soft     #EFEEF1
+  text muted     #6B6760     text secondary #5F5C66     placeholder #8A8691
+  accent (logo only) #6C47FF
+  hot chip bg    #FFE3A3 / text #4A3200       free pill bg #DDF3E7 / text #0B6B43
+  saved heart    #E5484D
+  radius: card 16px, button 12px, pill 999px
+  type: page title 26/500, section 15/500, featured title 20/500, card title 15/500,
+        meta 12/400, category 11/500, price 18/500 (featured 22/500) tabular-nums
+
+RULES
+  - One search (the pill). No search in the header on Explore.
+  - Category shown ONCE, as small text above the title. Never on the image.
+  - Date chip on image: "Tonight" uses the hot chip, others use white chip.
+  - Price is the strongest element on a card. "Free" is a green pill.
+  - Location is "Venue · Neighbourhood". No km.
+  - Cards in a row have equal height; price row pinned to the bottom.
+-->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#FBFAF8;color:#15141A;font-size:13px;-webkit-font-smoothing:antialiased}
+.nav{display:flex;align-items:center;gap:22px;padding:14px 32px;background:#fff;border-bottom:1px solid #ECE9E4}
+.logo{font-weight:500;font-size:16px;display:flex;align-items:center;gap:8px}
+.lg{width:24px;height:24px;border-radius:8px;background:#6C47FF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav a{color:#5F5C66;font-size:14px;text-decoration:none}
+.nav a.on{color:#15141A;font-weight:500}
+.sp{flex:1}
+.join{background:#15141A;color:#fff;border-radius:12px;padding:8px 16px;font-weight:500;font-size:14px}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 24px 56px}
+h1{font-size:26px;font-weight:500;letter-spacing:-0.4px;margin-bottom:14px}
+.pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #ECE9E4;border-radius:999px;padding:8px 8px 8px 18px}
+.pill .ph{flex:1;color:#8A8691;font-size:15px}
+.go{width:36px;height:36px;border-radius:50%;background:#15141A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
+.seg{display:inline-flex;gap:4px;background:#fff;border:1px solid #ECE9E4;border-radius:999px;padding:3px;margin-top:14px}
+.seg span{padding:7px 16px;border-radius:999px;color:#5F5C66;font-size:14px}
+.seg span.on{background:#15141A;color:#fff;font-weight:500}
+.sec{font-size:15px;font-weight:500;margin:26px 0 12px;display:flex;justify-content:space-between;align-items:baseline}
+.sec small{font-size:12px;font-weight:400;color:#6B6760}
+.vibes{display:flex;gap:8px;flex-wrap:wrap}
+.v{display:flex;align-items:center;gap:6px;padding:9px 15px;background:#fff;border:1px solid #ECE9E4;border-radius:999px;font-size:14px}
+.v i{font-size:17px;color:#6B6760}
+.v.on{background:#EFEEF1;border-color:#15141A}
+.v.on i{color:#15141A}
+.card{background:#fff;border:1px solid #ECE9E4;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.img{position:relative;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:rgba(21,20,26,.25);font-size:30px}
+.chip{position:absolute;left:10px;top:10px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:999px;background:#fff;color:#15141A}
+.chip.hot{background:#FFE3A3;color:#4A3200}
+.heart{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;color:#15141A}
+.bd{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+.cat{font-size:11px;color:#6B6760;font-weight:500;margin-bottom:3px}
+.tt{font-size:15px;font-weight:500;margin-bottom:3px;line-height:1.25}
+.mt{font-size:12px;color:#6B6760;margin-bottom:14px}
+.ft{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.pr{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums}
+.free{background:#DDF3E7;color:#0B6B43;font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px}
+.cta{background:#15141A;color:#fff;border-radius:12px;padding:8px 16px;font-size:14px;font-weight:500}
+.feat{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.feat .img{aspect-ratio:auto;min-height:230px}
+.feat .tt{font-size:20px;margin-bottom:6px}
+.feat .mt{font-size:13px}
+.feat .desc{font-size:14px;color:#5F5C66;margin-bottom:16px;line-height:1.5}
+.feat .pr{font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.empty{background:#fff;border:1px dashed #D9D5CE;border-radius:16px;padding:40px 24px;text-align:center}
+.empty h2{font-size:18px;font-weight:500;margin-bottom:6px}
+.empty p{color:#6B6760;font-size:14px;margin-bottom:16px}
+.note{font-size:12px;color:#6B6760;margin:40px 0 -12px}
+@media(max-width:720px){
+ .nav{padding:12px 16px;gap:14px}
+ .nav a{display:none}
+ .wrap{padding:20px 16px 40px}
+ h1{font-size:24px}
+ .feat{grid-template-columns:1fr}
+ .feat .img{aspect-ratio:16/10;min-height:0}
+ .grid{grid-template-columns:1fr}
+ .vibes{flex-wrap:nowrap;overflow-x:auto;margin-right:-16px;padding-right:16px;scrollbar-width:none}
+ .v{flex:none}
+}
+</style>
+</head>
+<body>
+<div class="nav"><div class="logo"><div class="lg">e</div>eventloop</div><a class="on">Explore</a><a>Saved</a><a>Tickets</a><span class="sp"></span><span class="join">Join</span></div>
+<div class="wrap">
+<h1>Tonight in Madrid</h1>
+<div class="pill"><i class="ti ti-search" style="color:#8A8691;font-size:19px"></i><span class="ph">Try "chill jazz, free entry"</span><span class="go"><i class="ti ti-sparkles"></i></span></div>
+<div class="seg"><span class="on">Tonight</span><span>Tomorrow</span><span>Weekend</span><span>All</span></div>
+
+<div class="sec">What's your vibe?</div>
+<div class="vibes">
+<span class="v on"><i class="ti ti-music"></i>Music</span>
+<span class="v"><i class="ti ti-flame"></i>Dance</span>
+<span class="v"><i class="ti ti-leaf"></i>Outdoors</span>
+<span class="v"><i class="ti ti-palette"></i>Creative</span>
+<span class="v"><i class="ti ti-book"></i>Learn</span>
+<span class="v"><i class="ti ti-users"></i>Social</span>
+<span class="v"><i class="ti ti-tools-kitchen-2"></i>Food and drink</span>
+</div>
+
+<div class="sec">Pick of the night<small>Fresh for tonight</small></div>
+<div class="card feat">
+<div class="img" style="background:#E9D9C4"><span class="chip hot">Tonight · 20:00</span><span class="heart"><i class="ti ti-heart"></i></span><i class="ti ti-photo"></i></div>
+<div class="bd"><p class="cat">Music</p><p class="tt">Jazz in the garden</p><p class="mt">Casa Verde · Retiro</p><p class="desc">Live quartet, golden hour, a drink in hand. Doors open at 19:30.</p><div class="ft"><span class="pr">€15</span><span class="cta">Get tickets</span></div></div>
+</div>
+
+<div class="sec">More tonight<small>5 events</small></div>
+<div class="grid">
+<div class="card"><div class="img" style="background:#D8E4F0"><span class="chip hot">Tonight · 21:00</span><span class="heart"><i class="ti ti-heart"></i></span><i class="ti ti-photo"></i></div><div class="bd"><p class="cat">Music</p><p class="tt">Rooftop sunset sessions</p><p class="mt">La Azotea · Malasaña</p><div class="ft"><span class="pr">€12</span></div></div></div>
+<div class="card"><div class="img" style="background:#E8D5E2"><span class="chip hot">Tonight · 22:00</span><span class="heart"><i class="ti ti-heart"></i></span><i class="ti ti-photo"></i></div><div class="bd"><p class="cat">Social</p><p class="tt">Open-mic comedy night</p><p class="mt">Sala Lavapiés · Lavapiés</p><div class="ft"><span class="free">Free</span></div></div></div>
+<div class="card"><div class="img" style="background:#D5E7D8"><span class="chip">Tomorrow · 19:30</span><span class="heart"><i class="ti ti-heart"></i></span><i class="ti ti-photo"></i></div><div class="bd"><p class="cat">Creative</p><p class="tt">Clay and wine workshop</p><p class="mt">Taller Chueca · Chueca</p><div class="ft"><span class="pr">€25</span></div></div></div>
+</div>
+
+<p class="note">Empty state (when a filter has no events):</p>
+<div class="sec" style="margin-top:28px">Empty state</div>
+<div class="empty"><h2>Quiet night.</h2><p>Tomorrow is packed.</p><span class="cta" style="display:inline-block">Show all events</span></div>
+</div>
+</body>
+</html>
