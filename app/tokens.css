@@ -59,13 +59,16 @@
   --radius-pill: 9999px;
 
   /* Type */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Arial, sans-serif;
   --text-page-title: 26px;
   --text-page-title-mobile: 24px;
   --text-logo: 16px;
   --text-body: 14px; /* nav links, segments, buttons, empty-state copy */
   --text-input: 15px;
   --text-empty-title: 18px;
+  --text-section-label: 15px; /* small section headings ("What's your vibe?") */
   --tracking-title: -0.4px;
   --text-section-title: 24px;
   --text-card-title: 15px;
@@ -74,6 +77,9 @@
   --text-chip: 11px;
   --text-pill: 12px;
   --text-price: 18px;
+  --text-feat-title: 20px; /* featured card */
+  --text-feat-meta: 13px;
+  --text-feat-price: 22px;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -124,7 +130,8 @@
   --avatar-size: 32px;
   --page-max-width: 1040px;
   --page-padding: 32px 24px 56px;
-  --page-padding-mobile: 20px 16px 40px;
+  --page-gutter-mobile: 16px;
+  --page-padding-mobile: 20px var(--page-gutter-mobile) 40px;
   --title-gap: 14px; /* h1 -> pill, pill -> segments */
   --pill-input-padding: 8px 8px 8px 18px;
   --control-icon-button: 36px; /* round search button */
@@ -139,6 +146,21 @@
   --icon-md: 19px; /* search glass */
   --text-mark: 13px; /* the "e" in the logo mark */
 
+  /* Vibe chips */
+  --vibe-padding: 9px 15px;
+  --vibe-icon-gap: 6px;
+  --vibe-border-selected: #b9b4ab; /* slightly darker neutral border on a selected chip */
+  --vibe-transition: 150ms ease;
+  /* Category accents — ONLY for the vibe chip icon (hover + selected). Non-text, on white. */
+  --cat-music-accent: #6c47ff;
+  --cat-arts-accent: #d6336c;
+  --cat-sports-accent: #2f6bff;
+  --cat-outdoors-accent: #1f9d55;
+  --cat-workshops-accent: #e8890c;
+  --cat-learn-accent: #0e9f9a;
+  --cat-social-accent: #e5533c;
+  --cat-food-accent: #a8643a;
+
   /* Event card (docs/explore-reference.html) */
   --card-media-ratio: 16 / 10;
   --card-padding: 14px 16px 16px;
@@ -150,6 +172,12 @@
   --chip-padding: 4px 10px;
   --pill-padding: 3px 10px;
   --card-hover-lift: -2px;
+
+  /* Featured card (.feat) */
+  --feat-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  --feat-body-share: calc(1 / 2.35); /* body column width / card width — keep in sync with --feat-columns */
+  --feat-media-min-height: 230px;
+  --feat-title-gap: 6px;
 
   /* Legacy aliases used by older screens — they now resolve to the tokens */
   --ink: var(--color-text);

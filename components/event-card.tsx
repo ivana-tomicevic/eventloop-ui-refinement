@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { Heart } from "lucide-react";
 import {
   eventCategory,
@@ -29,13 +30,15 @@ export default function EventCard({
     <article className="el-card">
       <a className="el-card__link" href={`/events/${event.id}`}>
         <div className="el-card__media">
-          <img
+          <Image
             src={eventImage(event)}
             alt=""
-            loading="lazy"
+            fill
+            sizes="(max-width: 720px) 100vw, (max-width: 900px) 50vw, 340px"
+            className="object-cover"
             onError={(e) => {
               e.currentTarget.onerror = null;
-              e.currentTarget.src = "/photos/jazz.jpg";
+              e.currentTarget.src = "/photos/events/jazz.jpg";
             }}
           />
           <span

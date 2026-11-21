@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Music2,
+  Music,
   Palette,
   Dumbbell,
-  Mountain,
-  PenLine,
+  Leaf,
+  Hammer,
   BookOpen,
   Users,
   UtensilsCrossed,
@@ -14,52 +14,26 @@ import {
 } from "lucide-react";
 import SiteNav from "./site-nav";
 import EventCard from "./event-card";
+import FeaturedCard from "./featured-card";
 import {
   getEvents,
-  CATEGORY_LABELS,
   getSavedIds,
   toggleSaved,
   type EventRecord,
 } from "./event-data";
-const categories = [
-  { id: "music", label: CATEGORY_LABELS.music, icon: Music2, tone: "#8a54ad" },
-  {
-    id: "culture",
-    label: CATEGORY_LABELS.culture,
-    icon: Palette,
-    tone: "#cb794c",
-  },
-  {
-    id: "sports",
-    label: CATEGORY_LABELS.sports,
-    icon: Dumbbell,
-    tone: "#438b73",
-  },
-  {
-    id: "nature",
-    label: CATEGORY_LABELS.nature,
-    icon: Mountain,
-    tone: "#668d56",
-  },
-  {
-    id: "workshops",
-    label: CATEGORY_LABELS.workshops,
-    icon: PenLine,
-    tone: "#b9843d",
-  },
-  {
-    id: "learning",
-    label: CATEGORY_LABELS.learning,
-    icon: BookOpen,
-    tone: "#507bb9",
-  },
-  { id: "social", label: CATEGORY_LABELS.social, icon: Users, tone: "#ba6c8d" },
-  {
-    id: "food",
-    label: CATEGORY_LABELS.food,
-    icon: UtensilsCrossed,
-    tone: "#b76c50",
-  },
+/**
+ * Vibe chips: short labels for the existing category ids (cards keep CATEGORY_LABELS).
+ * `tone` picks the --cat-* tokens a chip uses when selected.
+ */
+const vibes = [
+  { id: "music", label: "Music", icon: Music, tone: "music" },
+  { id: "culture", label: "Arts", icon: Palette, tone: "arts" },
+  { id: "sports", label: "Sports", icon: Dumbbell, tone: "sports" },
+  { id: "nature", label: "Outdoors", icon: Leaf, tone: "outdoors" },
+  { id: "workshops", label: "Workshops", icon: Hammer, tone: "workshops" },
+  { id: "learning", label: "Learn", icon: BookOpen, tone: "learn" },
+  { id: "social", label: "Social", icon: Users, tone: "social" },
+  { id: "food", label: "Food and drink", icon: UtensilsCrossed, tone: "food" },
 ];
 type TimeFilter = "tonight" | "tomorrow" | "weekend" | "all";
 const timeOptions: {
@@ -68,26 +42,47 @@ const timeOptions: {
   title: string;
   /** Empty-state heading; the description line is picked in the render. */
   empty: string;
+  /** Featured section title, grid title under it, grid title when nothing is featured. */
+  pick: string;
+  more: string;
+  on: string;
 }[] = [
   {
     id: "tonight",
     label: "Tonight",
     title: "Tonight in Madrid",
     empty: "Quiet night.",
+    pick: "Pick of the night",
+    more: "More tonight",
+    on: "Tonight",
   },
   {
     id: "tomorrow",
     label: "Tomorrow",
     title: "Tomorrow in Madrid",
     empty: "Nothing on tomorrow. Yet.",
+    pick: "Pick for tomorrow",
+    more: "More tomorrow",
+    on: "Tomorrow",
   },
   {
     id: "weekend",
     label: "Weekend",
     title: "This weekend in Madrid",
     empty: "Quiet weekend so far.",
+    pick: "Pick of the weekend",
+    more: "More this weekend",
+    on: "This weekend",
   },
-  { id: "all", label: "All", title: "All events in Madrid", empty: "" },
+  {
+    id: "all",
+    label: "All",
+    title: "All events in Madrid",
+    empty: "",
+    pick: "Our pick",
+    more: "More events",
+    on: "All events",
+  },
 ];
 const dayStart = (d: Date, offset = 0, hour = 0) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset, hour);
@@ -120,6 +115,8 @@ export default function EventloopScreen({
   const [vibe, setVibe] = useState("");
   const [activeVibe, setActiveVibe] = useState("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  /** The filter Explore opened on; "Clear filters" in the empty state returns to it. */
+  const [defaultTime, setDefaultTime] = useState<TimeFilter>("all");
   const activeTime = timeOptions.find((o) => o.id === timeFilter)!;
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
@@ -131,8 +128,10 @@ export default function EventloopScreen({
     // A search handed over from another page (?q=) starts on "All" so its results aren't hidden.
     if (!savedOnly && !q) {
       const tonight = timeRange("tonight", new Date());
-      if (loaded.some((e) => e.status !== "Draft" && matchesTime(e, tonight)))
+      if (loaded.some((e) => e.status !== "Draft" && matchesTime(e, tonight))) {
         setTimeFilter("tonight");
+        setDefaultTime("tonight");
+      }
     }
     setSearch(q);
     setSaved(getSavedIds());
@@ -203,6 +202,15 @@ export default function EventloopScreen({
     interests,
     timeFilter,
   ]);
+  // Featured pick: only without a text search and with at least 3 results.
+  // First result flagged `featured`, otherwise the first result.
+  const featured =
+    !savedOnly && !search && !activeVibe && filtered.length >= 3
+      ? filtered.find((e) => e.featured) || filtered[0]
+      : null;
+  const gridEvents = featured
+    ? filtered.filter((e) => e !== featured)
+    : filtered;
   return (
     <main className="eventloop-shell">
       <SiteNav showSearch={savedOnly} />
@@ -248,76 +256,106 @@ export default function EventloopScreen({
           </div>
         </section>
         {!savedOnly && (
-          <>
-            <section className="category-section">
-              <div className="section-heading">
-                <h2>{"What's your vibe?"}</h2>
-                <p>Pick a mood. We'll find the plan.</p>
-              </div>
-              <div className="category-grid">
-                {categories.map((cat) => (
-                  <button
-                    type="button"
-                    key={cat.id}
-                    className={
-                      "category-card " +
-                      (category === cat.id ? "category-card--active" : "")
-                    }
-                    onClick={() =>
-                      setCategory(category === cat.id ? "" : cat.id)
-                    }
-                  >
-                    <cat.icon size={23} color={cat.tone} strokeWidth={1.9} />
-                    <strong>{cat.label}</strong>
-                  </button>
-                ))}
-              </div>
-            </section>
-          </>
+          <section className="el-vibes" aria-labelledby="vibes-title">
+            <h2 id="vibes-title" className="el-section-label">
+              {"What's your vibe?"}
+            </h2>
+            <div
+              className="el-vibes__row"
+              role="group"
+              aria-labelledby="vibes-title"
+            >
+              {vibes.map((v) => (
+                <button
+                  type="button"
+                  key={v.id}
+                  className={`el-vibe el-vibe--${v.tone}`}
+                  aria-pressed={category === v.id}
+                  onClick={() => setCategory(category === v.id ? "" : v.id)}
+                >
+                  <v.icon aria-hidden="true" />
+                  {v.label}
+                </button>
+              ))}
+            </div>
+          </section>
         )}
-        <section className="explore-results">
-          <div className="results-heading">
-            <div>
-              <h2>
+        {featured && (
+          <section className="el-results-section" aria-labelledby="pick-title">
+            <div className="el-sec">
+              <h2 id="pick-title">{activeTime.pick}</h2>
+              {timeFilter === "tonight" && (
+                <span className="el-sec__aside">Fresh for tonight</span>
+              )}
+            </div>
+            <FeaturedCard
+              event={featured}
+              saved={saved.includes(String(featured.id))}
+              onSave={toggle}
+            />
+          </section>
+        )}
+        <section className="el-results-section" aria-label="Events">
+          {(gridEvents.length > 0 || search || activeVibe) && (
+            <div className="el-sec">
+              <h2 id="grid-title">
                 {savedOnly
                   ? "Saved events"
-                  : activeVibe
-                    ? "Matches for your vibe"
-                    : interests.length && !search && !category
-                      ? "Picked for you"
-                      : "Pick of the night"}
+                  : featured
+                    ? activeTime.more
+                    : search || activeVibe
+                      ? "Matches for your vibe"
+                      : activeTime.on}
               </h2>
-              <p>
-                {savedOnly
-                  ? "Your bookmarked experiences"
-                  : `${filtered.length} ${filtered.length === 1 ? "thing" : "things"} to do`}
-              </p>
+              <span className="el-sec__aside">
+                {gridEvents.length}{" "}
+                {gridEvents.length === 1 ? "event" : "events"}
+                {(search || category || activeVibe) && (
+                  <button
+                    type="button"
+                    className="el-sec__clear"
+                    onClick={() => {
+                      setSearch("");
+                      setCategory("");
+                      setActiveVibe("");
+                      setVibe("");
+                    }}
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </span>
             </div>
-            {(search || category || activeVibe) && (
+          )}
+          {gridEvents.length > 0 && (
+            <div className="el-grid">
+              {gridEvents.map((e) => (
+                <EventCard
+                  key={e.id}
+                  event={e}
+                  saved={saved.includes(String(e.id))}
+                  onSave={toggle}
+                />
+              ))}
+            </div>
+          )}
+          {!filtered.length && category && (
+            <div className="el-empty">
+              <h2>No matches</h2>
+              <p>Try another vibe or time.</p>
               <button
                 type="button"
+                className="el-empty__cta"
                 onClick={() => {
-                  setSearch("");
                   setCategory("");
-                  setActiveVibe("");
-                  setVibe("");
+                  setTimeFilter(defaultTime);
                 }}
               >
                 Clear filters
               </button>
-            )}
-          </div>
-          <div className="event-grid">
-            {filtered.map((e) => (
-              <EventCard
-                key={e.id}
-                event={e}
-                saved={saved.includes(String(e.id))}
-                onSave={toggle}
-              />
-            ))}
-          </div>
-          {!filtered.length && timeFilter !== "all" && (
+            </div>
+          )}
+          {!filtered.length && !category && timeFilter !== "all" && (
             <div className="el-empty">
               <h2>{activeTime.empty}</h2>
               <p>
@@ -334,7 +372,7 @@ export default function EventloopScreen({
               </button>
             </div>
           )}
-          {!filtered.length && timeFilter === "all" && (
+          {!filtered.length && !category && timeFilter === "all" && (
             <div className="explore-empty">
               <h3>
                 {savedOnly ? "No saved events yet" : "No matching events"}

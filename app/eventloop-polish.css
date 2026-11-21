@@ -242,73 +242,6 @@ body {
   padding: 0 16px;
   border-radius: 10px;
 }
-.category-section {
-  margin-bottom: 45px;
-}
-.category-section .section-heading {
-  margin-bottom: 12px;
-}
-.category-section .section-heading h2 {
-  font-size: var(--text-section-title);
-  letter-spacing: -0.04em;
-  margin: 0 0 5px;
-}
-.category-section .section-heading p {
-  font-size: 12px;
-}
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 0;
-}
-.category-card {
-  background: var(--color-surface) !important;
-  min-width: 0;
-  min-height: 99px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: 12px 5px;
-  text-align: center;
-  transition:
-    border-color 0.15s,
-    transform 0.15s;
-}
-.category-card:hover {
-  transform: translateY(-2px);
-}
-.category-card strong {
-  font-size: 11px;
-  line-height: 1.25;
-  font-weight: 650;
-}
-.category-card--active {
-  border-color: var(--color-brand);
-  background: var(--color-brand-soft) !important;
-}
-.explore-results {
-  margin-bottom: 40px;
-}
-.results-heading {
-  margin-bottom: 16px;
-}
-.results-heading h2 {
-  font-size: var(--text-section-title);
-  margin-bottom: 5px;
-}
-.results-heading p {
-  font-size: 12px;
-}
-.event-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
 .el-event-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -532,12 +465,6 @@ body {
   .el-nav-search {
     display: none;
   }
-  .category-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .event-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .el-hero {
     gap: 24px;
   }
@@ -575,12 +502,6 @@ body {
   }
   .el-ai-search {
     padding: 20px;
-  }
-  .category-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .event-grid {
-    grid-template-columns: 1fr;
   }
   .el-my-events-page {
     display: block;

@@ -14,6 +14,7 @@
 @import './eventloop-polish.css';
 @import './event-card.css';
 @import './explore-header.css';
+@import './explore-results.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -55,7 +56,6 @@ button { cursor: pointer; }
 :is(.primary-button, .outline-button, .auth-primary, .checkout-primary, .checkout-secondary, .create-secondary, .onboarding-primary, .onboarding-secondary, .organizer-primary, .organizer-secondary):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .section-heading { margin-bottom: 22px; }
 .section-heading h1, .section-heading h2 { margin: 0 0 11px; font-size: clamp(26px, 3.8vw, 40px); line-height: 1; letter-spacing: -.055em; }
-.event-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 26px; }
 .event-card { min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-card); transition: transform .2s ease, box-shadow .2s ease; }
 .event-card:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .event-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-popover); }
@@ -76,13 +76,11 @@ button { cursor: pointer; }
   .featured-card { grid-template-columns: 1fr; }
   .featured-card__image { min-height: 190px; }
   .featured-card__content { padding: 22px; }
-  .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .recommendation-grid { grid-template-columns: 1fr; gap: 12px; }
   .recommendation-grid .event-card, .recommendation-grid .event-card:first-child, .recommendation-grid .event-card:last-child { border-radius: var(--radius-card); }
 }
 
 @media (max-width: 430px) {
-  .event-grid { grid-template-columns: 1fr; }
   .event-card__image { aspect-ratio: 2.1; }
   .eyebrow { font-size: 17px; }
 }
