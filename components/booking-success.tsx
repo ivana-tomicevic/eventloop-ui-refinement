@@ -4,6 +4,7 @@ import {CalendarDays,MapPin} from 'lucide-react'
 
 import { useEffect, useState } from 'react'
 import {getEvent,eventImage,eventDate,eventLocation,type EventRecord} from './event-data'
+import {FreeSuccess} from './free-join'
 
 const event = { title: 'Summer Music Festival 2025', date: 'Subota, 15. juni 2025', location: 'Sarajevo City Center' }
 const prices = { general: 25, vip: 50, student: 15 }
@@ -13,15 +14,18 @@ export default function BookingSuccess() {
   const [selectedEvent,setSelectedEvent]=useState<EventRecord|null>(null);const [confirmed,setConfirmed]=useState(false)
   const [order, setOrder] = useState({ general: 0, vip: 0, student: 0 })
   const [orderId,setOrderId]=useState('')
+  const [free,setFree]=useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const id=params.get('event')||'0';setSelectedEvent(getEvent(id));try{const stored=JSON.parse(sessionStorage.getItem('eventloop-demo-order')||'null');if(stored?.confirmed&&String(stored.eventId)===id){setConfirmed(true);setOrder(stored.quantities);setOrderId(stored.orderId||'')}}catch{}
+    const id=params.get('event')||'0';setSelectedEvent(getEvent(id));try{const stored=JSON.parse(sessionStorage.getItem('eventloop-demo-order')||'null');if(stored?.confirmed&&String(stored.eventId)===id){setConfirmed(true);setOrder(stored.quantities);setOrderId(stored.orderId||'');setFree(Boolean(stored.free))}}catch{}
     setReady(true)
   }, [])
 
   const total = order.general * prices.general + order.vip * prices.vip + order.student * prices.student - order.student * 10
   const ticketSummary = [order.general && `${order.general}x Opšti ulaz`, order.vip && `${order.vip}x VIP`, order.student && `${order.student}x Studentski`].filter(Boolean).join(', ')
+
+  if (ready && confirmed && free && selectedEvent) return <FreeSuccess event={selectedEvent} spots={order.general} />
 
   if (ready && (!ticketSummary || !confirmed)) return <main className="payment-placeholder"><a className="brand" href="/"><span className="brand__mark">e</span><span>eventloop</span></a><section><p className="eyebrow">Potvrda nije dostupna</p><h1>Nema potvrđene narudžbe</h1><p>Pokreni checkout i završi demo plaćanje da bi se prikazala potvrda.</p><a className="checkout-primary" href="/checkout">Nazad na checkout</a></section></main>
 

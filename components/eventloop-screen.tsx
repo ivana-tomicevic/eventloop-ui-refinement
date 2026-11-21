@@ -35,6 +35,34 @@ const vibes = [
   { id: "social", label: "Social", icon: Users, tone: "social" },
   { id: "food", label: "Food and drink", icon: UtensilsCrossed, tone: "food" },
 ];
+type EmptyStateProps = {
+  title: string;
+  text: string;
+  action?: { label: string; onClick?: () => void; href?: string };
+};
+/** Empty state (.empty in the reference) shown instead of the results. */
+function EmptyState({ title, text, action }: EmptyStateProps) {
+  return (
+    <div className="el-empty" role="status">
+      <h2>{title}</h2>
+      <p>{text}</p>
+      {action &&
+        (action.href ? (
+          <a className="el-empty__cta" href={action.href}>
+            {action.label}
+          </a>
+        ) : (
+          <button
+            type="button"
+            className="el-empty__cta"
+            onClick={action.onClick}
+          >
+            {action.label}
+          </button>
+        ))}
+    </div>
+  );
+}
 type TimeFilter = "tonight" | "tomorrow" | "weekend" | "all";
 const timeOptions: {
   id: TimeFilter;
@@ -79,7 +107,7 @@ const timeOptions: {
     label: "All",
     title: "All events in Madrid",
     empty: "",
-    pick: "Our pick",
+    pick: "Don't miss this",
     more: "More events",
     on: "All events",
   },
@@ -110,6 +138,8 @@ export default function EventloopScreen({
   savedOnly?: boolean;
 }) {
   const [events, setEvents] = useState<EventRecord[]>([]);
+  /** False until localStorage is read, so the server render shows no results and no empty state. */
+  const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [vibe, setVibe] = useState("");
@@ -121,14 +151,15 @@ export default function EventloopScreen({
   const [interests, setInterests] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
   useEffect(() => {
-    const loaded = getEvents();
+    const list = getEvents();
     const q = new URLSearchParams(window.location.search).get("q") || "";
-    setEvents(loaded);
+    setEvents(list);
+    setLoaded(true);
     // Explore opens on "Tonight" when something is on tonight, otherwise "All" — never an empty first view.
     // A search handed over from another page (?q=) starts on "All" so its results aren't hidden.
     if (!savedOnly && !q) {
       const tonight = timeRange("tonight", new Date());
-      if (loaded.some((e) => e.status !== "Draft" && matchesTime(e, tonight))) {
+      if (list.some((e) => e.status !== "Draft" && matchesTime(e, tonight))) {
         setTimeFilter("tonight");
         setDefaultTime("tonight");
       }
@@ -165,11 +196,20 @@ export default function EventloopScreen({
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
-  const tomorrowCount = useMemo(() => {
-    const range = timeRange("tomorrow", new Date());
-    return events.filter((e) => e.status !== "Draft" && matchesTime(e, range))
-      .length;
+  /** How many events each day filter has (ignoring vibe and search) — the empty state points to a busy day. */
+  const dayCounts = useMemo(() => {
+    const now = new Date();
+    const count = (f: TimeFilter) =>
+      events.filter(
+        (e) => e.status !== "Draft" && matchesTime(e, timeRange(f, now)),
+      ).length;
+    return { tomorrow: count("tomorrow"), weekend: count("weekend") };
   }, [events]);
+  const clearSearch = () => {
+    setSearch("");
+    setActiveVibe("");
+    setVibe("");
+  };
   const filtered = useMemo(() => {
     const range = timeRange(timeFilter, new Date());
     return events
@@ -211,6 +251,75 @@ export default function EventloopScreen({
   const gridEvents = featured
     ? filtered.filter((e) => e !== featured)
     : filtered;
+  // One empty state that replaces both sections. The most specific cause wins: search, vibe, then day.
+  const showAll = {
+    label: "Show all events",
+    onClick: () => setTimeFilter("all"),
+  };
+  const empty: EmptyStateProps = savedOnly
+    ? {
+        title: "No saved events yet.",
+        text: "Tap the heart on any event to keep it here.",
+        action: { label: "Explore events", href: "/" },
+      }
+    : search || activeVibe
+      ? {
+          title: "Nothing matches that.",
+          text: "Try fewer words or another vibe.",
+          action: { label: "Clear search", onClick: clearSearch },
+        }
+      : category
+        ? {
+            title: "No matches.",
+            text: "Try another vibe or time.",
+            action: {
+              label: "Clear filters",
+              onClick: () => {
+                setCategory("");
+                setTimeFilter(defaultTime);
+              },
+            },
+          }
+        : timeFilter === "tonight"
+          ? dayCounts.tomorrow
+            ? {
+                title: "Quiet night.",
+                text: "Tomorrow is packed.",
+                action: {
+                  label: "See tomorrow",
+                  onClick: () => setTimeFilter("tomorrow"),
+                },
+              }
+            : {
+                title: "Quiet night.",
+                text: "There's more later this week.",
+                action: showAll,
+              }
+          : timeFilter === "tomorrow"
+            ? dayCounts.weekend
+              ? {
+                  title: "Nothing on tomorrow. Yet.",
+                  text: "The weekend is looking good.",
+                  action: {
+                    label: "See the weekend",
+                    onClick: () => setTimeFilter("weekend"),
+                  },
+                }
+              : {
+                  title: "Nothing on tomorrow. Yet.",
+                  text: "There's more later this week.",
+                  action: showAll,
+                }
+            : timeFilter === "weekend"
+              ? {
+                  title: "Quiet weekend so far.",
+                  text: "The week has plenty going on.",
+                  action: showAll,
+                }
+              : {
+                  title: "Nothing on right now.",
+                  text: "New events drop every week. Check back soon.",
+                };
   return (
     <main className="eventloop-shell">
       <SiteNav showSearch={savedOnly} />
@@ -280,7 +389,7 @@ export default function EventloopScreen({
             </div>
           </section>
         )}
-        {featured && (
+        {loaded && featured && (
           <section className="el-results-section" aria-labelledby="pick-title">
             <div className="el-sec">
               <h2 id="pick-title">{activeTime.pick}</h2>
@@ -295,8 +404,9 @@ export default function EventloopScreen({
             />
           </section>
         )}
-        <section className="el-results-section" aria-label="Events">
-          {(gridEvents.length > 0 || search || activeVibe) && (
+        {loaded && !filtered.length && <EmptyState {...empty} />}
+        {loaded && gridEvents.length > 0 && (
+          <section className="el-results-section" aria-labelledby="grid-title">
             <div className="el-sec">
               <h2 id="grid-title">
                 {savedOnly
@@ -315,10 +425,8 @@ export default function EventloopScreen({
                     type="button"
                     className="el-sec__clear"
                     onClick={() => {
-                      setSearch("");
+                      clearSearch();
                       setCategory("");
-                      setActiveVibe("");
-                      setVibe("");
                     }}
                   >
                     Clear filters
@@ -326,8 +434,6 @@ export default function EventloopScreen({
                 )}
               </span>
             </div>
-          )}
-          {gridEvents.length > 0 && (
             <div className="el-grid">
               {gridEvents.map((e) => (
                 <EventCard
@@ -338,53 +444,8 @@ export default function EventloopScreen({
                 />
               ))}
             </div>
-          )}
-          {!filtered.length && category && (
-            <div className="el-empty">
-              <h2>No matches</h2>
-              <p>Try another vibe or time.</p>
-              <button
-                type="button"
-                className="el-empty__cta"
-                onClick={() => {
-                  setCategory("");
-                  setTimeFilter(defaultTime);
-                }}
-              >
-                Clear filters
-              </button>
-            </div>
-          )}
-          {!filtered.length && !category && timeFilter !== "all" && (
-            <div className="el-empty">
-              <h2>{activeTime.empty}</h2>
-              <p>
-                {timeFilter === "tonight" && tomorrowCount > 0
-                  ? "Tomorrow is packed."
-                  : "Try another day."}
-              </p>
-              <button
-                type="button"
-                className="el-empty__cta"
-                onClick={() => setTimeFilter("all")}
-              >
-                Show all events
-              </button>
-            </div>
-          )}
-          {!filtered.length && !category && timeFilter === "all" && (
-            <div className="explore-empty">
-              <h3>
-                {savedOnly ? "No saved events yet" : "No matching events"}
-              </h3>
-              <p>
-                {savedOnly
-                  ? "Tap the heart on an event card to save it."
-                  : "Try a different search or category."}
-              </p>
-            </div>
-          )}
-        </section>
+          </section>
+        )}
       </div>
     </main>
   );

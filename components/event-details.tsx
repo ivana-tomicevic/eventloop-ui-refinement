@@ -1,6 +1,216 @@
-'use client'
-import {useEffect,useState} from 'react'
-import {CalendarDays,MapPin,Clock3,Ticket,Heart,ArrowLeft,ExternalLink} from 'lucide-react'
-import SiteNav from './site-nav'
-import {getEvent,eventDate,eventLocation,eventPrice,eventImage,getSavedIds,toggleSaved,type EventRecord} from './event-data'
-export default function EventDetails({id}:{id:string}){const[event,setEvent]=useState<EventRecord|null>(null);const[saved,setSaved]=useState(false);useEffect(()=>{const e=getEvent(id);setEvent(e);setSaved(getSavedIds().includes(String(e.id)))},[id]);if(!event)return <main className="event-details-page"><SiteNav/><div className="details-content">Loading event...</div></main>;const address=event.address||event.venue||event.location||'';const mapUrl=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;return <main className="event-details-page"><SiteNav/><div className="details-content"><a className="back-button" href="/"><ArrowLeft size={17}/> Back to Explore</a><section className="event-hero el-details-hero"><img src={eventImage(event)} alt={event.title} onError={e=>{e.currentTarget.onerror=null;e.currentTarget.src='/eventloop-jazz.jpg'}}/><h1>{event.title}</h1></section><div className="details-layout"><div className="details-main"><section className="details-card about-card"><h2>About this event</h2><p>{event.description||event.summary||'Discover this event and connect with your city.'}</p>{event.tags?.length?<div className="tag-list">{event.tags.map(t=><span key={t}>#{t}</span>)}</div>:null}</section><section className="details-card location-card"><h2><MapPin size={20}/> Location</h2><p className="location-name">{eventLocation(event)}</p>{event.address&&<p>{event.address}</p>}{!event.online&&address?<div className="el-map-link"><MapPin size={28}/><p>View the venue and directions on Google Maps</p><a href={mapUrl} target="_blank" rel="noopener noreferrer">Open map <ExternalLink size={15}/></a></div>:<p>Online event</p>}</section></div><aside className="details-sidebar"><section className="details-card action-card"><a className="ticket-button" href={`/checkout?event=${encodeURIComponent(String(event.id))}`}><Ticket size={18}/> Buy tickets</a><button className={'interested-button '+(saved?'interested-button--active':'')} type="button" onClick={()=>setSaved(toggleSaved(event.id).includes(String(event.id)))}><Heart size={18} fill={saved?'currentColor':'none'}/>{saved?'Saved':'Save event'}</button></section><section className="details-card sidebar-card"><h2>Event details</h2><dl><div><dt><CalendarDays size={16}/> Date</dt><dd>{eventDate(event)}</dd></div><div><dt><Clock3 size={16}/> Time</dt><dd>{event.start?event.start.split('T')[1]:'See date'}</dd></div><div><dt><MapPin size={16}/> Location</dt><dd>{eventLocation(event)}</dd></div><div><dt><Ticket size={16}/> Price</dt><dd>{eventPrice(event)}</dd></div></dl></section></aside></div></div></main>}
+"use client";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Clock3,
+  ExternalLink,
+  Heart,
+  Languages,
+  Ticket,
+} from "lucide-react";
+import SiteNav from "./site-nav";
+import {
+  eventCategory,
+  eventDate,
+  eventImage,
+  eventLocation,
+  eventPrice,
+  findEvent,
+  formatDuration,
+  getSavedIds,
+  toggleSaved,
+  type EventRecord,
+} from "./event-data";
+
+/**
+ * Event details. Same type, price and button styles as the Explore cards (docs/explore-reference.html).
+ * Styles: app/details.css (tokens only).
+ */
+export default function EventDetails({ id }: { id: string }) {
+  // undefined = still reading localStorage, null = no event with this id
+  const [event, setEvent] = useState<EventRecord | null | undefined>();
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    const found = findEvent(id) ?? null;
+    setEvent(found);
+    if (found) setSaved(getSavedIds().includes(String(found.id)));
+  }, [id]);
+
+  if (event === undefined)
+    return (
+      <main className="event-details-page">
+        <SiteNav showSearch={false} />
+        <div className="el-details" aria-busy="true">
+          <div className="el-details__hero el-details__hero--loading" />
+          <p className="el-details__loading">Loading…</p>
+        </div>
+      </main>
+    );
+
+  if (event === null)
+    return (
+      <main className="event-details-page">
+        <SiteNav showSearch={false} />
+        <div className="el-details">
+          <div className="el-empty">
+            <h2>Event not found</h2>
+            <p>It may have ended or moved. Plenty more is on.</p>
+            <a className="el-empty__cta" href="/">
+              Back to Explore
+            </a>
+          </div>
+        </div>
+      </main>
+    );
+
+  const price = eventPrice(event);
+  const free = price === "Free";
+  const description = event.description || event.summary;
+  // Tags that repeat the category ("Social", "Sport" for Sports) or the price ("Free") are already shown above.
+  const singular = (word: string) => word.toLowerCase().replace(/s$/, "");
+  const shownAbove = new Set(
+    [...eventCategory(event).split(/[^\p{L}]+/u), event.category || "", "free"]
+      .filter(Boolean)
+      .map(singular),
+  );
+  const tags = (event.tags || []).filter(
+    (tag) => !shownAbove.has(singular(tag)),
+  );
+  const place =
+    event.address ||
+    [event.venue, event.neighbourhood].filter(Boolean).join(", ") ||
+    event.location;
+  const mapUrl = place
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place + ", Madrid")}`
+    : "";
+  const goodToKnow = [
+    event.entry && { icon: Ticket, label: "Entry", value: event.entry },
+    event.durationMinutes && {
+      icon: Clock3,
+      label: "Duration",
+      value: formatDuration(event.durationMinutes),
+    },
+    event.language && {
+      icon: Languages,
+      label: "Language",
+      value: event.language,
+    },
+  ].filter(Boolean) as { icon: typeof Ticket; label: string; value: string }[];
+
+  return (
+    <main className="event-details-page">
+      <SiteNav showSearch={false} />
+      <article className="el-details">
+        <div className="el-details__hero">
+          <Image
+            src={eventImage(event)}
+            alt=""
+            fill
+            sizes="(max-width: 760px) 100vw, 760px"
+            className="object-cover"
+            preload
+          />
+          <a className="el-details__back" href="/" aria-label="Back to Explore">
+            <ArrowLeft aria-hidden="true" />
+          </a>
+          <button
+            className={
+              "el-card__save" + (saved ? " el-card__save--active" : "")
+            }
+            type="button"
+            aria-label={
+              saved ? `Remove ${event.title} from saved` : `Save ${event.title}`
+            }
+            aria-pressed={saved}
+            onClick={() =>
+              setSaved(toggleSaved(event.id).includes(String(event.id)))
+            }
+          >
+            <Heart
+              size={17}
+              strokeWidth={2}
+              fill={saved ? "currentColor" : "none"}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        <header className="el-details__head">
+          <p className="el-details__category">{eventCategory(event)}</p>
+          <h1 className="el-details__title">{event.title}</h1>
+          <p className="el-details__place">
+            {eventLocation(event)}
+            {!event.online && mapUrl && (
+              <a
+                className="el-details__map"
+                href={mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open map <ExternalLink aria-hidden="true" />
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            )}
+          </p>
+        </header>
+
+        <div className="el-details__facts">
+          <p className="el-details__date">
+            <CalendarDays aria-hidden="true" />
+            {eventDate(event)}
+          </p>
+          {/* Price + main action. On phones this bar sticks to the bottom of the screen. */}
+          <div className="el-details__action">
+            {free ? (
+              <span className="el-card__free">Free</span>
+            ) : (
+              <span className="el-card__price el-feat__price">{price}</span>
+            )}
+            <a
+              className="el-details__cta"
+              href={`/checkout?event=${encodeURIComponent(String(event.id))}`}
+            >
+              {free ? "Join" : "Get tickets"}
+            </a>
+          </div>
+        </div>
+
+        {description && (
+          <section
+            className="el-details__section"
+            aria-labelledby="about-title"
+          >
+            <h2 id="about-title">About</h2>
+            <p className="el-details__text">{description}</p>
+            {tags.length ? (
+              <ul className="el-details__tags" aria-label="Tags">
+                {tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        )}
+
+        {goodToKnow.length > 0 && (
+          <section className="el-details__section" aria-labelledby="good-title">
+            <h2 id="good-title">Good to know</h2>
+            <dl className="el-details__facts-list">
+              {goodToKnow.map(({ icon: Icon, label, value }) => (
+                <div key={label}>
+                  <dt>
+                    <Icon aria-hidden="true" />
+                    {label}
+                  </dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+      </article>
+    </main>
+  );
+}

@@ -2,7 +2,8 @@
 import SiteNav from './site-nav'
 
 import { useEffect,useMemo, useState } from 'react'
-import {getEvent,eventDate,eventLocation,eventImage,type EventRecord} from './event-data'
+import {getEvent,eventDate,eventLocation,eventImage,eventPrice,type EventRecord} from './event-data'
+import {FreeJoin} from './free-join'
 
 const ticketTypes = [
   { id: 'general', name: 'Opšti ulaz', price: 25, available: 50, note: '25 KM' },
@@ -19,6 +20,9 @@ export default function CheckoutPage() {
   const selectedCount = Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0)
   const paymentHref = `/checkout/payment?event=${encodeURIComponent(eventId)}&general=${quantities.general}&vip=${quantities.vip}&student=${quantities.student}`
   const updateQuantity = (id: string, change: number) => setQuantities((current) => ({ ...current, [id]: Math.max(0, Math.min(10, (current[id] ?? 0) + change)) }))
+
+  // Free events skip tickets and payment: a short "save your spot" form instead.
+  if (selectedEvent && eventPrice(selectedEvent) === 'Free') return <FreeJoin event={selectedEvent} />
 
   return (
     <main className="checkout-page">

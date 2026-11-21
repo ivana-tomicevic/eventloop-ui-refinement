@@ -345,56 +345,9 @@ body {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.event-details-page .topbar,
 .checkout-page .topbar,
 .success-page .topbar {
   width: 100%;
-}
-.details-content {
-  max-width: 1180px;
-}
-.el-details-hero {
-  height: 340px;
-}
-.el-details-hero img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.location-card h2,
-.sidebar-card dt,
-.ticket-button,
-.interested-button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-.el-map-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 175px;
-  gap: 8px;
-  background: #f5f2f6;
-  border: 1px solid #e5dde7;
-  border-radius: 12px;
-  text-align: center;
-  padding: 24px;
-  color: #5b4663;
-}
-.el-map-link p {
-  font-size: 13px;
-  margin: 0;
-}
-.el-map-link a {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #5f377c;
-  font-weight: 700;
-  text-decoration: none;
-  font-size: 13px;
 }
 .social-button {
   display: flex;
@@ -513,9 +466,6 @@ body {
   }
   .el-my-events-page .my-events-content {
     padding: 20px 15px;
-  }
-  .el-details-hero {
-    height: 250px;
   }
 }
 
@@ -697,7 +647,7 @@ body {
 .success-event p {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 @media (min-width: 701px) and (max-width: 1080px) {
   .el-nav-search {

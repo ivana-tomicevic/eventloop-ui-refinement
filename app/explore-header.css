@@ -348,7 +348,37 @@
   outline-offset: 2px;
 }
 
-/* ---------- Empty state for a time filter ---------- */
+/* ---------- Touch targets: at least 44x44 without changing how controls look ---------- */
+:is(
+  .el-nav__logo,
+  .el-nav__link,
+  .el-nav__join,
+  .el-nav__avatar-button,
+  .el-search-pill button,
+  .el-empty__cta,
+  .el-sec__clear
+) {
+  position: relative;
+}
+:is(
+  .el-nav__logo,
+  .el-nav__link,
+  .el-nav__join,
+  .el-nav__avatar-button,
+  .el-search-pill button,
+  .el-empty__cta,
+  .el-sec__clear
+)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-target));
+  height: max(100%, var(--touch-target));
+  transform: translate(-50%, -50%);
+}
+
+/* ---------- Empty state: replaces the results (.empty in the reference) ---------- */
 .el-empty {
   padding: var(--empty-padding);
   border: 1px dashed var(--color-border-strong);
@@ -368,6 +398,7 @@
   font-size: var(--text-body);
 }
 .el-empty__cta {
+  display: inline-block;
   padding: var(--button-padding);
   border: 0;
   border-radius: var(--radius-button);
@@ -376,6 +407,7 @@
   font: inherit;
   font-size: var(--text-body);
   font-weight: var(--font-weight-medium);
+  text-decoration: none;
   cursor: pointer;
 }
 .el-empty__cta:hover {
@@ -405,12 +437,30 @@
   .el-explore-header h1 {
     font-size: var(--text-page-title-mobile);
   }
+  /* Segments and vibe chips: one row that scrolls sideways, no visible scrollbar, 44px tall. */
   .el-time-filter {
     align-self: stretch;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .el-time-filter::-webkit-scrollbar {
+    display: none;
   }
   .el-time-filter button {
-    flex: 1;
-    padding-inline: var(--space-2);
+    flex: 1 0 auto;
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+    padding-inline: var(--space-3);
+  }
+  /* The scroll container would clip an outer ring, so draw it inside. */
+  .el-time-filter button:focus-visible {
+    outline-offset: -2px;
+  }
+  .el-time-filter button[aria-pressed="true"]:focus-visible {
+    outline-color: var(--color-on-brand);
+  }
+  .el-vibe {
+    min-height: var(--touch-target);
   }
   /* One scrollable row that runs to the screen edge, no visible scrollbar. */
   .el-vibes__row {
@@ -428,6 +478,16 @@
 }
 /* Narrow phones: keep the links, drop the wordmark so nothing overflows (the logo link keeps its name). */
 @media (max-width: 480px) {
+  .el-nav,
+  .el-nav__links {
+    gap: var(--nav-gap-compact);
+  }
+  .el-nav__join {
+    padding-inline: var(--space-3);
+  }
+  .el-time-filter button {
+    padding-inline: var(--space-2);
+  }
   .el-nav__wordmark {
     position: absolute;
     width: 1px;
