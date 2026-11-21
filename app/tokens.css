@@ -8,11 +8,12 @@
  * Contrast (WCAG AA, 4.5:1 for text), checked:
  *   text        #15141A on page 17.5:1
  *   text-muted  #6B6760 on page 5.4:1, on surface 5.6:1, on brand-soft 4.9:1
- *   on-brand    #FFFFFF on brand 5.3:1, on brand-hover 7.0:1
- *   brand       #6C47FF as text on surface 5.3:1, on brand-soft 4.6:1
- *   free        #1A7146 on surface 6.0:1, on free-soft 5.4:1
- *   urgent      #FF6B4A is a BACKGROUND only, with on-urgent text (6.5:1).
- *               Never use it as text on white (2.8:1).
+ *   on-brand    #FFFFFF on brand (ink) 18.3:1, on brand-hover 14.3:1
+ *   brand       #15141A as text on brand-soft 15.8:1 (text-muted on brand-soft 4.9:1)
+ *   on-accent   #FFFFFF on accent (logo) 5.3:1
+ *   saved       #E5484D heart icon on white 3.9:1 (non-text, needs 3:1)
+ *   free        #0B6B43 on free-soft 5.6:1
+ *   hot         #FFE3A3 is a BACKGROUND only, with on-hot #4A3200 text (9.6:1).
  */
 @theme static {
   /* Surfaces */
@@ -27,19 +28,29 @@
   --color-border: #ece9e4;
   --color-border-strong: #d9d4cc; /* inputs, secondary buttons */
 
-  /* Brand */
-  --color-brand: #6c47ff;
-  --color-brand-hover: #5835e0;
-  --color-brand-soft: #f2eeff; /* selected / hover states */
+  /* Brand = ink: primary buttons, selected segments/filters, active items */
+  --color-brand: #15141a;
+  --color-brand-hover: #2a2933;
+  --color-brand-soft: #efeef1; /* selected chips/hover; pair with an ink border when selected */
   --color-on-brand: #ffffff;
 
-  /* Urgency accent — backgrounds/badges only (e.g. "Tonight") */
-  --color-urgent: #ff6b4a;
-  --color-on-urgent: #15141a;
+  /* Purple accent — ONLY for the logo mark. Do not use anywhere else. */
+  --color-accent: #6c47ff;
+  --color-on-accent: #ffffff;
 
-  /* "Free" */
-  --color-free: #1a7146;
-  --color-free-soft: #e8f5ee;
+  /* Saved (filled heart) */
+  --color-saved: #e5484d;
+
+  /* Focus ring: ink, drawn with a 2px gap */
+  --color-focus: #15141a;
+
+  /* "Hot" warm yellow — urgency badges only (the "Tonight" date chip). Background only, always with on-hot text (9.6:1). */
+  --color-hot: #ffe3a3;
+  --color-on-hot: #4a3200;
+
+  /* "Free" pill: free text on free-soft (5.6:1) */
+  --color-free: #0b6b43;
+  --color-free-soft: #ddf3e7;
 
   /* Radii */
   --radius-card: 16px;
@@ -47,18 +58,26 @@
   --radius-pill: 9999px;
 
   /* Type */
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --text-page-title: clamp(32px, 3.6vw, 48px);
   --text-section-title: 24px;
-  --text-card-title: 19px;
+  --text-card-title: 15px;
   --text-meta: 12px;
-  --text-price: 16px;
+  --text-category: 11px;
+  --text-chip: 11px;
+  --text-pill: 12px;
+  --text-price: 18px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* Shadows */
   --shadow-card: 0 3px 10px rgb(21 20 26 / 0.06);
   --shadow-raised: 0 4px 18px rgb(21 20 26 / 0.04);
   --shadow-popover: 0 12px 30px rgb(21 20 26 / 0.11);
-  --shadow-focus: 0 0 0 3px rgb(108 71 255 / 0.18);
+  /* For inputs that show focus on their wrapper: 2px gap, then a 2px ink ring */
+  --shadow-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-focus);
 
   /* shadcn/ui names, mapped onto the tokens above */
   --color-background: var(--color-page);
@@ -72,7 +91,7 @@
   --color-muted: var(--color-page);
   --color-muted-foreground: var(--color-text-muted);
   --color-input: var(--color-border-strong);
-  --color-ring: var(--color-brand);
+  --color-ring: var(--color-focus);
 }
 
 :root {
@@ -87,6 +106,18 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
+
+  /* Event card (docs/explore-reference.html) */
+  --card-media-ratio: 16 / 10;
+  --card-padding: 14px 16px 16px;
+  --card-inset: 10px; /* date chip and heart, from the image edge */
+  --card-save-size: 34px;
+  --card-save-icon: 17px;
+  --card-line-gap: 3px; /* category -> title -> location */
+  --card-meta-gap: 14px; /* location -> price row */
+  --chip-padding: 4px 10px;
+  --pill-padding: 3px 10px;
+  --card-hover-lift: -2px;
 
   /* Legacy aliases used by older screens — they now resolve to the tokens */
   --ink: var(--color-text);

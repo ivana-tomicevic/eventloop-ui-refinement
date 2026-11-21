@@ -12,6 +12,7 @@
 @import './create-event-enhancements.css';
 @import './explore.css';
 @import './eventloop-polish.css';
+@import './event-card.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -24,7 +25,7 @@ button { cursor: pointer; }
 .eventloop-shell { min-height: 100vh; background: var(--color-page); }
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; height: 56px; align-items: center; gap: 24px; padding: 0 28px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); box-shadow: var(--shadow-raised); }
 .brand { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text); text-decoration: none; font-size: 11px; font-weight: 700; letter-spacing: -.04em; }
-.brand__mark { display: grid; width: 19px; height: 19px; place-items: center; border-radius: 6px 6px 6px 2px; background: var(--color-brand); color: var(--color-on-brand); font-size: 13px; font-style: italic; line-height: 1; }
+.brand__mark { display: grid; width: 19px; height: 19px; place-items: center; border-radius: 6px 6px 6px 2px; background: var(--color-accent); color: var(--color-on-accent); font-size: 13px; font-style: italic; line-height: 1; }
 .search-button, .profile-button { border: 0; background: transparent; color: var(--color-text); }
 .search-button { margin: 0 auto; font-size: 19px; line-height: 1; }
 .profile-button { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 50%; background: var(--color-border); font-size: 12px; font-weight: 700; }
@@ -50,16 +51,16 @@ button { cursor: pointer; }
 /* Shared button states (tokens only; primary = solid brand, secondary = white with border) */
 .primary-button:hover, .auth-primary:hover, .checkout-primary:hover, .onboarding-primary:hover, .organizer-primary:not(:disabled):hover { background: var(--color-brand-hover); }
 .outline-button:hover, .checkout-secondary:hover, .create-secondary:hover, .onboarding-secondary:hover, .organizer-secondary:hover { background: var(--color-brand-soft); }
-:is(.primary-button, .outline-button, .auth-primary, .checkout-primary, .checkout-secondary, .create-secondary, .onboarding-primary, .onboarding-secondary, .organizer-primary, .organizer-secondary):focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+:is(.primary-button, .outline-button, .auth-primary, .checkout-primary, .checkout-secondary, .create-secondary, .onboarding-primary, .onboarding-secondary, .organizer-primary, .organizer-secondary):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .section-heading { margin-bottom: 22px; }
 .section-heading h1, .section-heading h2 { margin: 0 0 11px; font-size: clamp(26px, 3.8vw, 40px); line-height: 1; letter-spacing: -.055em; }
 .event-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 26px; }
 .event-card { min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-card); transition: transform .2s ease, box-shadow .2s ease; }
-.event-card:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
+.event-card:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .event-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-popover); }
 .event-card__image { position: relative; aspect-ratio: 1.85; }
 .save-button { position: absolute; top: 9px; right: 9px; width: 22px; height: 22px; padding: 0; border: 0; background: transparent; color: var(--color-text); font-size: 16px; line-height: 1; }
-.save-button--saved { color: var(--color-brand); }
+.save-button--saved { color: var(--color-saved); }
 .event-card__body { min-height: 92px; padding: 11px 12px 9px; }
 .event-card h3 { overflow: hidden; margin: 0 0 7px; font-size: 12px; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
 .event-card p { margin: 4px 0; color: var(--color-text-muted); font-size: 8px; line-height: 1; }

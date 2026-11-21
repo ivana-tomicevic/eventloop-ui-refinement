@@ -1,0 +1,154 @@
+/* Event card — docs/explore-reference.html (.card). Tokens only: see app/tokens.css. */
+.el-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-text);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+.el-card:hover {
+  transform: translateY(var(--card-hover-lift));
+  box-shadow: var(--shadow-popover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-card {
+    transition: none;
+  }
+  .el-card:hover {
+    transform: none;
+  }
+}
+
+/* One link covers the whole card; flex so the price row can sit at the bottom */
+.el-card__link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  border-radius: inherit;
+  color: inherit;
+  text-decoration: none;
+}
+.el-card__link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.el-card__media {
+  position: relative;
+  aspect-ratio: var(--card-media-ratio);
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0
+    0;
+  background: var(--color-border);
+}
+.el-card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.el-card__chip {
+  position: absolute;
+  top: var(--card-inset);
+  left: var(--card-inset);
+  padding: var(--chip-padding);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-chip);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.el-card__chip--hot {
+  background: var(--color-hot);
+  color: var(--color-on-hot);
+}
+
+.el-card__save {
+  position: absolute;
+  top: var(--card-inset);
+  right: var(--card-inset);
+  display: grid;
+  place-items: center;
+  width: var(--card-save-size);
+  height: var(--card-save-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.el-card__save svg {
+  width: var(--card-save-icon);
+  height: var(--card-save-icon);
+}
+.el-card__save--active {
+  color: var(--color-saved);
+}
+.el-card__save:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.el-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--card-padding);
+}
+.el-card__body :where(p, h3) {
+  margin: 0;
+}
+.el-card__category {
+  margin-bottom: var(--card-line-gap);
+  color: var(--color-text-muted);
+  font-size: var(--text-category);
+  font-weight: var(--font-weight-medium);
+}
+.el-card__title {
+  margin-bottom: var(--card-line-gap);
+  color: var(--color-text);
+  font-size: var(--text-card-title);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.el-card__meta {
+  margin-bottom: var(--card-meta-gap);
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+  font-weight: var(--font-weight-regular);
+}
+
+/* Price row pinned to the bottom so cards in a row line up */
+.el-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.el-card__price {
+  color: var(--color-text);
+  font-size: var(--text-price);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.el-card__free {
+  padding: var(--pill-padding);
+  border-radius: var(--radius-pill);
+  background: var(--color-free-soft);
+  color: var(--color-free);
+  font-size: var(--text-pill);
+  font-weight: var(--font-weight-medium);
+}

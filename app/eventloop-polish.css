@@ -351,7 +351,7 @@ body {
   box-shadow: var(--shadow-card);
 }
 .el-save--active {
-  color: var(--color-brand);
+  color: var(--color-saved);
 }
 .el-event-card .event-card__body {
   display: flex;
@@ -833,8 +833,8 @@ body {
 }
 
 .el-ai-search button:focus-visible {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 3px;
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 /* Explore zaglavlje: naslov, pretraga (pilula), filter po vremenu */
 .el-explore-header {
@@ -904,7 +904,7 @@ body {
   background: var(--color-brand-hover);
 }
 .el-search-pill button:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 .el-time-filter {
@@ -939,7 +939,7 @@ body {
 }
 .el-time-filter button:focus-visible,
 .explore-empty .el-time-reset:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 .explore-empty .el-time-reset {

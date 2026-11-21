@@ -9,32 +9,57 @@ import {
   BookOpen,
   Users,
   UtensilsCrossed,
-  CalendarDays,
-  MapPin,
-  Heart,
   ArrowUpRight,
   Search,
 } from "lucide-react";
 import SiteNav from "./site-nav";
+import EventCard from "./event-card";
 import {
   getEvents,
-  eventDate,
-  eventLocation,
-  eventPrice,
-  eventImage,
+  CATEGORY_LABELS,
   getSavedIds,
   toggleSaved,
   type EventRecord,
 } from "./event-data";
 const categories = [
-  { id: "music", label: "Music", icon: Music2, tone: "#8a54ad" },
-  { id: "culture", label: "Arts & Culture", icon: Palette, tone: "#cb794c" },
-  { id: "sports", label: "Sports & Fitness", icon: Dumbbell, tone: "#438b73" },
-  { id: "nature", label: "Outdoors & Nature", icon: Mountain, tone: "#668d56" },
-  { id: "workshops", label: "Workshops", icon: PenLine, tone: "#b9843d" },
-  { id: "learning", label: "Learning", icon: BookOpen, tone: "#507bb9" },
-  { id: "social", label: "Social", icon: Users, tone: "#ba6c8d" },
-  { id: "food", label: "Food & Drink", icon: UtensilsCrossed, tone: "#b76c50" },
+  { id: "music", label: CATEGORY_LABELS.music, icon: Music2, tone: "#8a54ad" },
+  {
+    id: "culture",
+    label: CATEGORY_LABELS.culture,
+    icon: Palette,
+    tone: "#cb794c",
+  },
+  {
+    id: "sports",
+    label: CATEGORY_LABELS.sports,
+    icon: Dumbbell,
+    tone: "#438b73",
+  },
+  {
+    id: "nature",
+    label: CATEGORY_LABELS.nature,
+    icon: Mountain,
+    tone: "#668d56",
+  },
+  {
+    id: "workshops",
+    label: CATEGORY_LABELS.workshops,
+    icon: PenLine,
+    tone: "#b9843d",
+  },
+  {
+    id: "learning",
+    label: CATEGORY_LABELS.learning,
+    icon: BookOpen,
+    tone: "#507bb9",
+  },
+  { id: "social", label: CATEGORY_LABELS.social, icon: Users, tone: "#ba6c8d" },
+  {
+    id: "food",
+    label: CATEGORY_LABELS.food,
+    icon: UtensilsCrossed,
+    tone: "#b76c50",
+  },
 ];
 type TimeFilter = "tonight" | "tomorrow" | "weekend" | "all";
 const timeOptions: {
@@ -45,32 +70,32 @@ const timeOptions: {
 }[] = [
   {
     id: "tonight",
-    label: "Večeras",
-    title: "Večeras u Sarajevu",
-    empty: "Večeras nema događaja.",
+    label: "Tonight",
+    title: "Tonight in Madrid",
+    empty: "Quiet night.",
   },
   {
     id: "tomorrow",
-    label: "Sutra",
-    title: "Sutra u Sarajevu",
-    empty: "Sutra nema događaja.",
+    label: "Tomorrow",
+    title: "Tomorrow in Madrid",
+    empty: "Nothing on tomorrow. Yet.",
   },
   {
     id: "weekend",
-    label: "Vikend",
-    title: "Ovaj vikend u Sarajevu",
-    empty: "Ovaj vikend nema događaja.",
+    label: "Weekend",
+    title: "This weekend in Madrid",
+    empty: "Quiet weekend so far.",
   },
-  { id: "all", label: "Sve", title: "Svi događaji", empty: "" },
+  { id: "all", label: "All", title: "All events in Madrid", empty: "" },
 ];
 const dayStart = (d: Date, offset = 0, hour = 0) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset, hour);
-/** Poluotvoreni interval [od, do) u lokalnom vremenu, ili null za "Sve". */
+/** Half-open local-time range [from, to), or null for "All". */
 function timeRange(filter: TimeFilter, now: Date): [Date, Date] | null {
   if (filter === "tonight") return [dayStart(now, 0, 17), dayStart(now, 1)];
   if (filter === "tomorrow") return [dayStart(now, 1), dayStart(now, 2)];
   if (filter === "weekend") {
-    // Najbliža subota i nedjelja; u nedjelju je to tekući vikend.
+    // Nearest Saturday and Sunday; on a Sunday that is the current weekend.
     const day = now.getDay();
     const saturday = dayStart(now, day === 0 ? -1 : 6 - day);
     return [saturday, dayStart(saturday, 2)];
@@ -82,63 +107,6 @@ function matchesTime(e: EventRecord, range: [Date, Date] | null) {
   const start = e.start ? new Date(e.start) : null;
   if (!start || Number.isNaN(start.getTime())) return false;
   return start >= range[0] && start < range[1];
-}
-function Card({
-  event,
-  saved,
-  onSave,
-}: {
-  event: EventRecord;
-  saved: boolean;
-  onSave: (id: string | number) => void;
-}) {
-  return (
-    <article className="event-card el-event-card">
-      <div className="event-card__image">
-        <a href={`/events/${event.id}`} aria-label={`View ${event.title}`}>
-          <img
-            src={eventImage(event)}
-            alt={event.title}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = "/eventloop-jazz.jpg";
-            }}
-          />
-        </a>
-        <button
-          className={"el-save " + (saved ? "el-save--active" : "")}
-          type="button"
-          aria-label={saved ? "Remove saved event" : "Save event"}
-          aria-pressed={saved}
-          onClick={() => onSave(event.id)}
-        >
-          <Heart size={20} fill={saved ? "currentColor" : "none"} />
-        </button>
-      </div>
-      <div className="event-card__body">
-        <span className="el-card-category">
-          {categories.find((c) => c.id === event.category)?.label ||
-            event.category ||
-            "Event"}
-        </span>
-        <h3>
-          <a href={`/events/${event.id}`}>{event.title}</a>
-        </h3>
-        {event.summary && <p className="el-card-summary">{event.summary}</p>}
-        <div className="el-card-meta">
-          <span>
-            <CalendarDays size={15} />
-            {eventDate(event)}
-          </span>
-          <span>
-            <MapPin size={15} />
-            {eventLocation(event)}
-          </span>
-        </div>
-        <strong className="el-card-price">{eventPrice(event)}</strong>
-      </div>
-    </article>
-  );
 }
 export default function EventloopScreen({
   savedOnly = false,
@@ -182,11 +150,17 @@ export default function EventloopScreen({
       e.description,
       e.location,
       e.venue,
+      e.neighbourhood,
       ...(e.tags || []),
     ]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
+  const tomorrowCount = useMemo(() => {
+    const range = timeRange("tomorrow", new Date());
+    return events.filter((e) => e.status !== "Draft" && matchesTime(e, range))
+      .length;
+  }, [events]);
   const filtered = useMemo(() => {
     const range = timeRange(timeFilter, new Date());
     return events
@@ -200,7 +174,7 @@ export default function EventloopScreen({
           (!activeVibe ||
             activeVibe
               .toLowerCase()
-              .split(/\s+/)
+              .split(/[^\p{L}\p{N}]+/u)
               .some((word) => word.length > 2 && searchable(e).includes(word))),
       )
       .sort((a, b) => {
@@ -236,7 +210,7 @@ export default function EventloopScreen({
             }}
           >
             <label htmlFor="explore-search" className="sr-only">
-              Pretraži događaje
+              Search events
             </label>
             <Search
               size={20}
@@ -248,13 +222,13 @@ export default function EventloopScreen({
               type="search"
               value={vibe}
               onChange={(e) => setVibe(e.target.value)}
-              placeholder="Opiši šta tražiš, npr. opušten jazz i besplatno"
+              placeholder='Try "chill jazz, free entry"'
             />
-            <button type="submit" aria-label="Traži događaje">
+            <button type="submit" aria-label="Search">
               <ArrowUpRight size={20} strokeWidth={2.5} aria-hidden="true" />
             </button>
           </form>
-          <div className="el-time-filter" role="group" aria-label="Kada">
+          <div className="el-time-filter" role="group" aria-label="When">
             {timeOptions.map((o) => (
               <button
                 type="button"
@@ -271,8 +245,8 @@ export default function EventloopScreen({
           <>
             <section className="category-section">
               <div className="section-heading">
-                <h2>Browse by category</h2>
-                <p>Start with what sounds good today.</p>
+                <h2>{"What's your vibe?"}</h2>
+                <p>Pick a mood. We'll find the plan.</p>
               </div>
               <div className="category-grid">
                 {categories.map((cat) => (
@@ -305,12 +279,12 @@ export default function EventloopScreen({
                     ? "Matches for your vibe"
                     : interests.length && !search && !category
                       ? "Picked for you"
-                      : "Worth checking out"}
+                      : "Pick of the night"}
               </h2>
               <p>
                 {savedOnly
                   ? "Your bookmarked experiences"
-                  : `${filtered.length} events to explore`}
+                  : `${filtered.length} ${filtered.length === 1 ? "thing" : "things"} to do`}
               </p>
             </div>
             {(search || category || activeVibe) && (
@@ -329,7 +303,7 @@ export default function EventloopScreen({
           </div>
           <div className="event-grid">
             {filtered.map((e) => (
-              <Card
+              <EventCard
                 key={e.id}
                 event={e}
                 saved={saved.includes(String(e.id))}
@@ -339,13 +313,17 @@ export default function EventloopScreen({
           </div>
           {!filtered.length && timeFilter !== "all" && (
             <div className="explore-empty">
-              <h3>{activeTime.empty}</h3>
+              <h3>
+                {timeFilter === "tonight" && tomorrowCount > 0
+                  ? "Quiet night. Tomorrow is packed."
+                  : activeTime.empty}
+              </h3>
               <button
                 type="button"
                 className="el-time-reset"
                 onClick={() => setTimeFilter("all")}
               >
-                Prikaži sve
+                Show all events
               </button>
             </div>
           )}
