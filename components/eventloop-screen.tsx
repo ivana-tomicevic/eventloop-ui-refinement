@@ -17,7 +17,14 @@ import VibePicker from "./vibe-picker";
 import AreaPicker from "./area-picker";
 import EventCard from "./event-card";
 import FeaturedCard from "./featured-card";
-import { getEvents, getSavedIds, type EventRecord } from "./event-data";
+import {
+  eventTiming,
+  getEvents,
+  getSavedIds,
+  isPastForExplore,
+  isStartingSoon,
+  type EventRecord,
+} from "./event-data";
 type EmptyStateProps = {
   title: string;
   text: string;
@@ -205,7 +212,10 @@ export default function EventloopScreen({
     const now = new Date();
     const count = (f: TimeFilter) =>
       events.filter(
-        (e) => e.status !== "Draft" && matchesTime(e, timeRange(f, now)),
+        (e) =>
+          e.status !== "Draft" &&
+          !isPastForExplore(e, now) &&
+          matchesTime(e, timeRange(f, now)),
       ).length;
     return { tomorrow: count("tomorrow"), weekend: count("weekend") };
   }, [events]);
@@ -249,6 +259,8 @@ export default function EventloopScreen({
         (e) =>
           e.status !== "Draft" &&
           matchesTime(e, range) &&
+          // Explore drops events that ended or started 2+ hours ago (Saved keeps them).
+          (savedOnly || !isPastForExplore(e, now)) &&
           (!savedOnly || saved.includes(String(e.id))) &&
           (!category || e.category === category) &&
           (!area || e.neighbourhood === area) &&
@@ -274,12 +286,16 @@ export default function EventloopScreen({
     area,
     picked,
   ]);
-  // Same rule on every tab: the soonest event is "Starting soon", the rest go below (no duplicates).
-  const featured = !savedOnly && filtered.length ? filtered[0] : null;
-  const others = featured ? filtered.slice(1) : filtered;
+  // Same rule on every tab: the first event that hasn't started yet is "Starting soon", the rest
+  // (started ones too) go below, without duplicates.
+  const featured = savedOnly
+    ? null
+    : filtered.find((e) => eventTiming(e).state === "upcoming") || null;
+  const others = featured ? filtered.filter((e) => e !== featured) : filtered;
   const gridEvents = others;
-  // One empty state that replaces both sections. The most specific cause wins: search, vibe,
-  // chips, then day.
+  // One empty state that replaces both sections. The most specific cause wins: search, chips,
+  // then day. With a vibe picked (and no search) the header says it instead.
+  const vibeEmpty = Boolean(picked) && !search && !activeVibe;
   const showAll = {
     label: "Show all events",
     onClick: () => setTimeFilter("all"),
@@ -296,64 +312,58 @@ export default function EventloopScreen({
           text: "Try fewer words or another vibe.",
           action: { label: "Clear search", onClick: clearSearch },
         }
-      : picked
+      : chipFilter
         ? {
-            title: `Nothing for “${picked.label}” ${activeTime.when}.`,
-            text: "Try another vibe.",
-            action: { label: "Any vibe", onClick: () => pickVibe("") },
-          }
-        : chipFilter
-          ? {
-              title: "No matches.",
-              text: "Try another vibe or time.",
-              action: {
-                label: "Clear filters",
-                onClick: () => {
-                  clearChips();
-                  setTimeFilter(defaultTime);
-                },
+            title: "No matches.",
+            text: "Try another vibe or time.",
+            action: {
+              label: "Clear filters",
+              onClick: () => {
+                clearChips();
+                setTimeFilter(defaultTime);
               },
-            }
-          : timeFilter === "tonight"
-            ? dayCounts.tomorrow
+            },
+          }
+        : timeFilter === "tonight"
+          ? dayCounts.tomorrow
+            ? {
+                title: "Quiet night.",
+                text: "Tomorrow is packed.",
+                action: {
+                  label: "See tomorrow",
+                  onClick: () => setTimeFilter("tomorrow"),
+                },
+              }
+            : {
+                title: "Quiet night.",
+                text: "There's more later this week.",
+                action: showAll,
+              }
+          : timeFilter === "tomorrow"
+            ? dayCounts.weekend
               ? {
-                  title: "Quiet night.",
-                  text: "Tomorrow is packed.",
+                  title: "Nothing on tomorrow. Yet.",
+                  text: "The weekend is looking good.",
                   action: {
-                    label: "See tomorrow",
-                    onClick: () => setTimeFilter("tomorrow"),
+                    label: "See the weekend",
+                    onClick: () => setTimeFilter("weekend"),
                   },
                 }
               : {
-                  title: "Quiet night.",
+                  title: "Nothing on tomorrow. Yet.",
                   text: "There's more later this week.",
                   action: showAll,
                 }
-            : timeFilter === "tomorrow"
-              ? dayCounts.weekend
-                ? {
-                    title: "Nothing on tomorrow. Yet.",
-                    text: "The weekend is looking good.",
-                    action: {
-                      label: "See the weekend",
-                      onClick: () => setTimeFilter("weekend"),
-                    },
-                  }
-                : {
-                    title: "Nothing on tomorrow. Yet.",
-                    text: "There's more later this week.",
-                    action: showAll,
-                  }
-              : timeFilter === "weekend"
-                ? {
-                    title: "Quiet weekend so far.",
-                    text: "The week has plenty going on.",
-                    action: showAll,
-                  }
-                : {
-                    title: "Nothing on right now.",
-                    text: "New events drop every week. Check back soon.",
-                  };
+            : timeFilter === "weekend"
+              ? {
+                  title: "Quiet weekend so far.",
+                  text: "The week has plenty going on.",
+                  action: showAll,
+                }
+              : {
+                  title: "Nothing on right now.",
+                  text: "New events drop every week. Check back soon.",
+                };
   const count = (n: number) => `${n} ${n === 1 ? "event" : "events"}`;
   const grid = (list: EventRecord[]) => (
     <div className="el-grid">
@@ -372,21 +382,52 @@ export default function EventloopScreen({
       <SiteNav showSearch={false} />
       <div className="eventloop-content explore-content">
         <section className="el-explore-header" aria-labelledby="explore-title">
-          <h1 id="explore-title" aria-live="polite">
-            {savedOnly ? (
-              activeTime.title
-            ) : (
-              <>
-                {activeTime.title} for{" "}
-                <VibePicker
-                  value={vibeId}
-                  onChange={pickVibe}
-                  autoOpen={vibeIntro}
-                  onAutoOpen={markVibeIntroSeen}
-                />
-              </>
+          {/* Title + vibe. A picked vibe puts them on a card tinted for that vibe. */}
+          <div
+            className={"el-hero" + (picked ? " el-hero--tinted" : "")}
+            data-vibe={picked?.id}
+          >
+            <h1 id="explore-title" aria-live="polite">
+              {savedOnly ? (
+                activeTime.title
+              ) : (
+                <>
+                  {activeTime.title} for{" "}
+                  <VibePicker
+                    value={vibeId}
+                    onChange={pickVibe}
+                    autoOpen={vibeIntro}
+                    onAutoOpen={markVibeIntroSeen}
+                  />
+                </>
+              )}
+            </h1>
+            {loaded && !savedOnly && !picked && (
+              <p className="el-hero__sub" aria-live="polite">
+                {filtered.length > 0
+                  ? `${count(filtered.length)} in Madrid${activeTime.id === "all" ? "" : ` ${activeTime.when}`}. Pick a vibe to narrow it down.`
+                  : "Nothing here yet. Try another day."}
+              </p>
             )}
-          </h1>
+            {loaded && picked && (
+              <p className="el-hero__sub" aria-live="polite">
+                {filtered.length > 0 ? (
+                  `${count(filtered.length)}. ${picked.hint}.`
+                ) : (
+                  <>
+                    Nothing {activeTime.when}. Try another vibe.{" "}
+                    <button
+                      type="button"
+                      className="el-sec__clear"
+                      onClick={() => pickVibe("")}
+                    >
+                      Any vibe
+                    </button>
+                  </>
+                )}
+              </p>
+            )}
+          </div>
           {/* Search: its own full-width row */}
           <form
             className="el-search-pill"
@@ -456,7 +497,11 @@ export default function EventloopScreen({
           <section className="el-results-section" aria-labelledby="pick-title">
             <div className="el-sec">
               <h2 id="pick-title">
-                {picked ? `Best for “${picked.label}”` : "Starting soon"}
+                {picked
+                  ? "Best match"
+                  : isStartingSoon(featured)
+                    ? "Starting soon"
+                    : "Next up"}
               </h2>
             </div>
             <FeaturedCard
@@ -466,7 +511,7 @@ export default function EventloopScreen({
             />
           </section>
         )}
-        {loaded && !filtered.length && <EmptyState {...empty} />}
+        {loaded && !filtered.length && !vibeEmpty && <EmptyState {...empty} />}
         {loaded && gridEvents.length > 0 && (
           <section className="el-results-section" aria-labelledby="grid-title">
             <div className="el-sec">
@@ -474,7 +519,7 @@ export default function EventloopScreen({
                 {savedOnly
                   ? "Saved events"
                   : picked
-                    ? `More for “${picked.label}”`
+                    ? "More events"
                     : featured
                       ? activeTime.more
                       : search || activeVibe

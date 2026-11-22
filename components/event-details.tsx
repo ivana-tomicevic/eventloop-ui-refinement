@@ -15,7 +15,9 @@ import {
   bookingLabel,
   eventCategory,
   eventDate,
+  eventTiming,
   eventImage,
+  eventImageAlt,
   eventLocation,
   eventPrice,
   findEvent,
@@ -71,6 +73,8 @@ export default function EventDetails({ id }: { id: string }) {
   const price = eventPrice(event);
   const checkoutHref = `/checkout?event=${encodeURIComponent(String(event.id))}`;
   const free = isFree(event);
+  /** Started or ended events can't be booked any more. */
+  const timing = eventTiming(event);
   const description = event.description || event.summary;
   // Tags that repeat the category ("Social", "Sport" for Sports) or the price ("Free") are already shown above.
   const singular = (word: string) => word.toLowerCase().replace(/s$/, "");
@@ -110,7 +114,7 @@ export default function EventDetails({ id }: { id: string }) {
         <div className="el-details__hero">
           <Image
             src={eventImage(event)}
-            alt=""
+            alt={eventImageAlt(event)}
             fill
             sizes="(max-width: 760px) 100vw, 760px"
             className="object-cover"
@@ -180,19 +184,28 @@ export default function EventDetails({ id }: { id: string }) {
             ) : (
               <span className="el-card__price el-feat__price">{price}</span>
             )}
-            <a
-              className="el-details__cta"
-              href={checkoutHref}
-              onClick={(e) => {
-                // Tickets need an account; after signing in they land on checkout.
-                if (!isSignedIn()) {
-                  e.preventDefault();
-                  window.location.assign(authUrl(checkoutHref));
-                }
-              }}
-            >
-              {bookingLabel(event)}
-            </a>
+            {timing.state === "upcoming" ? (
+              <a
+                className="el-details__cta"
+                href={checkoutHref}
+                onClick={(e) => {
+                  // Tickets need an account; after signing in they land on checkout.
+                  if (!isSignedIn()) {
+                    e.preventDefault();
+                    window.location.assign(authUrl(checkoutHref));
+                  }
+                }}
+              >
+                {bookingLabel(event)}
+              </a>
+            ) : (
+              // Started or over: no booking.
+              <button type="button" className="el-details__cta" disabled>
+                {timing.state === "ended"
+                  ? "This event has ended"
+                  : "This event has started"}
+              </button>
+            )}
           </div>
         </div>
 

@@ -67,10 +67,19 @@
   font-weight: var(--font-weight-medium);
   line-height: 1.3;
   white-space: nowrap;
+  /* Never under the heart: stop short of it and cut long text with "…" */
+  max-width: calc(100% - 2 * var(--card-inset) - var(--card-save-size) - var(--space-2));
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .el-card__chip--hot {
   background: var(--color-hot);
   color: var(--color-on-hot);
+}
+/* Starts within 2 hours, or started less than 2 hours ago */
+.el-card__chip--live {
+  background: var(--color-live);
+  color: var(--color-on-live);
 }
 
 .el-card__save {

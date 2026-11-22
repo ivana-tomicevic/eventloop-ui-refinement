@@ -6,6 +6,7 @@ import SiteNav from "./site-nav";
 import {
   eventDate,
   eventImage,
+  eventImageAlt,
   eventLocation,
   findEvent,
   formatPrice,
@@ -50,7 +51,7 @@ export default function MyTickets() {
                   <div className="el-ticket__thumb">
                     <Image
                       src={eventImage(event)}
-                      alt=""
+                      alt={eventImageAlt(event)}
                       fill
                       sizes="120px"
                       className="object-cover"

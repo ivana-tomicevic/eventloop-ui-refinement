@@ -15,6 +15,7 @@ import { accountName, currentUserId } from "./auth";
 import {
   eventDate,
   eventImage,
+  eventImageAlt,
   eventLocation,
   formatPrice,
   type EventRecord,
@@ -185,7 +186,7 @@ export function EventSummary({ event }: { event: EventRecord }) {
       <div className="el-join__thumb">
         <Image
           src={eventImage(event)}
-          alt=""
+          alt={eventImageAlt(event)}
           fill
           sizes="96px"
           className="object-cover"

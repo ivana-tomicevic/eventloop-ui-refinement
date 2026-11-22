@@ -59,6 +59,35 @@
 
   /* "Hot" warm yellow — urgency badges only (the "Tonight" date chip). Background only, always with on-hot text (9.6:1). */
   --color-hot: #ffe3a3;
+  /* Lime: ONLY live / soon states — card chips (starts or started < 2h).
+     Always with on-live (ink) text, 14.9:1. Never lime text. */
+  --color-live: #d6f55b;
+  --color-on-live: #15141a;
+
+  /* Explore header tints (135deg gradient a -> b): neutral for "any vibe", then one pair per vibe.
+     Very light: about 10% saturation or less; ink text 15.7:1+ and muted text 4.8:1+ on all. */
+  --tint-any-a: #f6f3ee;
+  --tint-any-b: #f1eee8;
+  --tint-date-night-a: #fff6ee;
+  --tint-date-night-b: #fcedef;
+  --tint-friends-night-a: #fff8e6;
+  --tint-friends-night-b: #fff4e6;
+  --tint-solo-a: #f0f5ff;
+  --tint-solo-b: #ecf2fa;
+  --tint-easy-to-talk-a: #f1f9f4;
+  --tint-easy-to-talk-b: #ecf6f5;
+  --tint-dance-a: #fceef8;
+  --tint-dance-b: #f6edfa;
+  --tint-get-moving-a: #eef8ea;
+  --tint-get-moving-b: #f3fae6;
+  --tint-free-a: #e8f6ee;
+  --tint-free-b: #eef9f3;
+  --tint-last-minute-a: #fff0eb;
+  --tint-last-minute-b: #fff0e6;
+  --tint-golden-hour-a: #fff7e1;
+  --tint-golden-hour-b: #fff1de;
+  --tint-try-new-a: #edf7fa;
+  --tint-try-new-b: #ecf3fc;
   --color-on-hot: #4a3200;
 
   /* "Free" pill: free text on free-soft (5.6:1) */
@@ -72,6 +101,8 @@
   --radius-sheet: 24px; /* onboarding card and modals */
 
   /* Type */
+  /* Display face: ONLY Explore's header title (and the vibe pill inside it). Everything else is Inter. */
+  --font-display: var(--font-bricolage), var(--font-sans);
   --font-sans:
     var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Arial, sans-serif;
@@ -225,6 +256,17 @@
   --allset-photo-out: 140px; /* how far a photo reaches past the card edge */
 
   /* Vibe in Explore's title ("for [any vibe]") and its panel ("What kind of night?") */
+  /* Explore header: the title, and the tinted card it sits on once a vibe is picked */
+  --text-hero: 34px;
+  --text-hero-mobile: 28px;
+  --text-hero-sub: 16px;
+  --line-height-hero: 1.1;
+  --tracking-hero: -0.02em;
+  --hero-padding: 28px 32px;
+  --hero-padding-mobile: 20px;
+  --radius-hero: 24px;
+  --hero-transition: 200ms ease;
+
   /* Explore controls: title, search, filters (when | area), categories */
   --search-height: 52px;
   --explore-title-gap: 20px; /* title -> search */
@@ -240,11 +282,21 @@
   /* Mask (not a colour): the category row fades out on the right while chips are hidden */
   --fade-right: linear-gradient(to right, #000 calc(100% - var(--fade-width)), transparent);
 
+  --color-pill-idle: #e9e5de; /* "any vibe" pill on the header card (ink 14.6:1) */
+  --color-pill-idle-hover: #e2ddd4;
+  --color-pill-picked: rgb(255 255 255 / 0.7); /* a picked vibe's pill over its tint */
+  --color-pill-picked-hover: rgb(255 255 255 / 0.9);
   --vibe-pick-gap: 6px;
-  --vibe-pick-padding-x: 12px;
-  --vibe-pick-padding: 2px var(--vibe-pick-padding-x);
-  --vibe-pick-icon: 0.8em; /* the picked vibe's icon, scales with the title */
-  --vibe-pick-chevron: 0.7em; /* chevron and "×" */
+  --vibe-pick-padding: 6px 8px 6px 14px;
+  /* 44px pill at most: 30px line + 2 × 6px padding + 2 × 1px border */
+  --vibe-pick-line-height: 30px;
+  --vibe-pick-icon: 20px; /* the picked vibe's icon */
+  --vibe-pick-icon-gap: 8px;
+  --vibe-pick-chevron: 0.7em;
+  --vibe-clear-size: 22px; /* the "×" circle; its tap area is 44px */
+  --vibe-clear-icon: 12px;
+  --vibe-clear-stroke: 1.5;
+  --vibe-pick-scale-narrow: 0.75em; /* phones: the longest vibe still fits on one line */
   --vibe-panel-width: 600px;
   --vibe-panel-offset: 8px; /* gap between the pill and the panel */
   --vibe-option-icon: 32px; /* icon circle in a panel row */

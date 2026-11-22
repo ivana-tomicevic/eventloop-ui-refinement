@@ -6,9 +6,11 @@ import {
   eventCategory,
   eventDate,
   eventImage,
+  eventImageAlt,
   eventLocation,
   eventPrice,
   isTonight,
+  liveChipLabel,
   type EventRecord,
 } from "./event-data";
 
@@ -37,6 +39,8 @@ export default function EventCard({
   note?: ReactNode;
 }) {
   const price = eventPrice(event);
+  /** Lime chip while it starts within 2 hours or started less than 2 hours ago. */
+  const live = liveChipLabel(event);
   const Wrapper = href === null ? "div" : "a";
   const link = href === null ? {} : { href: href ?? `/events/${event.id}` };
   return (
@@ -45,7 +49,7 @@ export default function EventCard({
         <div className="el-card__media">
           <Image
             src={eventImage(event)}
-            alt=""
+            alt={eventImageAlt(event)}
             fill
             sizes="(max-width: 720px) 100vw, (max-width: 900px) 50vw, 340px"
             className="object-cover"
@@ -55,10 +59,15 @@ export default function EventCard({
           />
           <span
             className={
-              "el-card__chip" + (isTonight(event) ? " el-card__chip--hot" : "")
+              "el-card__chip" +
+              (live
+                ? " el-card__chip--live"
+                : isTonight(event)
+                  ? " el-card__chip--hot"
+                  : "")
             }
           >
-            {eventDate(event)}
+            {live || eventDate(event)}
           </span>
         </div>
         <div className="el-card__body">

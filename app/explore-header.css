@@ -157,13 +157,91 @@
   align-items: stretch;
   margin-bottom: var(--explore-header-gap);
 }
+/* ---------- Header: title + vibe on a card, neutral until a vibe is picked ---------- */
+.el-hero {
+  position: relative;
+  margin-bottom: var(--explore-title-gap);
+  padding: var(--hero-padding);
+  border-radius: var(--radius-hero);
+  background: linear-gradient(135deg, var(--tint-any-a), var(--tint-any-b));
+}
+/* The vibe's tint fades in over the neutral one (a gradient can't transition, its opacity can);
+   nothing else moves. */
+.el-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--hero-tint-a), var(--hero-tint-b));
+  opacity: 0;
+  transition: opacity var(--hero-transition);
+  pointer-events: none;
+}
+.el-hero--tinted::before {
+  opacity: 1;
+}
+.el-hero > * {
+  position: relative;
+}
+.el-hero[data-vibe="date-night"] {
+  --hero-tint-a: var(--tint-date-night-a);
+  --hero-tint-b: var(--tint-date-night-b);
+}
+.el-hero[data-vibe="friends-night"] {
+  --hero-tint-a: var(--tint-friends-night-a);
+  --hero-tint-b: var(--tint-friends-night-b);
+}
+.el-hero[data-vibe="solo"] {
+  --hero-tint-a: var(--tint-solo-a);
+  --hero-tint-b: var(--tint-solo-b);
+}
+.el-hero[data-vibe="easy-to-talk"] {
+  --hero-tint-a: var(--tint-easy-to-talk-a);
+  --hero-tint-b: var(--tint-easy-to-talk-b);
+}
+.el-hero[data-vibe="dance"] {
+  --hero-tint-a: var(--tint-dance-a);
+  --hero-tint-b: var(--tint-dance-b);
+}
+.el-hero[data-vibe="get-moving"] {
+  --hero-tint-a: var(--tint-get-moving-a);
+  --hero-tint-b: var(--tint-get-moving-b);
+}
+.el-hero[data-vibe="free"] {
+  --hero-tint-a: var(--tint-free-a);
+  --hero-tint-b: var(--tint-free-b);
+}
+.el-hero[data-vibe="last-minute"] {
+  --hero-tint-a: var(--tint-last-minute-a);
+  --hero-tint-b: var(--tint-last-minute-b);
+}
+.el-hero[data-vibe="golden-hour"] {
+  --hero-tint-a: var(--tint-golden-hour-a);
+  --hero-tint-b: var(--tint-golden-hour-b);
+}
+.el-hero[data-vibe="try-new"] {
+  --hero-tint-a: var(--tint-try-new-a);
+  --hero-tint-b: var(--tint-try-new-b);
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-hero::before {
+    transition: none;
+  }
+}
 .el-explore-header h1 {
-  margin: 0 0 var(--explore-title-gap);
+  margin: 0;
   color: var(--color-text);
-  font-size: var(--text-page-title);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-title);
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-hero);
+  line-height: var(--line-height-hero);
+}
+.el-hero__sub {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-hero-sub);
+  font-weight: var(--font-weight-regular);
 }
 .el-search-pill {
   display: flex;
@@ -567,14 +645,27 @@
   background: var(--color-field);
   color: var(--color-text);
   font-size: inherit;
-  font-weight: var(--font-weight-semibold);
-  line-height: inherit;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--vibe-pick-line-height);
   transition:
     background-color var(--field-transition),
     border-color var(--field-transition);
 }
 .el-vibe-pick:hover {
   background: var(--color-field-hover);
+}
+/* On the header card: grey while it's "any vibe", see-through white once a vibe is picked */
+.el-hero .el-vibe-pick {
+  background: var(--color-pill-idle);
+}
+.el-hero .el-vibe-pick:hover {
+  background: var(--color-pill-idle-hover);
+}
+.el-hero .el-vibe-pick--picked {
+  background: var(--color-pill-picked);
+}
+.el-hero .el-vibe-pick--picked:hover {
+  background: var(--color-pill-picked-hover);
 }
 /* Focus: the muted 1px border on the pill, no ring, no outline (same as the fields) */
 .el-vibe-pick:has(.el-vibe-pick__button:focus-visible) {
@@ -607,30 +698,37 @@
 .el-vibe-pick__icon {
   width: var(--vibe-pick-icon);
   height: var(--vibe-pick-icon);
+  margin-right: calc(var(--vibe-pick-icon-gap) - var(--vibe-pick-gap));
 }
 .el-vibe-pick__chevron {
   width: var(--vibe-pick-chevron);
   height: var(--vibe-pick-chevron);
   color: var(--color-text-muted);
 }
+/* "×": a 22px circle, transparent until hover; focus = white fill + muted 1px border */
 .el-vibe-pick__clear {
   display: grid;
   align-self: center;
   place-items: center;
+  flex-shrink: 0;
+  width: var(--vibe-clear-size);
+  height: var(--vibe-clear-size);
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   color: var(--color-text-muted);
 }
 .el-vibe-pick__clear svg {
-  width: var(--vibe-pick-chevron);
-  height: var(--vibe-pick-chevron);
+  width: var(--vibe-clear-icon);
+  height: var(--vibe-clear-icon);
+  stroke-width: var(--vibe-clear-stroke);
 }
 .el-vibe-pick__clear:hover {
-  color: var(--color-text);
+  background: var(--color-field);
 }
 .el-vibe-pick__clear:focus-visible {
   outline: none;
   border-color: var(--color-text-muted);
+  background: var(--color-surface);
 }
 /* Tap areas: at least 44px tall (and 44px wide for the "×") while the pill stays compact */
 .el-vibe-pick__button::after,
@@ -643,12 +741,16 @@
   height: max(100%, var(--touch-target));
   transform: translate(-50%, -50%);
 }
-.el-vibe-pick__button::after {
-  width: calc(100% + 2 * var(--vibe-pick-padding-x));
-}
 @media (prefers-reduced-motion: reduce) {
   .el-vibe-pick {
     transition: none;
+  }
+}
+/* Narrow phones: the pill drops under the title text and gets a little smaller, so
+   "Try something new" + "×" stay on one line */
+@media (max-width: 480px) {
+  .el-vibe-pick {
+    font-size: var(--vibe-pick-scale-narrow);
   }
 }
 
@@ -875,7 +977,11 @@
     padding: var(--page-padding-mobile);
   }
   .el-explore-header h1 {
-    font-size: var(--text-page-title-mobile);
+    font-size: var(--text-hero-mobile);
+  }
+  /* The card spans the content width */
+  .el-hero {
+    padding: var(--hero-padding-mobile);
   }
   /* Segments and vibe chips: one row that scrolls sideways, no visible scrollbar, 44px tall. */
   .el-time-filter {

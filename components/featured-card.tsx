@@ -6,9 +6,11 @@ import {
   eventCategory,
   eventDate,
   eventImage,
+  eventImageAlt,
   eventLocation,
   eventPrice,
   isTonight,
+  liveChipLabel,
   type EventRecord,
 } from "./event-data";
 
@@ -28,6 +30,8 @@ export default function FeaturedCard({
   onSave: (id: string | number) => void;
 }) {
   const price = eventPrice(event);
+  /** Lime chip while it starts within 2 hours or started less than 2 hours ago. */
+  const live = liveChipLabel(event);
   const description = event.summary || event.description;
   return (
     <article className="el-card el-feat">
@@ -35,7 +39,7 @@ export default function FeaturedCard({
         <div className="el-card__media el-feat__media">
           <Image
             src={eventImage(event)}
-            alt=""
+            alt={eventImageAlt(event)}
             fill
             sizes="(max-width: 720px) 100vw, 600px"
             className="object-cover"
@@ -46,10 +50,15 @@ export default function FeaturedCard({
           />
           <span
             className={
-              "el-card__chip" + (isTonight(event) ? " el-card__chip--hot" : "")
+              "el-card__chip" +
+              (live
+                ? " el-card__chip--live"
+                : isTonight(event)
+                  ? " el-card__chip--hot"
+                  : "")
             }
           >
-            {eventDate(event)}
+            {live || eventDate(event)}
           </span>
         </div>
         <div className="el-card__body">
