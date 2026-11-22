@@ -103,6 +103,7 @@ function toEvent(
 export default function CreateEventPage() {
   const [form, setForm] = useState<Form>(empty);
   const [errors, setErrors] = useState<Errors>({});
+  const [saveFailed, setSaveFailed] = useState(false);
   const [editing, setEditing] = useState<EventRecord | null>(null);
   const idRef = useRef(`ev-${Date.now().toString(36)}`);
 
@@ -154,7 +155,11 @@ export default function CreateEventPage() {
       document.getElementById(`ev-${first}`)?.focus();
       return;
     }
-    saveEvent(toEvent(form, idRef.current, status, editing ?? undefined));
+    const ok = saveEvent(
+      toEvent(form, idRef.current, status, editing ?? undefined),
+    );
+    setSaveFailed(!ok);
+    if (!ok) return;
     window.location.assign(
       `/organizer/events?${status === "Published" ? "published" : "saved"}=${encodeURIComponent(idRef.current)}`,
     );
@@ -346,6 +351,13 @@ export default function CreateEventPage() {
               {error("image")}
             </div>
 
+            <div role="alert">
+              {saveFailed && (
+                <FieldError id="ev-save-error">
+                  {"Couldn't save. Your browser storage is full."}
+                </FieldError>
+              )}
+            </div>
             <div className="el-create__actions">
               <button
                 type="submit"

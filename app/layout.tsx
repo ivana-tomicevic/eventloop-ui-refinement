@@ -18,9 +18,9 @@ const bricolage = Bricolage_Grotesque({
 })
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: "Eventloop — what's on in Madrid tonight",
+  description:
+    'Find small events in Madrid by vibe: tonight, tomorrow or this weekend.',
   icons: {
     icon: [
       {
@@ -41,11 +41,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
+  colorScheme: 'light',
+  themeColor: '#FBFAF8',
 }
 
 export default function RootLayout({

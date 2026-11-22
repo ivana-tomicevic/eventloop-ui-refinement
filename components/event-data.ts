@@ -75,8 +75,9 @@ const demoIds=new Set(demoEvents.map(d=>String(d.id)));saved=saved.filter(e=>!de
 return [...saved,...demoEvents.filter(d=>!saved.some(e=>String(e.id)===String(d.id)||e.title===d.title))].filter(e=>!e.deleted)}
 /** Events the organizer created or edited (localStorage). */
 export function readSavedEvents():EventRecord[]{try{const data=JSON.parse(localStorage.getItem('eventloop-events')||'[]');return Array.isArray(data)?data:[]}catch{return []}}
-/** Adds or replaces an event (by id) in localStorage. Works for demo events too: the saved copy wins. */
-export function saveEvent(event:EventRecord){const rest=readSavedEvents().filter(e=>String(e.id)!==String(event.id));localStorage.setItem('eventloop-events',JSON.stringify([event,...rest]))}
+/** Adds or replaces an event (by id) in localStorage. Works for demo events too: the saved copy wins.
+ *  Returns false when the browser refuses the write (storage full, private mode). */
+export function saveEvent(event:EventRecord):boolean{const rest=readSavedEvents().filter(e=>String(e.id)!==String(event.id));try{localStorage.setItem('eventloop-events',JSON.stringify([event,...rest]));return true}catch{return false}}
 /** The event with this id, or undefined (no fallback). */
 export function findEvent(id:string|number){return getEvents().find(e=>String(e.id)===String(id))}
 export function getEvent(id:string|number){return getEvents().find(e=>String(e.id)===String(id))||demoEvents[0]}
@@ -109,4 +110,4 @@ const PHOTO_ALT:Record<string,string>={
 export function eventImageAlt(event:EventRecord){return PHOTO_ALT[eventImage(event)]||''}
 export function eventImage(event:EventRecord){return event.image||'/photos/events/jazz.jpg'}
 export function getSavedIds(){try{const a=JSON.parse(localStorage.getItem('eventloop-saved')||'[]');return Array.isArray(a)?a.map(String):[]}catch{return []}}
-export function toggleSaved(id:string|number){const ids=getSavedIds();const next=ids.includes(String(id))?ids.filter(x=>x!==String(id)):[...ids,String(id)];localStorage.setItem('eventloop-saved',JSON.stringify(next));window.dispatchEvent(new Event('eventloop-saved-changed'));return next}
+export function toggleSaved(id:string|number){const ids=getSavedIds();const next=ids.includes(String(id))?ids.filter(x=>x!==String(id)):[...ids,String(id)];try{localStorage.setItem('eventloop-saved',JSON.stringify(next))}catch{return ids}window.dispatchEvent(new Event('eventloop-saved-changed'));return next}

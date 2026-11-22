@@ -15,6 +15,7 @@ import {
 
 type Sales = Record<string, { tickets: number; revenue: number }>;
 const NOTICE_MS = 4000;
+const STORAGE_FULL = "Couldn't save. Your browser storage is full.";
 
 /** "⋯" on a published card: Move to drafts, Delete. */
 function MoreMenu({
@@ -109,7 +110,10 @@ export default function MyEventsPage() {
   }, [notice]);
 
   const setStatus = (event: EventRecord, status: "Published" | "Draft") => {
-    saveEvent({ ...event, status });
+    if (!saveEvent({ ...event, status })) {
+      setNotice(STORAGE_FULL);
+      return;
+    }
     setNotice(
       status === "Published"
         ? `${event.title} is live on Explore.`
@@ -118,8 +122,12 @@ export default function MyEventsPage() {
     load();
   };
   const remove = (event: EventRecord) => {
-    saveEvent({ ...event, deleted: true });
+    const ok = saveEvent({ ...event, deleted: true });
     setConfirmDelete(null);
+    if (!ok) {
+      setNotice(STORAGE_FULL);
+      return;
+    }
     setNotice(`${event.title} was deleted.`);
     load();
   };
