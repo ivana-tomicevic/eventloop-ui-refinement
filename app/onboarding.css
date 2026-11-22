@@ -407,11 +407,6 @@
   min-height: var(--touch-target);
 }
 
-/* ---------- Explore: "Where?" row ---------- */
-.el-vibes .el-vibes__where {
-  margin: var(--space-4) 0 var(--space-3);
-}
-
 /* ---------- Header additions ---------- */
 /* "Become a host": text link left of the avatar; hidden on narrow phones (the footer has it) */
 .el-nav__become {

@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { Sparkles, Search, MapPin } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Sparkles, Search } from "lucide-react";
 import SiteNav from "./site-nav";
-import { CATEGORIES, NEIGHBOURHOODS } from "./vibes";
+import { CATEGORIES } from "./vibes";
 import {
   findVibe,
   hasVibe,
@@ -14,10 +14,10 @@ import {
 import { authUrl, isSignedIn, saveOrAskToSignIn, startHosting } from "./auth";
 import { readHostProfile } from "./host";
 import VibePicker from "./vibe-picker";
+import AreaPicker from "./area-picker";
 import EventCard from "./event-card";
 import FeaturedCard from "./featured-card";
 import { getEvents, getSavedIds, type EventRecord } from "./event-data";
-const ANYWHERE = "anywhere";
 type EmptyStateProps = {
   title: string;
   text: string;
@@ -131,7 +131,7 @@ export default function EventloopScreen({
   /** The filter Explore opened on; "Clear filters" in the empty state returns to it. */
   const [defaultTime, setDefaultTime] = useState<TimeFilter>("all");
   const activeTime = timeOptions.find((o) => o.id === timeFilter)!;
-  /** One category chip and one "Where?" chip at a time ("" = none / anywhere). They filter. */
+  /** One category chip and one neighbourhood at a time ("" = none / anywhere). They filter. */
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
   /** The vibe in the title (one at a time, "" = any vibe). Kept for this session only. */
@@ -222,8 +222,22 @@ export default function EventloopScreen({
   // Single choice: another chip replaces it, the selected one switches it off.
   const toggleCategoryChip = (id: string) =>
     setCategory((c) => (c === id ? "" : id));
-  const toggleAreaChip = (name: string) =>
-    setArea((a) => (name === ANYWHERE || a === name ? "" : name));
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const [chipsFade, setChipsFade] = useState(false);
+  useEffect(() => {
+    const row = chipsRef.current;
+    if (!row) return;
+    const update = () =>
+      setChipsFade(row.scrollLeft + row.clientWidth < row.scrollWidth - 1);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(row);
+    row.addEventListener("scroll", update, { passive: true });
+    return () => {
+      observer.disconnect();
+      row.removeEventListener("scroll", update);
+    };
+  }, [savedOnly]);
   const filtered = useMemo(() => {
     const now = new Date();
     const range = timeRange(timeFilter, now);
@@ -373,89 +387,73 @@ export default function EventloopScreen({
               </>
             )}
           </h1>
-          <form
-            className="el-search-pill"
-            role="search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setActiveVibe(vibe.trim());
-            }}
-          >
-            <label htmlFor="explore-search" className="sr-only">
-              Search events
-            </label>
-            <Search aria-hidden="true" className="el-search-pill__icon" />
-            <input
-              id="explore-search"
-              type="search"
-              autoComplete="off"
-              value={vibe}
-              onChange={(e) => setVibe(e.target.value)}
-              placeholder='Try "chill jazz, free entry"'
-            />
-            <button type="submit" aria-label="Search">
-              <Sparkles aria-hidden="true" />
-            </button>
-          </form>
-          <div className="el-time-filter" role="group" aria-label="When">
-            {timeOptions.map((o) => (
-              <button
-                type="button"
-                key={o.id}
-                aria-pressed={timeFilter === o.id}
-                onClick={() => setTimeFilter(o.id)}
-              >
-                {o.label}
+          {/* Row 1: when + search (phones: search on top, then the tabs) */}
+          <div className="el-explore-row">
+            <div className="el-time-filter" role="group" aria-label="When">
+              {timeOptions.map((o) => (
+                <button
+                  type="button"
+                  key={o.id}
+                  aria-pressed={timeFilter === o.id}
+                  onClick={() => setTimeFilter(o.id)}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            <form
+              className="el-search-pill"
+              role="search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setActiveVibe(vibe.trim());
+              }}
+            >
+              <label htmlFor="explore-search" className="sr-only">
+                Search events
+              </label>
+              <Search aria-hidden="true" className="el-search-pill__icon" />
+              <input
+                id="explore-search"
+                type="search"
+                autoComplete="off"
+                value={vibe}
+                onChange={(e) => setVibe(e.target.value)}
+                placeholder='Try "chill jazz, free entry"'
+              />
+              <button type="submit" aria-label="Search">
+                <Sparkles aria-hidden="true" />
               </button>
-            ))}
+            </form>
           </div>
+          {/* Row 2: neighbourhood | categories */}
+          {!savedOnly && (
+            <div className="el-filter-row">
+              <AreaPicker value={area} onChange={setArea} />
+              <span className="el-filter-row__divider" aria-hidden="true" />
+              <div
+                ref={chipsRef}
+                className="el-filter-row__chips"
+                data-fade={chipsFade}
+                role="group"
+                aria-label="Category"
+              >
+                {CATEGORIES.map((v) => (
+                  <button
+                    type="button"
+                    key={v.id}
+                    className={`el-vibe el-vibe--${v.tone}`}
+                    aria-pressed={category === v.id}
+                    onClick={() => toggleCategoryChip(v.id)}
+                  >
+                    <v.icon aria-hidden="true" />
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
-        {!savedOnly && (
-          <section className="el-vibes" aria-labelledby="vibes-title">
-            <h2 id="vibes-title" className="el-section-label">
-              {"What's on?"}
-            </h2>
-            <div
-              className="el-vibes__row"
-              role="group"
-              aria-labelledby="vibes-title"
-            >
-              {CATEGORIES.map((v) => (
-                <button
-                  type="button"
-                  key={v.id}
-                  className={`el-vibe el-vibe--${v.tone}`}
-                  aria-pressed={category === v.id}
-                  onClick={() => toggleCategoryChip(v.id)}
-                >
-                  <v.icon aria-hidden="true" />
-                  {v.label}
-                </button>
-              ))}
-            </div>
-            <h2 id="where-title" className="el-section-label el-vibes__where">
-              Where?
-            </h2>
-            <div
-              className="el-vibes__row"
-              role="group"
-              aria-labelledby="where-title"
-            >
-              {[ANYWHERE, ...NEIGHBOURHOODS].map((name) => (
-                <button
-                  type="button"
-                  key={name}
-                  className="el-vibe el-vibe--area"
-                  aria-pressed={name === ANYWHERE ? area === "" : area === name}
-                  onClick={() => toggleAreaChip(name)}
-                >
-                  <MapPin aria-hidden="true" />
-                  {name === ANYWHERE ? "Anywhere in Madrid" : name}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
         {loaded && featured && (
           <section className="el-results-section" aria-labelledby="pick-title">
             <div className="el-sec">

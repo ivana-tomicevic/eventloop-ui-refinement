@@ -81,7 +81,7 @@
   --text-body: 14px; /* nav links, segments, buttons, empty-state copy */
   --text-input: 16px; /* never below 16px: mobile Safari zooms into smaller fields */
   --text-empty-title: 18px;
-  --text-section-label: 15px; /* small section headings ("What's on?") */
+  --text-section-label: 15px; /* small section headings ("Preview" in Create an event) */
   --tracking-title: -0.4px;
   --text-section-title: 24px;
   --text-card-title: 15px;
@@ -225,6 +225,16 @@
   --allset-photo-out: 140px; /* how far a photo reaches past the card edge */
 
   /* Vibe in Explore's title ("for [any vibe]") and its panel ("What kind of night?") */
+  /* Explore controls: title, row 1 (when + search), row 2 (neighbourhood | categories) */
+  --explore-stack-gap: var(--space-3); /* between the title and the two rows */
+  --explore-row-gap: var(--space-4); /* tabs <-> search */
+  --explore-header-gap: var(--space-5); /* controls -> first section */
+  --filter-divider-height: 24px;
+  --area-list-width: 220px;
+  --fade-width: 32px;
+  /* Mask (not a colour): the category row fades out on the right while chips are hidden */
+  --fade-right: linear-gradient(to right, #000 calc(100% - var(--fade-width)), transparent);
+
   --vibe-pick-gap: 6px;
   --vibe-pick-padding-x: 12px;
   --vibe-pick-padding: 2px var(--vibe-pick-padding-x);
