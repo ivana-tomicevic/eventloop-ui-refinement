@@ -124,6 +124,7 @@ export default function SiteNav({
           <input
             aria-label="Search events, places or organizers"
             placeholder="Search events, places or organizers..."
+            autoComplete="off"
             value={query}
             onChange={(e) => search(e.target.value)}
           />

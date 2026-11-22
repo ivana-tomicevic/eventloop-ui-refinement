@@ -375,6 +375,7 @@ export default function EventloopScreen({
             <input
               id="explore-search"
               type="search"
+              autoComplete="off"
               value={vibe}
               onChange={(e) => setVibe(e.target.value)}
               placeholder='Try "chill jazz, free entry"'

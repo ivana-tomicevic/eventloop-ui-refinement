@@ -47,7 +47,7 @@
   --color-error: #c4282d;
   --color-error-border: #e5484d; /* input border in the error state (non-text) */
 
-  /* Input fields: filled, white with an ink border on focus */
+  /* Input fields: filled at rest, white with a muted border on focus */
   --color-field: #f6f4f0;
   --color-field-hover: #f1eee9;
 
@@ -79,7 +79,7 @@
   --text-page-title-mobile: 24px;
   --text-logo: 16px;
   --text-body: 14px; /* nav links, segments, buttons, empty-state copy */
-  --text-input: 15px;
+  --text-input: 16px; /* never below 16px: mobile Safari zooms into smaller fields */
   --text-empty-title: 18px;
   --text-section-label: 15px; /* small section headings ("What's your vibe?") */
   --tracking-title: -0.4px;
@@ -105,8 +105,6 @@
   /* For inputs that show focus on their wrapper: 2px gap, then a 2px ink ring */
   --shadow-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-focus);
   --shadow-sheet: 0 8px 32px rgb(21 20 26 / 0.06); /* onboarding card */
-  --shadow-field-focus: 0 0 0 4px rgb(21 20 26 / 0.08);
-  --shadow-field-error: 0 0 0 4px rgb(229 72 77 / 0.12);
 
   /* shadcn/ui names, mapped onto the tokens above */
   --color-background: var(--color-page);
@@ -152,7 +150,7 @@
   --page-gutter-mobile: 16px;
   --page-padding-mobile: 20px var(--page-gutter-mobile) 40px;
   --title-gap: 14px; /* h1 -> pill, pill -> segments */
-  --pill-input-padding: 8px 8px 8px 18px;
+  --pill-input-padding: 0 var(--space-2) 0 var(--space-4); /* icon left, round button right */
   --control-icon-button: 36px; /* round search button */
   --segment-padding: 7px 16px;
   --segment-gap: 4px;
@@ -229,9 +227,14 @@
   --modal-max-height: 85vh;
   --pick-chip-height: 48px;
 
-  /* Input fields */
-  --field-height: 52px;
-  --field-transition: 120ms ease;
+  /* Input fields (every input, select, textarea and both search fields) */
+  --field-height: 48px;
+  --field-textarea-height: 96px;
+  --field-padding-x: var(--space-4);
+  --field-label-gap: 6px;
+  --radius-field: 12px;
+  --field-transition: 150ms ease;
+  --field-disabled-opacity: 0.6;
 
   /* Legacy aliases used by older screens — they now resolve to the tokens */
   --ink: var(--color-text);

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { ImagePlus } from "lucide-react";
+import { ChevronDown, ImagePlus } from "lucide-react";
 import OrganizerNav from "./organizer-nav";
 import EventCard from "./event-card";
 import { CATEGORIES, NEIGHBOURHOODS } from "./vibes";
@@ -281,16 +281,19 @@ export default function CreateEventPage() {
               </label>
               <label className="el-join__field">
                 Neighbourhood
-                <select
-                  {...described("neighbourhood")}
-                  value={form.neighbourhood}
-                  onChange={(e) => set("neighbourhood", e.target.value)}
-                >
-                  <option value="">Choose…</option>
-                  {NEIGHBOURHOODS.map((n) => (
-                    <option key={n}>{n}</option>
-                  ))}
-                </select>
+                <span className="el-join__select">
+                  <select
+                    {...described("neighbourhood")}
+                    value={form.neighbourhood}
+                    onChange={(e) => set("neighbourhood", e.target.value)}
+                  >
+                    <option value="">Choose…</option>
+                    {NEIGHBOURHOODS.map((n) => (
+                      <option key={n}>{n}</option>
+                    ))}
+                  </select>
+                  <ChevronDown aria-hidden="true" />
+                </span>
                 {error("neighbourhood")}
               </label>
             </div>

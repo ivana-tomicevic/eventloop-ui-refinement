@@ -168,13 +168,25 @@
   display: flex;
   align-items: center;
   gap: var(--pill-gap);
+  min-height: var(--field-height);
   padding: var(--pill-input-padding);
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent;
   border-radius: var(--radius-pill);
+  background: var(--color-field);
+  transition: border-color var(--field-transition);
+}
+.el-search-pill:hover {
+  background: var(--color-field-hover);
+}
+/* Same focus as every field: white with a muted 1px border, no ring */
+.el-search-pill:focus-within {
+  border-color: var(--color-text-muted);
   background: var(--color-surface);
 }
-.el-search-pill:focus-within {
-  box-shadow: var(--shadow-focus);
+@media (prefers-reduced-motion: reduce) {
+  .el-search-pill {
+    transition: none;
+  }
 }
 .el-search-pill__icon {
   flex-shrink: 0;
