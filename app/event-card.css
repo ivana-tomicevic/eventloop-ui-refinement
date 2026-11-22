@@ -103,8 +103,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: var(--touch-target);
-  height: var(--touch-target);
+  width: var(--tap-min);
+  height: var(--tap-min);
   transform: translate(-50%, -50%);
 }
 .el-card__save svg {

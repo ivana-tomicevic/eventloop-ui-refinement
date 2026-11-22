@@ -400,7 +400,7 @@
   top: 50%;
   left: 0;
   width: 100%;
-  height: var(--touch-target);
+  height: var(--tap-min);
   transform: translateY(-50%);
 }
 /* Wide screens: the chips spread from the search's left edge to its right edge
@@ -492,8 +492,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: max(100%, var(--touch-target));
-  height: max(100%, var(--touch-target));
+  width: max(100%, var(--tap-min));
+  height: max(100%, var(--tap-min));
   transform: translate(-50%, -50%);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -520,7 +520,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
   padding: 0 var(--space-3);
   border-radius: var(--radius-button);
   color: var(--color-text);
@@ -740,8 +740,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: max(100%, var(--touch-target));
-  height: max(100%, var(--touch-target));
+  width: max(100%, var(--tap-min));
+  height: max(100%, var(--tap-min));
   transform: translate(-50%, -50%);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -785,7 +785,7 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
   padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 0;
   border-radius: var(--radius-button);
@@ -849,7 +849,7 @@
   border-top: 1px solid var(--color-border);
 }
 .el-vibe-panel__text {
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-button);
@@ -886,7 +886,8 @@
   }
 }
 
-/* ---------- Touch targets: at least 44x44 without changing how controls look ---------- */
+/* ---------- Touch targets: at least 44x44 (--tap-min) without changing how controls look.
+   An invisible ::after grows the tap area; focus rings stay on the visible control. ---------- */
 :is(
   .el-nav__logo,
   .el-nav__link,
@@ -894,7 +895,8 @@
   .el-nav__avatar-button,
   .el-search-pill button,
   .el-empty__cta,
-  .el-sec__clear
+  .el-sec__clear,
+  .el-time-filter button
 ) {
   position: relative;
 }
@@ -905,14 +907,15 @@
   .el-nav__avatar-button,
   .el-search-pill button,
   .el-empty__cta,
-  .el-sec__clear
+  .el-sec__clear,
+  .el-time-filter button
 )::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: max(100%, var(--touch-target));
-  height: max(100%, var(--touch-target));
+  width: max(100%, var(--tap-min));
+  height: max(100%, var(--tap-min));
   transform: translate(-50%, -50%);
 }
 
@@ -994,8 +997,8 @@
   }
   .el-time-filter button {
     flex: 1 0 auto;
-    min-width: var(--touch-target);
-    min-height: var(--touch-target);
+    min-width: var(--tap-min);
+    min-height: var(--tap-min);
     padding-inline: var(--space-3);
   }
   /* The scroll container would clip an outer ring, so draw it inside. */
@@ -1006,7 +1009,7 @@
     outline-color: var(--color-on-brand);
   }
   .el-vibe {
-    min-height: var(--touch-target);
+    min-height: var(--tap-min);
   }
   /* One scrollable row that runs to the screen edge, no visible scrollbar. */
   .el-vibes__row {

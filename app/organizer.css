@@ -90,8 +90,8 @@
 .el-org__icon {
   display: grid;
   place-items: center;
-  width: var(--touch-target);
-  height: var(--touch-target);
+  width: var(--tap-min);
+  height: var(--tap-min);
   padding: 0;
   border: 0;
   border-radius: var(--radius-button);
@@ -122,8 +122,8 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-width: var(--touch-target);
-  min-height: var(--touch-target);
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
   padding: 0 var(--space-4);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-button);
@@ -294,7 +294,7 @@
 .el-org__btn--ghost::after {
   content: "";
   position: absolute;
-  inset: calc((var(--ghost-button-height) - var(--touch-target)) / 2) 0;
+  inset: calc((var(--ghost-button-height) - var(--tap-min)) / 2) 0;
 }
 .el-org__btn--ghost:hover {
   background: var(--color-hover-warm);
@@ -302,7 +302,7 @@
 /* "← My events" above the event form */
 .el-create__back {
   display: inline-flex;
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
   align-items: center;
   margin-bottom: var(--space-2);
   font-size: var(--text-body);

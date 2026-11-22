@@ -32,7 +32,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
 }
 .el-nav__back svg {
   width: var(--icon-sm);
@@ -103,7 +103,7 @@
 .el-shell__skip {
   display: inline-flex;
   align-items: center;
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
   padding: 0 var(--space-3);
   border-radius: var(--radius-button);
   color: var(--color-text);
@@ -130,20 +130,20 @@
 }
 .el-auth__switch button {
   flex: 1;
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
 }
 .el-auth__password {
   position: relative;
   display: block;
 }
 .el-auth__password input {
-  padding-right: calc(var(--touch-target) + var(--space-2));
+  padding-right: calc(var(--tap-min) + var(--space-2));
 }
 /* 44px show/hide button, centred inside the 52px field */
 .el-auth__password .el-org__icon {
   position: absolute;
-  top: calc((var(--field-height) - var(--touch-target)) / 2);
-  right: calc((var(--field-height) - var(--touch-target)) / 2);
+  top: calc((var(--field-height) - var(--tap-min)) / 2);
+  right: calc((var(--field-height) - var(--tap-min)) / 2);
 }
 /* Google / Apple: two white bordered buttons side by side */
 .el-auth__social {
@@ -157,7 +157,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
   padding: 0 var(--space-3);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-button);
@@ -211,7 +211,7 @@
   text-align: center;
 }
 .el-auth__host .el-details__map {
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
 }
 .el-auth__inline-link {
   padding: 0;
@@ -404,7 +404,7 @@
   margin: 0;
 }
 .el-explore-footer .el-details__map {
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
 }
 
 /* ---------- Header additions ---------- */
@@ -412,7 +412,7 @@
 .el-nav__become {
   display: inline-flex;
   align-items: center;
-  min-height: var(--touch-target);
+  min-height: var(--tap-min);
 }
 @media (max-width: 480px) {
   .el-nav__become {

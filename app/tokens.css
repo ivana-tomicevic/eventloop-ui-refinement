@@ -180,7 +180,7 @@
   --nav-gap: 22px;
   --nav-gap-mobile: 14px;
   --nav-gap-compact: 12px; /* phones up to 480px, so logo + links + Join fit at 320px */
-  --touch-target: 44px; /* minimum tap area for buttons and the heart */
+  --tap-min: 44px; /* minimum tap area for buttons and the heart */
   --ghost-button-height: 36px;
   --nav-mark-size: 24px;
   --nav-mark-radius: 8px;
