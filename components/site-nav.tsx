@@ -5,7 +5,6 @@ import { Search, LogOut } from "lucide-react";
 import AccountMenu, { type MenuItem } from "./account-menu";
 import { authUrl, signOut, startHosting, userName } from "./auth";
 import { readHostProfile } from "./host";
-import VibesModal, { openVibes } from "./vibes-modal";
 
 const links = [
   { href: "/", label: "Explore" },
@@ -17,7 +16,7 @@ const links = [
  * Shared attendee header (docs/explore-reference.html .nav).
  * Signed out: "Log in" + ink "Sign up". Signed in (any role): the account menu with "Log out".
  * No host profile yet: a quiet "Become a host" link next to the avatar (hidden on narrow phones);
- * with one, the menu has "Switch to hosting" instead. "My vibes" opens a modal on any page.
+ * with one, the menu has "Switch to hosting" instead.
  * `showSearch` keeps the old header search available; every screen now passes false.
  */
 export default function SiteNav({
@@ -73,7 +72,6 @@ export default function SiteNav({
   };
 
   const menu: MenuItem[] = [
-    { label: "My vibes", onClick: openVibes },
     ...(hasHostProfile
       ? [
           { label: "Host profile", href: "/organizer/setup?edit=1" },
@@ -139,7 +137,6 @@ export default function SiteNav({
             </a>
           )}
           <AccountMenu name={user} items={menu} />
-          <VibesModal />
         </>
       ) : (
         <>

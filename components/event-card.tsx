@@ -50,8 +50,7 @@ export default function EventCard({
             sizes="(max-width: 720px) 100vw, (max-width: 900px) 50vw, 340px"
             className="object-cover"
             onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = "/photos/events/jazz.jpg";
+              e.currentTarget.style.visibility = "hidden";
             }}
           />
           <span

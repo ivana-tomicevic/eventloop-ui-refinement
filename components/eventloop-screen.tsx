@@ -3,23 +3,21 @@ import { useEffect, useMemo, useState } from "react";
 import { Sparkles, Search, MapPin } from "lucide-react";
 import SiteNav from "./site-nav";
 import { CATEGORIES, NEIGHBOURHOODS } from "./vibes";
-import { MOODS, eventMoods, moodLabel, readMyMoods } from "./moods";
 import {
-  authUrl,
-  isHosting,
-  isSignedIn,
-  saveOrAskToSignIn,
-  startHosting,
-} from "./auth";
+  findVibe,
+  hasVibe,
+  markVibeIntroSeen,
+  readSessionVibe,
+  saveSessionVibe,
+  vibeIntroSeen,
+} from "./moods";
+import { authUrl, isSignedIn, saveOrAskToSignIn, startHosting } from "./auth";
 import { readHostProfile } from "./host";
-import { openVibes, setMyMoods, MOODS_CHANGED } from "./vibes-modal";
+import VibePicker from "./vibe-picker";
 import EventCard from "./event-card";
 import FeaturedCard from "./featured-card";
 import { getEvents, getSavedIds, type EventRecord } from "./event-data";
 const ANYWHERE = "anywhere";
-/** "Made for your vibe" shows one row of up to 4; "Find your vibe" offers the first 5 moods. */
-const FOR_YOU_MAX = 4;
-const FIND_VIBE_CHIPS = 5;
 type EmptyStateProps = {
   title: string;
   text: string;
@@ -58,6 +56,8 @@ const timeOptions: {
   /** Grid title under "Starting soon", grid title when nothing is featured. */
   more: string;
   on: string;
+  /** End of the vibe empty state: "Nothing for Date night tonight." */
+  when: string;
 }[] = [
   {
     id: "tonight",
@@ -66,6 +66,7 @@ const timeOptions: {
     empty: "Quiet night.",
     more: "More tonight",
     on: "Tonight",
+    when: "tonight",
   },
   {
     id: "tomorrow",
@@ -74,6 +75,7 @@ const timeOptions: {
     empty: "Nothing on tomorrow. Yet.",
     more: "More tomorrow",
     on: "Tomorrow",
+    when: "tomorrow",
   },
   {
     id: "weekend",
@@ -82,6 +84,7 @@ const timeOptions: {
     empty: "Quiet weekend so far.",
     more: "More this weekend",
     on: "This weekend",
+    when: "this weekend",
   },
   {
     id: "all",
@@ -90,6 +93,7 @@ const timeOptions: {
     empty: "",
     more: "More events",
     on: "All events",
+    when: "right now",
   },
 ];
 const dayStart = (d: Date, offset = 0, hour = 0) =>
@@ -130,9 +134,10 @@ export default function EventloopScreen({
   /** One category chip and one "Where?" chip at a time ("" = none / anywhere). They filter. */
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
-  /** "Made for your vibe": signed-in visitors only; their saved moods ("My vibes"). */
-  const [visitor, setVisitor] = useState(false);
-  const [myMoods, setMoods] = useState<string[]>([]);
+  /** The vibe in the title (one at a time, "" = any vibe). Kept for this session only. */
+  const [vibeId, setVibeId] = useState("");
+  /** First visit: the vibe panel opens by itself, once per person. */
+  const [vibeIntro, setVibeIntro] = useState(false);
   const [saved, setSaved] = useState<string[]>([]);
   /** Footer "Host an event": sign up as a host, the host profile, or the workspace. */
   const [hostLink, setHostLink] = useState(
@@ -156,21 +161,19 @@ export default function EventloopScreen({
         setTimeFilter("tonight");
         setDefaultTime("tonight");
       }
-      setVisitor(isSignedIn() && !isHosting());
-      setMoods(readMyMoods());
+      setVibeId(readSessionVibe());
+      setVibeIntro(!vibeIntroSeen());
       if (isSignedIn())
         setHostLink(readHostProfile() ? "/organizer" : "/organizer/setup");
     }
     setSearch(q);
     setSaved(getSavedIds());
   }, []);
-  // Vibes saved (modal or a "Find your vibe" chip): update the row right away.
-  useEffect(() => {
-    if (savedOnly) return;
-    const handle = () => setMoods(readMyMoods());
-    window.addEventListener(MOODS_CHANGED, handle);
-    return () => window.removeEventListener(MOODS_CHANGED, handle);
-  }, [savedOnly]);
+  const pickVibe = (id: string) => {
+    setVibeId(id);
+    saveSessionVibe(id);
+  };
+  const picked = savedOnly ? null : findVibe(vibeId);
   useEffect(() => {
     const handle = (e: Event) =>
       setSearch((e as CustomEvent<string>).detail || "");
@@ -222,7 +225,8 @@ export default function EventloopScreen({
   const toggleAreaChip = (name: string) =>
     setArea((a) => (name === ANYWHERE || a === name ? "" : name));
   const filtered = useMemo(() => {
-    const range = timeRange(timeFilter, new Date());
+    const now = new Date();
+    const range = timeRange(timeFilter, now);
     const startOf = (e: EventRecord) =>
       e.start ? new Date(e.start).getTime() : Number.POSITIVE_INFINITY;
     // Soonest first, so "Starting soon" is always the first event of the tab.
@@ -234,6 +238,7 @@ export default function EventloopScreen({
           (!savedOnly || saved.includes(String(e.id))) &&
           (!category || e.category === category) &&
           (!area || e.neighbourhood === area) &&
+          (!picked || hasVibe(e, picked.id, now)) &&
           (!search || searchable(e).includes(search.toLowerCase())) &&
           (!activeVibe ||
             activeVibe
@@ -253,24 +258,14 @@ export default function EventloopScreen({
     timeFilter,
     category,
     area,
+    picked,
   ]);
   // Same rule on every tab: the soonest event is "Starting soon", the rest go below (no duplicates).
   const featured = !savedOnly && filtered.length ? filtered[0] : null;
   const others = featured ? filtered.slice(1) : filtered;
-  // "Made for your vibe": up to 4 from this tab that share a mood (most shared first, then
-  // soonest; filtered is already soonest first and sort is stable). Never the featured one.
-  const forYou = myMoods.length
-    ? others
-        .map((e) => ({
-          event: e,
-          match: eventMoods(e).filter((m) => myMoods.includes(m)),
-        }))
-        .filter((x) => x.match.length > 0)
-        .sort((a, b) => b.match.length - a.match.length)
-        .slice(0, FOR_YOU_MAX)
-    : [];
   const gridEvents = others;
-  // One empty state that replaces both sections. The most specific cause wins: search, chips, then day.
+  // One empty state that replaces both sections. The most specific cause wins: search, vibe,
+  // chips, then day.
   const showAll = {
     label: "Show all events",
     onClick: () => setTimeFilter("all"),
@@ -287,58 +282,64 @@ export default function EventloopScreen({
           text: "Try fewer words or another vibe.",
           action: { label: "Clear search", onClick: clearSearch },
         }
-      : chipFilter
+      : picked
         ? {
-            title: "No matches.",
-            text: "Try another vibe or time.",
-            action: {
-              label: "Clear filters",
-              onClick: () => {
-                clearChips();
-                setTimeFilter(defaultTime);
-              },
-            },
+            title: `Nothing for “${picked.label}” ${activeTime.when}.`,
+            text: "Try another vibe.",
+            action: { label: "Any vibe", onClick: () => pickVibe("") },
           }
-        : timeFilter === "tonight"
-          ? dayCounts.tomorrow
-            ? {
-                title: "Quiet night.",
-                text: "Tomorrow is packed.",
-                action: {
-                  label: "See tomorrow",
-                  onClick: () => setTimeFilter("tomorrow"),
+        : chipFilter
+          ? {
+              title: "No matches.",
+              text: "Try another vibe or time.",
+              action: {
+                label: "Clear filters",
+                onClick: () => {
+                  clearChips();
+                  setTimeFilter(defaultTime);
                 },
-              }
-            : {
-                title: "Quiet night.",
-                text: "There's more later this week.",
-                action: showAll,
-              }
-          : timeFilter === "tomorrow"
-            ? dayCounts.weekend
+              },
+            }
+          : timeFilter === "tonight"
+            ? dayCounts.tomorrow
               ? {
-                  title: "Nothing on tomorrow. Yet.",
-                  text: "The weekend is looking good.",
+                  title: "Quiet night.",
+                  text: "Tomorrow is packed.",
                   action: {
-                    label: "See the weekend",
-                    onClick: () => setTimeFilter("weekend"),
+                    label: "See tomorrow",
+                    onClick: () => setTimeFilter("tomorrow"),
                   },
                 }
               : {
-                  title: "Nothing on tomorrow. Yet.",
+                  title: "Quiet night.",
                   text: "There's more later this week.",
                   action: showAll,
                 }
-            : timeFilter === "weekend"
-              ? {
-                  title: "Quiet weekend so far.",
-                  text: "The week has plenty going on.",
-                  action: showAll,
-                }
-              : {
-                  title: "Nothing on right now.",
-                  text: "New events drop every week. Check back soon.",
-                };
+            : timeFilter === "tomorrow"
+              ? dayCounts.weekend
+                ? {
+                    title: "Nothing on tomorrow. Yet.",
+                    text: "The weekend is looking good.",
+                    action: {
+                      label: "See the weekend",
+                      onClick: () => setTimeFilter("weekend"),
+                    },
+                  }
+                : {
+                    title: "Nothing on tomorrow. Yet.",
+                    text: "There's more later this week.",
+                    action: showAll,
+                  }
+              : timeFilter === "weekend"
+                ? {
+                    title: "Quiet weekend so far.",
+                    text: "The week has plenty going on.",
+                    action: showAll,
+                  }
+                : {
+                    title: "Nothing on right now.",
+                    text: "New events drop every week. Check back soon.",
+                  };
   const count = (n: number) => `${n} ${n === 1 ? "event" : "events"}`;
   const grid = (list: EventRecord[]) => (
     <div className="el-grid">
@@ -358,7 +359,19 @@ export default function EventloopScreen({
       <div className="eventloop-content explore-content">
         <section className="el-explore-header" aria-labelledby="explore-title">
           <h1 id="explore-title" aria-live="polite">
-            {activeTime.title}
+            {savedOnly ? (
+              activeTime.title
+            ) : (
+              <>
+                {activeTime.title} for{" "}
+                <VibePicker
+                  value={vibeId}
+                  onChange={pickVibe}
+                  autoOpen={vibeIntro}
+                  onAutoOpen={markVibeIntroSeen}
+                />
+              </>
+            )}
           </h1>
           <form
             className="el-search-pill"
@@ -446,72 +459,15 @@ export default function EventloopScreen({
         {loaded && featured && (
           <section className="el-results-section" aria-labelledby="pick-title">
             <div className="el-sec">
-              <h2 id="pick-title">Starting soon</h2>
+              <h2 id="pick-title">
+                {picked ? `Best for “${picked.label}”` : "Starting soon"}
+              </h2>
             </div>
             <FeaturedCard
               event={featured}
               saved={saved.includes(String(featured.id))}
               onSave={toggle}
             />
-          </section>
-        )}
-        {loaded && visitor && !savedOnly && !myMoods.length && (
-          <section className="el-results-section" aria-labelledby="vibe-title">
-            <div className="el-sec">
-              <h2 id="vibe-title">Find your vibe</h2>
-            </div>
-            <div className="el-picks" role="group" aria-labelledby="vibe-title">
-              {MOODS.slice(0, FIND_VIBE_CHIPS).map((m) => (
-                <button
-                  type="button"
-                  key={m.id}
-                  className="el-pick"
-                  aria-pressed={false}
-                  onClick={() => setMyMoods([m.id])}
-                >
-                  <m.icon aria-hidden="true" />
-                  {m.label}
-                </button>
-              ))}
-              <button
-                type="button"
-                className="el-sec__clear el-foryou__more"
-                onClick={openVibes}
-              >
-                More
-              </button>
-            </div>
-          </section>
-        )}
-        {loaded && visitor && forYou.length > 0 && (
-          <section
-            className="el-results-section"
-            aria-labelledby="foryou-title"
-          >
-            <div className="el-sec">
-              <h2 id="foryou-title">Made for your vibe</h2>
-              <span className="el-sec__aside">
-                <button
-                  type="button"
-                  className="el-sec__clear"
-                  aria-label="Edit your vibes"
-                  onClick={openVibes}
-                >
-                  Edit
-                </button>
-              </span>
-            </div>
-            <div className="el-grid el-foryou">
-              {forYou.map(({ event, match }) => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  saved={saved.includes(String(event.id))}
-                  onSave={toggle}
-                  note={`Because: ${match.slice(0, 2).map(moodLabel).join(", ")}`}
-                />
-              ))}
-            </div>
           </section>
         )}
         {loaded && !filtered.length && <EmptyState {...empty} />}
@@ -521,11 +477,13 @@ export default function EventloopScreen({
               <h2 id="grid-title">
                 {savedOnly
                   ? "Saved events"
-                  : featured
-                    ? activeTime.more
-                    : search || activeVibe
-                      ? "Matches for your search"
-                      : activeTime.on}
+                  : picked
+                    ? `More for “${picked.label}”`
+                    : featured
+                      ? activeTime.more
+                      : search || activeVibe
+                        ? "Matches for your search"
+                        : activeTime.on}
               </h2>
               <span className="el-sec__aside">
                 {count(gridEvents.length)}

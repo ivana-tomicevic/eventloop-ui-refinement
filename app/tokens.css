@@ -81,7 +81,7 @@
   --text-body: 14px; /* nav links, segments, buttons, empty-state copy */
   --text-input: 16px; /* never below 16px: mobile Safari zooms into smaller fields */
   --text-empty-title: 18px;
-  --text-section-label: 15px; /* small section headings ("What's your vibe?") */
+  --text-section-label: 15px; /* small section headings ("What's on?") */
   --tracking-title: -0.4px;
   --text-section-title: 24px;
   --text-card-title: 15px;
@@ -218,14 +218,27 @@
   --create-preview-width: 340px; /* live card preview next to the form */
   --create-button-min: 160px;
 
-  /* Auth + onboarding (OnboardingShell), "My vibes" modal */
+  /* Auth + onboarding (OnboardingShell) */
   --shell-card-width: 480px;
   --allset-check-size: 64px;
   --allset-photo-width: 180px; /* welcome screen photos (desktop) */
   --allset-photo-out: 140px; /* how far a photo reaches past the card edge */
-  --modal-width: 560px;
-  --modal-max-height: 85vh;
-  --pick-chip-height: 48px;
+
+  /* Vibe in Explore's title ("for [any vibe]") and its panel ("What kind of night?") */
+  --vibe-pick-gap: 6px;
+  --vibe-pick-padding-x: 12px;
+  --vibe-pick-padding: 2px var(--vibe-pick-padding-x);
+  --vibe-pick-icon: 0.8em; /* the picked vibe's icon, scales with the title */
+  --vibe-pick-chevron: 0.7em; /* chevron and "×" */
+  --vibe-panel-width: 600px;
+  --vibe-panel-offset: 8px; /* gap between the pill and the panel */
+  --vibe-option-icon: 40px; /* icon circle in a panel row */
+  --sheet-max-height: 85vh; /* phones: the panel as a bottom sheet */
+  --z-popover: 20; /* under the header (30) */
+  --z-sheet: 60;
+
+  /* Photo placeholder: shown behind every event photo, visible while a photo is missing */
+  --photo-placeholder: linear-gradient(135deg, var(--color-field), var(--color-border));
 
   /* Input fields (every input, select, textarea and both search fields) */
   --field-height: 48px;

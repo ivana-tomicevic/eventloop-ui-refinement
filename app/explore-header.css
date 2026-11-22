@@ -151,6 +151,7 @@
 
 /* ---------- Title, search pill, segmented filter ---------- */
 .el-explore-header {
+  position: relative; /* the vibe panel is placed inside it */
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -358,6 +359,235 @@
 .el-vibe:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+/* ---------- Vibe in the title: "Tonight in Madrid for [any vibe ▾]" (components/vibe-picker.tsx) ---------- */
+/* A compact pill in the title's own size, on the same baseline as the words before it.
+   Picked or not it stays light; picked adds the vibe's icon left and a separate "×". */
+.el-vibe-pick {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--vibe-pick-gap);
+  padding: var(--vibe-pick-padding);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--color-field);
+  color: var(--color-text);
+  font-size: inherit;
+  font-weight: var(--font-weight-semibold);
+  line-height: inherit;
+  transition:
+    background-color var(--field-transition),
+    border-color var(--field-transition);
+}
+.el-vibe-pick:hover {
+  background: var(--color-field-hover);
+}
+/* Focus: the muted 1px border on the pill, no ring, no outline (same as the fields) */
+.el-vibe-pick:has(.el-vibe-pick__button:focus-visible) {
+  border-color: var(--color-text-muted);
+}
+.el-vibe-pick__button,
+.el-vibe-pick__clear {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.el-vibe-pick__button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--vibe-pick-gap);
+}
+.el-vibe-pick__button:focus-visible {
+  outline: none;
+}
+/* Icons sit in the middle of the line; the text keeps the baseline */
+.el-vibe-pick svg {
+  flex-shrink: 0;
+  align-self: center;
+}
+.el-vibe-pick__icon {
+  width: var(--vibe-pick-icon);
+  height: var(--vibe-pick-icon);
+}
+.el-vibe-pick__chevron {
+  width: var(--vibe-pick-chevron);
+  height: var(--vibe-pick-chevron);
+  color: var(--color-text-muted);
+}
+.el-vibe-pick__clear {
+  display: grid;
+  align-self: center;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+}
+.el-vibe-pick__clear svg {
+  width: var(--vibe-pick-chevron);
+  height: var(--vibe-pick-chevron);
+}
+.el-vibe-pick__clear:hover {
+  color: var(--color-text);
+}
+.el-vibe-pick__clear:focus-visible {
+  outline: none;
+  border-color: var(--color-text-muted);
+}
+/* Tap areas: at least 44px tall (and 44px wide for the "×") while the pill stays compact */
+.el-vibe-pick__button::after,
+.el-vibe-pick__clear::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-target));
+  height: max(100%, var(--touch-target));
+  transform: translate(-50%, -50%);
+}
+.el-vibe-pick__button::after {
+  width: calc(100% + 2 * var(--vibe-pick-padding-x));
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-vibe-pick {
+    transition: none;
+  }
+}
+
+/* The panel: under the pill on desktop (placed by the component), a bottom sheet on phones */
+.el-vibe-panel {
+  position: absolute;
+  z-index: var(--z-popover);
+  top: calc(var(--vibe-panel-top, 100%) + var(--vibe-panel-offset));
+  left: var(--vibe-panel-left, 0);
+  width: min(var(--vibe-panel-width), 100%);
+  padding: var(--space-5);
+  border-radius: var(--radius-sheet);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-popover);
+}
+.el-vibe-panel__scrim {
+  display: none;
+}
+.el-vibe-panel__title {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text);
+  font-size: var(--text-empty-title);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-title);
+}
+.el-vibe-panel__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.el-vibe-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.el-vibe-option:hover {
+  background: var(--color-brand-soft);
+}
+.el-vibe-option[aria-pressed="true"] {
+  border-color: var(--color-text);
+  background: var(--color-brand-soft);
+}
+.el-vibe-option:focus-visible,
+.el-vibe-panel__text:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.el-vibe-option__icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--vibe-option-icon);
+  height: var(--vibe-option-icon);
+  border-radius: var(--radius-pill);
+  background: var(--color-field);
+}
+.el-vibe-option__icon svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.el-vibe-option__text {
+  display: grid;
+  min-width: 0;
+}
+.el-vibe-option__label {
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+}
+.el-vibe-option__hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+}
+.el-vibe-panel__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+.el-vibe-panel__text {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.el-vibe-panel__text:hover {
+  background: var(--color-field);
+}
+@media (max-width: 720px) {
+  .el-vibe-panel__scrim {
+    display: block;
+    position: fixed;
+    z-index: var(--z-sheet);
+    inset: 0;
+    background: var(--color-scrim);
+  }
+  .el-vibe-panel {
+    position: fixed;
+    z-index: var(--z-sheet);
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: var(--sheet-max-height);
+    overflow-y: auto;
+    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  }
+  .el-vibe-panel__list {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- Touch targets: at least 44x44 without changing how controls look ---------- */

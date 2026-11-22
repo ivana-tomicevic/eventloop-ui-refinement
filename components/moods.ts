@@ -1,66 +1,126 @@
 /**
- * Moods ("vibes"): how an evening feels, separate from the category (what it is).
- * Events carry `moods` read from their title and description; "Out late" and "Budget-friendly"
- * are worked out from the start time and price. "My vibes" (the modal) stores the picked ids per
- * account; Explore's "Made for your vibe" row uses them.
+ * Vibes: how a night feels, separate from the category (what it is). Picked in Explore's title
+ * ("Tonight in Madrid for [any vibe]"), one at a time.
+ * Events carry the tagged vibe ids in `moods` (read from their title and description);
+ * "Free" and "Last-minute" are worked out from the price and the start time, not stored.
+ * The pick lasts for the session only: every new visit starts on "any vibe".
  */
 import {
-  Coffee,
-  Users,
-  Moon,
-  Footprints,
-  Hammer,
-  Lightbulb,
   Wine,
-  Wallet,
+  Users,
+  User,
+  MessageCircle,
+  Music,
+  Footprints,
+  Gift,
+  Timer,
+  Sunset,
+  Sparkles,
 } from "lucide-react";
 import { eventPriceValue, type EventRecord } from "./event-data";
 import { currentUserId } from "./auth";
 
-export const MOODS = [
-  { id: "chill", label: "Chill", icon: Coffee },
-  { id: "meet-people", label: "Meet people", icon: Users },
-  { id: "out-late", label: "Out late", icon: Moon },
-  { id: "get-moving", label: "Get moving", icon: Footprints },
-  { id: "make-things", label: "Make things", icon: Hammer },
-  { id: "learn", label: "Learn something", icon: Lightbulb },
-  { id: "date-night", label: "Date night", icon: Wine },
-  { id: "budget", label: "Budget-friendly", icon: Wallet },
+export const VIBES = [
+  {
+    id: "date-night",
+    label: "Date night",
+    hint: "Easy to talk, a little romantic",
+    icon: Wine,
+  },
+  {
+    id: "friends-night",
+    label: "Friends night",
+    hint: "Good for a group",
+    icon: Users,
+  },
+  {
+    id: "solo",
+    label: "Solo & cool",
+    hint: "Easy to show up alone",
+    icon: User,
+  },
+  {
+    id: "easy-to-talk",
+    label: "Easy to talk",
+    hint: "Quiet enough to chat",
+    icon: MessageCircle,
+  },
+  {
+    id: "dance",
+    label: "Dance it out",
+    hint: "Loud, late, moving",
+    icon: Music,
+  },
+  {
+    id: "get-moving",
+    label: "Get moving",
+    hint: "Active and outside",
+    icon: Footprints,
+  },
+  { id: "free", label: "Free", hint: "No ticket to buy", icon: Gift },
+  {
+    id: "last-minute",
+    label: "Last-minute",
+    hint: "Starts within 2 hours",
+    icon: Timer,
+  },
+  {
+    id: "golden-hour",
+    label: "Golden hour",
+    hint: "Sunset, outside",
+    icon: Sunset,
+  },
+  {
+    id: "try-new",
+    label: "Try something new",
+    hint: "Firsts and surprises",
+    icon: Sparkles,
+  },
 ];
-export const moodLabel = (id: string) =>
-  MOODS.find((m) => m.id === id)?.label || id;
+export const findVibe = (id: string | null | undefined) =>
+  VIBES.find((v) => v.id === id) || null;
 
-const LATE_HOUR = 21; // "Out late": starts at 21:00 or later
-const BUDGET_MAX = 10; // "Budget-friendly": free or up to €10
+const LAST_MINUTE_MS = 2 * 60 * 60 * 1000; // "Last-minute": starts within 2 hours from now
 
-/** The event's moods: the ones read from its text plus the two worked out from its data. */
-export function eventMoods(event: EventRecord): string[] {
-  const moods = [...(event.moods || [])];
-  const start = event.start ? new Date(event.start) : null;
-  if (start && !Number.isNaN(start.getTime()) && start.getHours() >= LATE_HOUR)
-    moods.push("out-late");
-  const price = eventPriceValue(event);
-  if (price !== null && price <= BUDGET_MAX) moods.push("budget");
-  return [...new Set(moods)];
+/** True when the event has this vibe: tagged on the event, or worked out from price / start time. */
+export function hasVibe(event: EventRecord, id: string, now = new Date()) {
+  if (id === "free") return eventPriceValue(event) === 0;
+  if (id === "last-minute") {
+    const start = event.start ? new Date(event.start).getTime() : NaN;
+    const left = start - now.getTime();
+    return left >= 0 && left <= LAST_MINUTE_MS;
+  }
+  return (event.moods || []).includes(id);
 }
 
-// One entry per account. The old "prefs" key (categories + neighbourhoods) is simply ignored.
-const key = () => `eventloop-moods:${currentUserId()}`;
-
-export function readMyMoods(): string[] {
+// The picked vibe, for this session only (sessionStorage).
+const SESSION_KEY = "eventloop-vibe";
+export function readSessionVibe(): string {
   try {
-    const list = JSON.parse(localStorage.getItem(key()) || "[]");
-    const known = new Set(MOODS.map((m) => m.id));
-    return Array.isArray(list)
-      ? list.map(String).filter((id) => known.has(id))
-      : [];
+    const id = sessionStorage.getItem(SESSION_KEY);
+    return findVibe(id) ? (id as string) : "";
   } catch {
-    return [];
+    return "";
   }
 }
-
-export function saveMyMoods(ids: string[]) {
+export function saveSessionVibe(id: string) {
   try {
-    localStorage.setItem(key(), JSON.stringify(ids));
+    if (id) sessionStorage.setItem(SESSION_KEY, id);
+    else sessionStorage.removeItem(SESSION_KEY);
+  } catch {}
+}
+
+// The vibe panel opens by itself once per person (per account, or per browser when signed out).
+const introKey = () => `eventloop-vibe-intro:${currentUserId() || "guest"}`;
+export function vibeIntroSeen(): boolean {
+  try {
+    return Boolean(localStorage.getItem(introKey()));
+  } catch {
+    return true; // storage blocked: never pop the panel open
+  }
+}
+export function markVibeIntroSeen() {
+  try {
+    localStorage.setItem(introKey(), "1");
   } catch {}
 }

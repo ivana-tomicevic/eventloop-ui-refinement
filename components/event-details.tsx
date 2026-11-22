@@ -114,6 +114,10 @@ export default function EventDetails({ id }: { id: string }) {
             fill
             sizes="(max-width: 760px) 100vw, 760px"
             className="object-cover"
+            // A missing photo leaves the placeholder behind it visible.
+            onError={(e) => {
+              e.currentTarget.style.visibility = "hidden";
+            }}
             preload
           />
           <a className="el-details__back" href="/" aria-label="Back to Explore">

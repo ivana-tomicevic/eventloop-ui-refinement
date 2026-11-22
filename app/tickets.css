@@ -105,7 +105,7 @@
   aspect-ratio: var(--card-media-ratio);
   overflow: hidden;
   border-radius: var(--radius-button);
-  background: var(--color-border);
+  background: var(--photo-placeholder);
 }
 .el-ticket__body {
   flex: 1;

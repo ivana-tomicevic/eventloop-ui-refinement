@@ -54,6 +54,10 @@ export default function MyTickets() {
                       fill
                       sizes="120px"
                       className="object-cover"
+                      // A missing photo leaves the placeholder behind it visible.
+                      onError={(e) => {
+                        e.currentTarget.style.visibility = "hidden";
+                      }}
                     />
                   </div>
                   <div className="el-ticket__body">

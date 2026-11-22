@@ -41,8 +41,7 @@ export default function FeaturedCard({
             className="object-cover"
             preload
             onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = "/photos/events/jazz.jpg";
+              e.currentTarget.style.visibility = "hidden";
             }}
           />
           <span

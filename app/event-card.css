@@ -46,7 +46,7 @@
   overflow: hidden;
   border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0
     0;
-  background: var(--color-border);
+  background: var(--photo-placeholder);
 }
 .el-card__media img {
   display: block;
