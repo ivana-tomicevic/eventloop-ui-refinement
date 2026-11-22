@@ -141,6 +141,7 @@
   color: var(--color-on-brand);
   font-size: var(--text-body);
   font-weight: var(--font-weight-medium);
+  white-space: nowrap;
   text-decoration: none;
   transition: background-color 150ms ease;
 }
@@ -249,7 +250,7 @@
   }
 }
 
-/* ---------- Free event: "Save your spot" + "You're in." (components/free-join.tsx) ---------- */
+/* ---------- Free event: "Save your spot" + "You're in." (components/booking.tsx) ---------- */
 .el-join__lead {
   margin: 0 0 var(--space-5);
   color: var(--color-text-secondary);
@@ -345,23 +346,69 @@
   font-size: var(--text-body);
   font-weight: var(--font-weight-medium);
 }
-.el-join__field input {
-  min-height: var(--touch-target);
+/* Input fields (auth, host profile, event form, checkout): filled at rest, white with an ink
+   border and a soft ring on focus. The ring is the visible focus, so the default outline goes. */
+.el-join__field :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--field-height);
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid transparent;
   border-radius: var(--radius-button);
-  background: var(--color-surface);
+  background: var(--color-field);
   color: var(--color-text);
   font: inherit;
   font-size: var(--text-input);
   font-weight: var(--font-weight-regular);
+  transition:
+    background-color var(--field-transition),
+    border-color var(--field-transition),
+    box-shadow var(--field-transition);
 }
-.el-join__field input::placeholder {
+.el-join__field textarea {
+  padding-block: var(--space-3);
+  line-height: 1.5;
+  resize: vertical;
+}
+.el-join__field :is(input, textarea)::placeholder {
   color: var(--color-text-muted);
 }
-.el-join__field input:focus-visible {
+.el-join__field :is(input, select, textarea):hover {
+  background: var(--color-field-hover);
+}
+.el-join__field :is(input, select, textarea):focus-visible {
   outline: none;
-  box-shadow: var(--shadow-focus);
+  border-color: var(--color-focus);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-field-focus);
+}
+.el-join__field :is(input, select, textarea)[aria-invalid="true"] {
+  border-color: var(--color-error-border);
+  box-shadow: var(--shadow-field-error);
+}
+/* Chrome autofill paints fields blue: keep the field colour (white while focused) and ink text */
+.el-join__field input:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-text);
+  box-shadow: 0 0 0 1000px var(--color-field) inset;
+  caret-color: var(--color-text);
+}
+.el-join__field input:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1000px var(--color-field-hover) inset;
+}
+.el-join__field input:-webkit-autofill:focus-visible {
+  box-shadow:
+    0 0 0 1000px var(--color-surface) inset,
+    var(--shadow-field-focus);
+}
+.el-join__field input:-webkit-autofill[aria-invalid="true"] {
+  box-shadow:
+    0 0 0 1000px var(--color-field) inset,
+    var(--shadow-field-error);
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-join__field :is(input, select, textarea) {
+    transition: none;
+  }
 }
 .el-join__submit {
   width: 100%;
@@ -371,16 +418,15 @@
   font-weight: var(--font-weight-medium);
   cursor: pointer;
 }
-.el-join__form > .el-details__map,
-.el-join__actions .el-details__map {
+.el-join__form > .el-details__map {
   justify-self: center;
   font-size: var(--text-body);
   min-height: var(--touch-target);
 }
-.el-join__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
+
+/* "Hosted by …" (host profile) under the place line */
+.el-details__host {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--text-feat-meta);
 }

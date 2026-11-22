@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import SiteNav from "./site-nav";
 import {
+  bookingLabel,
   eventCategory,
   eventDate,
   eventImage,
@@ -20,9 +21,11 @@ import {
   findEvent,
   formatDuration,
   getSavedIds,
-  toggleSaved,
+  isFree,
   type EventRecord,
 } from "./event-data";
+import { authUrl, isSignedIn, saveOrAskToSignIn } from "./auth";
+import { hostName } from "./host";
 
 /**
  * Event details. Same type, price and button styles as the Explore cards (docs/explore-reference.html).
@@ -66,7 +69,8 @@ export default function EventDetails({ id }: { id: string }) {
     );
 
   const price = eventPrice(event);
-  const free = price === "Free";
+  const checkoutHref = `/checkout?event=${encodeURIComponent(String(event.id))}`;
+  const free = isFree(event);
   const description = event.description || event.summary;
   // Tags that repeat the category ("Social", "Sport" for Sports) or the price ("Free") are already shown above.
   const singular = (word: string) => word.toLowerCase().replace(/s$/, "");
@@ -124,9 +128,10 @@ export default function EventDetails({ id }: { id: string }) {
               saved ? `Remove ${event.title} from saved` : `Save ${event.title}`
             }
             aria-pressed={saved}
-            onClick={() =>
-              setSaved(toggleSaved(event.id).includes(String(event.id)))
-            }
+            onClick={() => {
+              const next = saveOrAskToSignIn(event.id);
+              if (next) setSaved(next.includes(String(event.id)));
+            }}
           >
             <Heart
               size={17}
@@ -154,6 +159,9 @@ export default function EventDetails({ id }: { id: string }) {
               </a>
             )}
           </p>
+          {hostName(event) && (
+            <p className="el-details__host">Hosted by {hostName(event)}</p>
+          )}
         </header>
 
         <div className="el-details__facts">
@@ -170,9 +178,16 @@ export default function EventDetails({ id }: { id: string }) {
             )}
             <a
               className="el-details__cta"
-              href={`/checkout?event=${encodeURIComponent(String(event.id))}`}
+              href={checkoutHref}
+              onClick={(e) => {
+                // Tickets need an account; after signing in they land on checkout.
+                if (!isSignedIn()) {
+                  e.preventDefault();
+                  window.location.assign(authUrl(checkoutHref));
+                }
+              }}
             >
-              {free ? "Join" : "Get tickets"}
+              {bookingLabel(event)}
             </a>
           </div>
         </div>

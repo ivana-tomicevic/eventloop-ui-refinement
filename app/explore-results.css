@@ -3,7 +3,7 @@
 
 /* ---------- Section titles ---------- */
 .el-results-section + .el-results-section {
-  margin-top: var(--section-gap);
+  margin-top: var(--results-gap);
 }
 .el-sec {
   display: flex;
@@ -84,6 +84,7 @@
   color: var(--color-on-brand);
   font-size: var(--text-body);
   font-weight: var(--font-weight-medium);
+  white-space: nowrap;
   transition: background-color 150ms ease;
 }
 .el-feat:hover .el-feat__cta {

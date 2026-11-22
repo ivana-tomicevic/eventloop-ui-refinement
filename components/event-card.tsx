@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { Heart } from "lucide-react";
 import {
   eventCategory,
@@ -15,20 +16,32 @@ import {
  * Event card — matches docs/explore-reference.html (.card).
  * The whole card is one link; the save heart is a separate button laid over the image
  * (a button can't live inside a link).
+ * Organizer screens reuse it: without `onSave` there is no heart, and `href={null}` makes a
+ * non-clickable card (the live preview in Create an event). `actions` adds a bottom row inside
+ * the card, outside the link (the organizer's status + Edit / Publish / Delete).
  */
 export default function EventCard({
   event,
-  saved,
+  saved = false,
   onSave,
+  href,
+  actions,
+  note,
 }: {
   event: EventRecord;
-  saved: boolean;
-  onSave: (id: string | number) => void;
+  saved?: boolean;
+  onSave?: (id: string | number) => void;
+  href?: string | null;
+  actions?: ReactNode;
+  /** Small line under the price (the organizer's sales) */
+  note?: ReactNode;
 }) {
   const price = eventPrice(event);
+  const Wrapper = href === null ? "div" : "a";
+  const link = href === null ? {} : { href: href ?? `/events/${event.id}` };
   return (
     <article className="el-card">
-      <a className="el-card__link" href={`/events/${event.id}`}>
+      <Wrapper className="el-card__link" {...link}>
         <div className="el-card__media">
           <Image
             src={eventImage(event)}
@@ -60,24 +73,28 @@ export default function EventCard({
               <span className="el-card__price">{price}</span>
             )}
           </div>
+          {note && <p className="el-card__note">{note}</p>}
         </div>
-      </a>
-      <button
-        className={"el-card__save" + (saved ? " el-card__save--active" : "")}
-        type="button"
-        aria-label={
-          saved ? `Remove ${event.title} from saved` : `Save ${event.title}`
-        }
-        aria-pressed={saved}
-        onClick={() => onSave(event.id)}
-      >
-        <Heart
-          size={17}
-          strokeWidth={2}
-          fill={saved ? "currentColor" : "none"}
-          aria-hidden="true"
-        />
-      </button>
+      </Wrapper>
+      {actions && <div className="el-card__actions">{actions}</div>}
+      {onSave && (
+        <button
+          className={"el-card__save" + (saved ? " el-card__save--active" : "")}
+          type="button"
+          aria-label={
+            saved ? `Remove ${event.title} from saved` : `Save ${event.title}`
+          }
+          aria-pressed={saved}
+          onClick={() => onSave(event.id)}
+        >
+          <Heart
+            size={17}
+            strokeWidth={2}
+            fill={saved ? "currentColor" : "none"}
+            aria-hidden="true"
+          />
+        </button>
+      )}
     </article>
   );
 }

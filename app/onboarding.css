@@ -1,5 +1,612 @@
-.onboarding-page { min-height: 100vh; display: grid; place-items: center; padding: 32px 16px; background: #18151d; }.onboarding-card { width: min(100%, 560px); border: 1px solid rgba(255,255,255,.22); border-radius: 24px; background: #fff; padding: 32px 40px 28px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }.onboarding-brand { display: flex; align-items: center; gap: 7px; margin-bottom: 26px; color: #161218; font-size: 13px; font-weight: 700; }.onboarding-progress { display: flex; gap: 5px; margin-bottom: 30px; }.onboarding-progress span { height: 4px; flex: 1; border-radius: 999px; background: #ece8f2; }.onboarding-progress .onboarding-progress__active { background: var(--purple); }.onboarding-card .eyebrow { margin: 0 0 8px; color: var(--purple); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }.onboarding-card h1 { margin: 0 0 8px; color: #151217; font-size: 31px; letter-spacing: -.055em; }.onboarding-subtitle { margin: 0 0 24px; color: #6b6670; font-size: 12px; line-height: 1.45; }.interest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }.interest-card { position: relative; display: flex; min-height: 144px; flex-direction: column; align-items: flex-start; gap: 7px; border: 1px solid rgba(28,20,35,.12); border-radius: 15px; padding: 14px; color: #141116; text-align: left; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }.interest-card:hover { transform: translateY(-2px); box-shadow: 0 7px 16px rgba(35,20,50,.09); }.interest-card:focus-visible { outline: 3px solid #d7c4ff; outline-offset: 2px; }.interest-card--lavender { background: #faf5ff; }.interest-card--rose { background: #fff2f4; }.interest-card--mint { background: #f1fcf5; }.interest-card--blue { background: #f2f5ff; }.interest-card--peach { background: #fff4e6; }.interest-card--green { background: #ebfbf4; }.interest-card--pink { background: #fcf1ff; }.interest-card--blush { background: #fff5f7; }.interest-card--teal { background: #effcfb; }.interest-card--selected { border-color: var(--purple); box-shadow: 0 0 0 3px #e9ddff; }.interest-icon { display: grid; width: 27px; height: 27px; place-items: center; margin-bottom: 7px; color: #201c25; font-size: 23px; line-height: 1; }.interest-card strong { max-width: 130px; font-size: 12px; line-height: 1.15; }.interest-card > span:last-of-type { max-width: 130px; color: #6e6970; font-size: 10px; line-height: 1.2; }.interest-check { position: absolute; top: 10px; right: 10px; display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: var(--purple); color: white; font-size: 11px; }.onboarding-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 26px; }.onboarding-primary, .onboarding-secondary { display: flex; min-height: 44px; align-items: center; justify-content: center; border-radius: var(--radius-button); font-size: 15px; text-decoration: none; font-family: inherit; cursor: pointer; }
-.onboarding-primary { background: var(--color-brand); color: var(--color-on-brand); }.onboarding-primary--disabled { background: var(--color-brand-soft); color: var(--color-brand); pointer-events: none; }.onboarding-secondary { border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-brand); }.onboarding-skip { display: block; margin: 15px auto 0; border: 0; background: transparent; color: #77717d; font-size: 10px; text-decoration: underline; }.onboarding-skip:hover { color: var(--purple); }
-@media (max-width: 600px) { .onboarding-page { padding: 16px; align-items: start; }.onboarding-card { padding: 24px 18px 22px; border-radius: 20px; }.onboarding-card h1 { font-size: 28px; }.interest-grid { gap: 9px; }.interest-card { min-height: 130px; padding: 11px; border-radius: 12px; }.interest-card strong { font-size: 11px; }.interest-card > span:last-of-type { font-size: 9px; }.interest-icon { margin-bottom: 3px; }.onboarding-actions { margin-top: 20px; }}
-@media (max-width: 390px) { .interest-grid { grid-template-columns: repeat(2, 1fr); }.interest-card { min-height: 126px; }.interest-card:nth-child(3) { grid-column: span 2; min-height: 106px; }}
-.discovery-options { display: flex; flex-direction: column; gap: 14px; }.discovery-option { position: relative; display: flex; min-height: 100px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 12px; border: 1px solid #dcd8df; border-radius: 15px; padding: 18px; background: white; color: #161218; text-align: left; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }.discovery-option:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(35,20,50,.06); }.discovery-option--selected { border-color: var(--purple); box-shadow: 0 0 0 3px #eee7ff; }.discovery-option > span { display: flex; align-items: center; gap: 12px; }.discovery-option strong { font-size: 12px; }.discovery-option em { border-radius: 5px; padding: 3px 6px; background: #f0eaff; color: var(--purple); font-size: 9px; font-style: normal; }.discovery-option small { color: #6e6970; font-size: 10px; }.onboarding-complete { display: flex; flex-direction: column; align-items: center; padding: 42px 0 22px; text-align: center; }.onboarding-complete-icon { display: grid; width: 78px; height: 78px; place-items: center; margin-bottom: 24px; border-radius: 50%; background: #f0eaff; color: var(--purple); font-size: 32px; font-weight: 700; }.onboarding-complete .onboarding-subtitle { max-width: 370px; margin-bottom: 0; }
+/* OnboardingShell (auth, host profile, welcome), "My vibes" modal, Explore vibe rows + footer,
+   confetti. Builds on .el-nav__logo, .el-time-filter, .el-vibe, .el-join*, .el-pay*. Tokens only. */
+
+/* ---------- Shell: small logo top left, one card centred on the page ---------- */
+.el-shell {
+  overflow-x: clip; /* the welcome photos may reach past narrow edges */
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  gap: var(--space-4);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--space-4);
+  background: var(--canvas);
+  color: var(--color-text);
+}
+.el-shell__logo {
+  justify-self: start;
+}
+/* With a real header (booking steps): the header spans the page, the card keeps its margins */
+.el-shell--header {
+  gap: var(--space-6);
+  padding: 0 0 var(--space-6);
+}
+.el-shell--header > .el-nav {
+  justify-self: stretch;
+}
+.el-shell--header > .el-shell__card {
+  width: calc(100% - 2 * var(--space-4));
+}
+/* "Back to event" in the checkout / payment header */
+.el-nav__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--touch-target);
+}
+.el-nav__back svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* ---------- Booking confirmation ("You're in."), everything centred ---------- */
+.el-booking-done {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.el-booking-done > .el-shell__lead {
+  margin-bottom: var(--space-5);
+}
+.el-booking-done > .el-join__event {
+  justify-self: stretch;
+  text-align: left;
+}
+.el-booking-done > .el-card__free,
+.el-booking-done__paid {
+  margin: var(--space-4) 0 0;
+}
+.el-booking-done__paid {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+}
+.el-booking-done > .el-pay__demo {
+  margin-top: var(--space-3);
+}
+.el-shell__card {
+  align-self: center;
+  width: 100%;
+  max-width: var(--shell-card-width);
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sheet);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sheet);
+}
+.el-shell__title {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text);
+  font-size: var(--text-page-title-mobile);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-title);
+  line-height: 1.25;
+}
+.el-shell__lead {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+/* Chips wrap here (Explore scrolls them sideways on phones). */
+.el-shell .el-shell__chips {
+  flex-wrap: wrap;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+}
+.el-vibe--area {
+  --vibe-accent: var(--color-text);
+}
+.el-shell__skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-button);
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.el-shell__skip:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+@media (max-width: 480px) {
+  .el-shell__card {
+    padding: var(--space-5);
+  }
+}
+
+/* ---------- Auth ---------- */
+.el-auth__switch {
+  display: flex;
+  width: 100%;
+  margin: 0 0 var(--space-4);
+}
+.el-auth__switch button {
+  flex: 1;
+  min-height: var(--touch-target);
+}
+.el-auth__password {
+  position: relative;
+  display: block;
+}
+.el-auth__password input {
+  padding-right: calc(var(--touch-target) + var(--space-2));
+}
+/* 44px show/hide button, centred inside the 52px field */
+.el-auth__password .el-org__icon {
+  position: absolute;
+  top: calc((var(--field-height) - var(--touch-target)) / 2);
+  right: calc((var(--field-height) - var(--touch-target)) / 2);
+}
+/* Google / Apple: two white bordered buttons side by side */
+.el-auth__social {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+.el-auth__provider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-button);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.el-auth__provider:hover {
+  background: var(--color-hover-warm);
+}
+.el-auth__provider:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.el-auth__logo-mark {
+  flex-shrink: 0;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.el-auth__demo {
+  margin-top: var(--space-2);
+}
+/* "or" with a line on each side */
+.el-auth__or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+}
+.el-auth__or::before,
+.el-auth__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.el-auth__or + .el-join__form {
+  margin-top: var(--space-4);
+}
+/* "Hosting events? Sign up as a host" (sign up only) */
+.el-auth__host p {
+  margin: 0;
+  padding-top: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--text-body);
+  text-align: center;
+}
+.el-auth__host .el-details__map {
+  min-height: var(--touch-target);
+}
+.el-auth__inline-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.el-auth__inline-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Log in <-> Sign up without a jump: fields only one mode has open and close (height + opacity) */
+.el-auth__reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+/* Only after a real switch (not when the page opens in one mode) */
+.el-auth__card--animate .el-auth__reveal {
+  transition:
+    grid-template-rows 200ms ease,
+    opacity 200ms ease;
+}
+.el-auth__reveal > * {
+  min-height: 0;
+  overflow: hidden;
+}
+.el-auth__reveal[data-open="false"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+/* The closed name field still leaves the form gap above Email; drop the same space above the form. */
+.el-auth__or + .el-join__form.el-auth__form--login {
+  margin-top: 0;
+}
+.el-auth__card--animate .el-join__form {
+  transition: margin-top 200ms ease;
+}
+/* Title, intro and button text cross-fade when the mode changes */
+.el-auth__fade {
+  display: inline-block;
+}
+.el-auth__card--animate .el-auth__fade {
+  animation: el-auth-fade 200ms ease;
+}
+@keyframes el-auth-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-auth__card--animate .el-auth__reveal,
+  .el-auth__card--animate .el-join__form {
+    transition: none;
+  }
+  .el-auth__card--animate .el-auth__fade {
+    animation: none;
+  }
+}
+
+/* ---------- Welcome ("Welcome to Eventloop.") ---------- */
+.el-allset {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.el-allset__check {
+  display: grid;
+  place-items: center;
+  width: var(--allset-check-size);
+  height: var(--allset-check-size);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  animation: el-check-in 320ms ease-out;
+}
+.el-allset__check svg {
+  width: var(--space-6);
+  height: var(--space-6);
+}
+@keyframes el-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.el-allset__actions {
+  display: grid;
+  justify-items: center;
+  justify-self: stretch;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+/* Photos behind the card (desktop only): rounded, tilted, partly outside the card's edges */
+.el-shell__stage {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  max-width: var(--shell-card-width);
+}
+.el-shell__stage > .el-shell__card {
+  position: relative;
+  z-index: 1;
+}
+.el-allset__photos {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .el-allset__photos {
+    display: block;
+  }
+}
+.el-allset__photo {
+  position: absolute;
+  overflow: hidden;
+  width: var(--allset-photo-width);
+  border-radius: var(--radius-card);
+  background: var(--color-border);
+  box-shadow: var(--shadow-card);
+  animation: el-photo-in 400ms ease-out both;
+}
+.el-allset__photo--1 {
+  top: calc(-1 * var(--space-7));
+  left: calc(-1 * var(--allset-photo-out));
+  height: 220px;
+  rotate: -6deg;
+}
+.el-allset__photo--2 {
+  bottom: calc(-1 * var(--space-8));
+  left: calc(-1 * var(--allset-photo-out) + var(--space-6));
+  height: 170px;
+  rotate: 4deg;
+  animation-delay: 80ms;
+}
+.el-allset__photo--3 {
+  top: calc(-1 * var(--space-8));
+  right: calc(-1 * var(--allset-photo-out) + var(--space-5));
+  height: 180px;
+  rotate: 5deg;
+  animation-delay: 160ms;
+}
+.el-allset__photo--4 {
+  bottom: calc(-1 * var(--space-7));
+  right: calc(-1 * var(--allset-photo-out));
+  height: 240px;
+  rotate: -4deg;
+  animation-delay: 240ms;
+}
+@keyframes el-photo-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-allset__check,
+  .el-allset__photo {
+    animation: none;
+  }
+}
+
+/* ---------- "My vibes" modal ---------- */
+.el-modal {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--color-scrim);
+}
+.el-modal__card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--modal-width);
+  max-height: var(--modal-max-height);
+  overflow: hidden;
+  border-radius: var(--radius-sheet);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-popover);
+}
+.el-modal__head {
+  padding: var(--space-3) var(--space-3) 0;
+}
+.el-modal__close {
+  color: var(--color-text);
+}
+.el-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-6) var(--space-5);
+}
+.el-modal__section {
+  margin: var(--space-5) 0 var(--space-3);
+  color: var(--color-text);
+  font-size: var(--text-section-label);
+  font-weight: var(--font-weight-semibold);
+}
+.el-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.el-modal__body .el-shell__lead + .el-picks {
+  margin-top: var(--space-5);
+}
+/* Neutral vibe chip (modal and Explore): white with a border; chosen = ink border + soft fill */
+.el-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--pick-chip-height);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.el-pick svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--color-text-secondary);
+}
+.el-pick:hover {
+  border-color: var(--color-text);
+}
+.el-pick[aria-pressed="true"] {
+  border-color: var(--color-brand);
+  background: var(--color-brand-soft);
+  box-shadow: inset 0 0 0 1px var(--color-brand);
+}
+.el-pick[aria-pressed="true"] svg {
+  color: var(--color-text);
+}
+.el-pick:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.el-modal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+.el-modal__count {
+  color: var(--color-text-secondary);
+  font-size: var(--text-body);
+}
+.el-modal__save {
+  flex: none;
+  border: 0;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+@media (max-width: 480px) {
+  .el-modal__body {
+    padding-inline: var(--space-5);
+  }
+  .el-modal__bar {
+    padding-inline: var(--space-5);
+  }
+}
+
+/* ---------- Explore: "Find your vibe" / "Made for your vibe", quiet footer ---------- */
+/* One row of up to 4 cards; on phones it scrolls sideways */
+.el-grid.el-foryou {
+  grid-template-columns: none;
+  grid-auto-columns: calc((100% - 3 * var(--space-4)) / 4);
+  grid-auto-flow: column;
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+}
+@media (max-width: 900px) {
+  .el-grid.el-foryou {
+    grid-auto-columns: var(--foryou-card-mobile);
+  }
+}
+.el-foryou__more {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-2);
+  font-size: var(--text-body);
+}
+.el-explore-footer {
+  margin-top: var(--space-7);
+  padding: var(--space-5) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--text-body);
+  text-align: center;
+}
+.el-explore-footer p {
+  margin: 0;
+}
+.el-explore-footer .el-details__map {
+  min-height: var(--touch-target);
+}
+
+/* ---------- Explore: "Where?" row ---------- */
+.el-vibes .el-vibes__where {
+  margin: var(--space-4) 0 var(--space-3);
+}
+
+/* ---------- Header additions ---------- */
+/* "Become a host": text link left of the avatar; hidden on narrow phones (the footer has it) */
+.el-nav__become {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+}
+@media (max-width: 480px) {
+  .el-nav__become {
+    display: none;
+  }
+}
+/* Signed out on narrow phones: Saved/Tickets need an account anyway, so make room for Log in + Sign up. */
+@media (max-width: 400px) {
+  .el-nav--guest .el-nav__link--member {
+    display: none;
+  }
+  .el-nav__avatar-button svg {
+    display: none;
+  }
+}
+
+/* ---------- Confetti (1.5 s at most: 1.25 s + up to 240 ms delay; never blocks clicks) ---------- */
+.el-confetti {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.el-confetti__piece {
+  position: absolute;
+  top: calc(-1 * var(--space-3));
+  left: var(--x);
+  width: var(--space-2);
+  height: var(--space-3);
+  border-radius: calc(var(--space-1) / 2);
+  opacity: 0;
+  animation: el-confetti-fall 1.25s ease-in var(--delay) forwards;
+}
+.el-confetti__piece--ink {
+  background: var(--color-brand);
+}
+.el-confetti__piece--hot {
+  background: var(--color-hot);
+}
+.el-confetti__piece--pop {
+  background: var(--cat-sports-accent);
+}
+@keyframes el-confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift), 70vh) rotate(var(--spin));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-confetti {
+    display: none;
+  }
+}

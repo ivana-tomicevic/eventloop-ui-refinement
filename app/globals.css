@@ -3,18 +3,14 @@
 @import 'shadcn/tailwind.css';
 @import './tokens.css';
 @import './details.css';
-@import './checkout.css';
 @import './onboarding.css';
-@import './auth.css';
-@import './organizer.css';
-@import './create-event.css';
-@import './my-events.css';
-@import './create-event-enhancements.css';
 @import './explore.css';
 @import './eventloop-polish.css';
 @import './event-card.css';
 @import './explore-header.css';
 @import './explore-results.css';
+@import './tickets.css';
+@import './organizer.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -50,10 +46,6 @@ button { cursor: pointer; }
 .outline-button, .primary-button { border-radius: var(--radius-button); padding: 7px 10px; font-size: 9px; }
 .outline-button { border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); }
 .primary-button { border: 0; background: var(--color-brand); color: var(--color-on-brand); }
-/* Shared button states (tokens only; primary = solid brand, secondary = white with border) */
-.primary-button:hover, .auth-primary:hover, .checkout-primary:hover, .onboarding-primary:hover, .organizer-primary:not(:disabled):hover { background: var(--color-brand-hover); }
-.outline-button:hover, .checkout-secondary:hover, .create-secondary:hover, .onboarding-secondary:hover, .organizer-secondary:hover { background: var(--color-brand-soft); }
-:is(.primary-button, .outline-button, .auth-primary, .checkout-primary, .checkout-secondary, .create-secondary, .onboarding-primary, .onboarding-secondary, .organizer-primary, .organizer-secondary):focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .section-heading { margin-bottom: 22px; }
 .section-heading h1, .section-heading h2 { margin: 0 0 11px; font-size: clamp(26px, 3.8vw, 40px); line-height: 1; letter-spacing: -.055em; }
 .event-card { min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-card); transition: transform .2s ease, box-shadow .2s ease; }

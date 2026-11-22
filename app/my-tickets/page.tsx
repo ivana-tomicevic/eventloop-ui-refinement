@@ -1,6 +1,5 @@
-'use client'
-import {useEffect,useState} from 'react'
-import SiteNav from '@/components/site-nav'
-import {getEvent,eventDate,eventLocation,eventImage,type EventRecord} from '@/components/event-data'
-import {Ticket,CalendarDays,MapPin} from 'lucide-react'
-export default function MyTicketsPage(){const [order,setOrder]=useState<{eventId:string;quantities:{general:number;vip:number;student:number};total:number;confirmed:boolean}|null>(null);const [event,setEvent]=useState<EventRecord|null>(null);useEffect(()=>{try{const saved=JSON.parse(sessionStorage.getItem('eventloop-demo-order')||'null');if(saved?.confirmed){setOrder(saved);setEvent(getEvent(saved.eventId))}}catch{}},[]);return <main className="eventloop-shell"><SiteNav/><div className="el-tickets-content"><h1>My Tickets</h1><p>Your demo bookings in this browser session.</p>{order&&event?<article className="el-ticket"><img src={eventImage(event)} alt=""/><div><span className="el-card-category">DEMO BOOKING CONFIRMED</span><h2>{event.title}</h2><p><CalendarDays size={16}/>{eventDate(event)}</p><p><MapPin size={16}/>{eventLocation(event)}</p><p><Ticket size={16}/>{Object.entries(order.quantities).filter(([,n])=>n>0).map(([type,n])=>`${n} ${type}`).join(', ')}</p><strong>{order.total} KM · simulated payment</strong></div></article>:<div className="explore-empty"><h2>No tickets yet</h2><p>Complete a demo checkout to see your booking here.</p><a href="/">Explore events</a></div>}</div></main>}
+import MyTickets from "@/components/my-tickets";
+
+export default function Page() {
+  return <MyTickets />;
+}

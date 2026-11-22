@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import {
+  bookingLabel,
   eventCategory,
   eventDate,
   eventImage,
@@ -14,7 +15,7 @@ import {
 /**
  * Featured "Pick of the night" card — docs/explore-reference.html (.card.feat).
  * Reuses the event card's chip, heart, price and Free pill classes. The whole card is one link;
- * "Get tickets" is only styled like a button (a link can't contain another interactive element),
+ * The booking label is only styled like a button (a link can't contain another interactive element),
  * and the heart is a separate button laid over the image.
  */
 export default function FeaturedCard({
@@ -63,7 +64,7 @@ export default function FeaturedCard({
             ) : (
               <span className="el-card__price el-feat__price">{price}</span>
             )}
-            <span className="el-feat__cta">Get tickets</span>
+            <span className="el-feat__cta">{bookingLabel(event)}</span>
           </div>
         </div>
       </a>

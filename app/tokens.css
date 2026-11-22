@@ -33,6 +33,7 @@
   --color-brand: #15141a;
   --color-brand-hover: #2a2933;
   --color-brand-soft: #efeef1; /* selected chips/hover; pair with an ink border when selected */
+  --color-hover-warm: #f3f1ec; /* hover fill for ghost buttons */
   --color-on-brand: #ffffff;
 
   /* Purple accent — ONLY for the logo mark. Do not use anywhere else. */
@@ -41,6 +42,17 @@
 
   /* Saved (filled heart) */
   --color-saved: #e5484d;
+
+  /* Form errors (text, 5.1:1 on surface) */
+  --color-error: #c4282d;
+  --color-error-border: #e5484d; /* input border in the error state (non-text) */
+
+  /* Input fields: filled, white with an ink border on focus */
+  --color-field: #f6f4f0;
+  --color-field-hover: #f1eee9;
+
+  /* Modal backdrop */
+  --color-scrim: rgb(21 20 26 / 0.4);
 
   /* Focus ring: ink, drawn with a 2px gap */
   --color-focus: #15141a;
@@ -57,6 +69,7 @@
   --radius-card: 16px;
   --radius-button: 12px;
   --radius-pill: 9999px;
+  --radius-sheet: 24px; /* onboarding card and modals */
 
   /* Type */
   --font-sans:
@@ -91,6 +104,9 @@
   --shadow-popover: 0 12px 30px rgb(21 20 26 / 0.11);
   /* For inputs that show focus on their wrapper: 2px gap, then a 2px ink ring */
   --shadow-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-focus);
+  --shadow-sheet: 0 8px 32px rgb(21 20 26 / 0.06); /* onboarding card */
+  --shadow-field-focus: 0 0 0 4px rgb(21 20 26 / 0.08);
+  --shadow-field-error: 0 0 0 4px rgb(229 72 77 / 0.12);
 
   /* shadcn/ui names, mapped onto the tokens above */
   --color-background: var(--color-page);
@@ -127,6 +143,7 @@
   --nav-gap-mobile: 14px;
   --nav-gap-compact: 12px; /* phones up to 480px, so logo + links + Join fit at 320px */
   --touch-target: 44px; /* minimum tap area for buttons and the heart */
+  --ghost-button-height: 36px;
   --nav-mark-size: 24px;
   --nav-mark-radius: 8px;
   --avatar-size: 32px;
@@ -143,6 +160,8 @@
   --button-padding: 8px 16px;
   --empty-padding: 40px 24px;
   --section-gap: 26px; /* space above each page section */
+  --results-gap: 32px; /* between Explore result sections */
+  --foryou-card-mobile: 78%; /* "Made for your vibe" card width when the row scrolls */
   --pill-gap: 10px;
   --icon-sm: 17px; /* icons inside buttons */
   --icon-md: 19px; /* search glass */
@@ -195,6 +214,24 @@
   /* Booking confirmation */
   --success-card-width: 640px;
   --success-thumb-size: 64px;
+  --ticket-thumb-size: 112px; /* My Tickets */
+
+  /* Organizer */
+  --create-preview-width: 340px; /* live card preview next to the form */
+  --create-button-min: 160px;
+
+  /* Auth + onboarding (OnboardingShell), "My vibes" modal */
+  --shell-card-width: 480px;
+  --allset-check-size: 64px;
+  --allset-photo-width: 180px; /* welcome screen photos (desktop) */
+  --allset-photo-out: 140px; /* how far a photo reaches past the card edge */
+  --modal-width: 560px;
+  --modal-max-height: 85vh;
+  --pick-chip-height: 48px;
+
+  /* Input fields */
+  --field-height: 52px;
+  --field-transition: 120ms ease;
 
   /* Legacy aliases used by older screens — they now resolve to the tokens */
   --ink: var(--color-text);
