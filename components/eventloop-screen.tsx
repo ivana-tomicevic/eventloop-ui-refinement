@@ -14,6 +14,8 @@ import {
 import { authUrl, isSignedIn, saveOrAskToSignIn, startHosting } from "./auth";
 import { readHostProfile } from "./host";
 import VibePicker from "./vibe-picker";
+import EventTimeline from "./event-timeline";
+import ViewToggle, { type ExploreView } from "./view-toggle";
 import AreaPicker from "./area-picker";
 import EventCard from "./event-card";
 import FeaturedCard from "./featured-card";
@@ -25,6 +27,7 @@ import {
   isStartingSoon,
   type EventRecord,
 } from "./event-data";
+const VIEW_KEY = "eventloop-view";
 type EmptyStateProps = {
   title: string;
   text: string;
@@ -143,6 +146,8 @@ export default function EventloopScreen({
   const [area, setArea] = useState("");
   /** The vibe in the title (one at a time, "" = any vibe). Kept for this session only. */
   const [vibeId, setVibeId] = useState("");
+  /** "List | Timeline" (Tonight only). Remembered for this session; List by default. */
+  const [view, setView] = useState<ExploreView>("list");
   /** First visit: the vibe panel opens by itself, once per person. */
   const [vibeIntro, setVibeIntro] = useState(false);
   const [saved, setSaved] = useState<string[]>([]);
@@ -169,6 +174,10 @@ export default function EventloopScreen({
         setDefaultTime("tonight");
       }
       setVibeId(readSessionVibe());
+      try {
+        if (sessionStorage.getItem(VIEW_KEY) === "timeline")
+          setView("timeline");
+      } catch {}
       setVibeIntro(!vibeIntroSeen());
       if (isSignedIn())
         setHostLink(readHostProfile() ? "/organizer" : "/organizer/setup");
@@ -176,6 +185,12 @@ export default function EventloopScreen({
     setSearch(q);
     setSaved(getSavedIds());
   }, []);
+  const pickView = (next: ExploreView) => {
+    setView(next);
+    try {
+      sessionStorage.setItem(VIEW_KEY, next);
+    } catch {}
+  };
   const pickVibe = (id: string) => {
     setVibeId(id);
     saveSessionVibe(id);
@@ -293,6 +308,12 @@ export default function EventloopScreen({
     : filtered.find((e) => eventTiming(e).state === "upcoming") || null;
   const others = featured ? filtered.filter((e) => e !== featured) : filtered;
   const gridEvents = others;
+  // The view switch only exists on Tonight; every other tab is the List.
+  const showViewToggle = !savedOnly && timeFilter === "tonight";
+  const timeline = showViewToggle && view === "timeline";
+  const viewToggle = showViewToggle ? (
+    <ViewToggle value={view} onChange={pickView} />
+  ) : null;
   // One empty state that replaces both sections. The most specific cause wins: search, chips,
   // then day. With a vibe picked (and no search) the header says it instead.
   const vibeEmpty = Boolean(picked) && !search && !activeVibe;
@@ -402,12 +423,9 @@ export default function EventloopScreen({
                 </>
               )}
             </h1>
-            {loaded && !savedOnly && !picked && (
-              <p className="el-hero__sub" aria-live="polite">
-                {filtered.length > 0
-                  ? `${count(filtered.length)} in Madrid${activeTime.id === "all" ? "" : ` ${activeTime.when}`}. Pick a vibe to narrow it down.`
-                  : "Nothing here yet. Try another day."}
-              </p>
+            {/* "Any vibe": a second title line instead of a subtitle */}
+            {!savedOnly && !picked && (
+              <p className="el-hero__aside">{"Don't stay in."}</p>
             )}
             {loaded && picked && (
               <p className="el-hero__sub" aria-live="polite">
@@ -493,26 +511,55 @@ export default function EventloopScreen({
             </div>
           )}
         </section>
-        {loaded && featured && (
-          <section className="el-results-section" aria-labelledby="pick-title">
+        {/* First section: "Starting soon / Next up / Best match" in the List, or the Timeline on
+            Tonight. One section, so the "List | Timeline" switch stays the same element (and keeps
+            focus) when the view changes. */}
+        {loaded && (timeline || featured) && (
+          <section
+            className="el-results-section"
+            aria-labelledby={timeline ? "timeline-title" : "pick-title"}
+          >
             <div className="el-sec">
-              <h2 id="pick-title">
-                {picked
-                  ? "Best match"
-                  : isStartingSoon(featured)
-                    ? "Starting soon"
-                    : "Next up"}
-              </h2>
+              {timeline ? (
+                <h2 id="timeline-title">The night, hour by hour</h2>
+              ) : (
+                <h2 id="pick-title">
+                  {picked
+                    ? "Best match"
+                    : featured && isStartingSoon(featured)
+                      ? "Starting soon"
+                      : "Next up"}
+                </h2>
+              )}
+              {viewToggle}
             </div>
-            <FeaturedCard
-              event={featured}
-              saved={saved.includes(String(featured.id))}
-              onSave={toggle}
-            />
+            {!timeline && featured ? (
+              <FeaturedCard
+                event={featured}
+                saved={saved.includes(String(featured.id))}
+                onSave={toggle}
+              />
+            ) : filtered.length ? (
+              <EventTimeline events={filtered} saved={saved} onSave={toggle} />
+            ) : (
+              <div className="el-tl-empty" role="status">
+                <h3>{"Don't stay in."}</h3>
+                <p>Nothing tonight yet. Try tomorrow.</p>
+                <button
+                  type="button"
+                  className="el-empty__cta"
+                  onClick={() => setTimeFilter("tomorrow")}
+                >
+                  See tomorrow
+                </button>
+              </div>
+            )}
           </section>
         )}
-        {loaded && !filtered.length && !vibeEmpty && <EmptyState {...empty} />}
-        {loaded && gridEvents.length > 0 && (
+        {loaded && !timeline && !filtered.length && !vibeEmpty && (
+          <EmptyState {...empty} />
+        )}
+        {loaded && !timeline && gridEvents.length > 0 && (
           <section className="el-results-section" aria-labelledby="grid-title">
             <div className="el-sec">
               <h2 id="grid-title">
@@ -537,6 +584,7 @@ export default function EventloopScreen({
                     Clear search
                   </button>
                 )}
+                {!featured && viewToggle}
               </span>
             </div>
             {grid(gridEvents)}

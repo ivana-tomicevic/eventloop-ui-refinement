@@ -125,3 +125,252 @@
     right: var(--card-inset);
   }
 }
+
+/* ---------- "List | Timeline" switch (Tonight only; components/view-toggle.tsx) ---------- */
+.el-sec:has(.el-view) {
+  align-items: center;
+}
+.el-view {
+  display: inline-flex;
+  flex: none;
+  gap: var(--segment-gap);
+  height: var(--view-height);
+  padding: var(--segment-inset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+.el-view__option {
+  position: relative;
+  padding: 0 var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  cursor: pointer;
+}
+.el-view__option:hover {
+  color: var(--color-text);
+}
+.el-view__option[aria-checked="true"] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-weight: var(--font-weight-medium);
+}
+/* Focus like everywhere else: white fill + 1px muted border, no ring */
+.el-view__option:focus-visible {
+  outline: none;
+  border-color: var(--color-text-muted);
+}
+.el-view__option[aria-checked="false"]:focus-visible {
+  background: var(--color-surface);
+}
+/* 36px to look at, 44px to tap */
+.el-view__option::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--touch-target);
+  transform: translateY(-50%);
+}
+
+/* ---------- Timeline: the night, hour by hour (components/event-timeline.tsx) ---------- */
+.el-tl {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* The thin vertical line through every dot */
+.el-tl::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--tl-time-col) + var(--tl-rail) / 2);
+  width: 1px;
+  background: var(--line);
+}
+.el-tl__item,
+.el-tl__now {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tl-time-col) var(--tl-rail) minmax(0, 1fr);
+  align-items: center;
+}
+/* Hours with nothing on: a little more space, never an empty row */
+.el-tl__item {
+  margin-top: calc(var(--tl-empty-hours, 0) * var(--tl-hour-gap));
+}
+.el-tl__time {
+  color: var(--color-text-muted);
+  font-size: var(--text-tl-time);
+  font-variant-numeric: tabular-nums;
+}
+.el-tl__dot {
+  justify-self: center;
+  width: var(--tl-dot);
+  height: var(--tl-dot);
+  border-radius: var(--radius-pill);
+  background: var(--color-text-muted);
+  box-shadow: 0 0 0 var(--space-1) var(--color-page); /* a gap in the line around the dot */
+}
+/* "Now": a lime dot on the line, a lime line across, and the time on a lime label */
+.el-tl__now {
+  min-height: var(--space-5);
+}
+.el-tl__now::before {
+  content: "";
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  width: var(--tl-dot);
+  height: var(--tl-dot);
+  border-radius: var(--radius-pill);
+  background: var(--color-live);
+  box-shadow: 0 0 0 var(--space-1) var(--color-page);
+}
+.el-tl__now::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: calc(var(--tl-time-col) + var(--tl-rail) / 2);
+  height: 2px;
+  background: var(--color-live);
+  transform: translateY(-50%);
+}
+.el-tl__now-label {
+  position: relative;
+  z-index: 1;
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: start;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-live);
+  color: var(--color-on-live);
+  font-size: var(--text-meta);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+/* Compact card: the whole card is the link, the heart sits on top of it */
+.el-tl-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+.el-tl-card__link {
+  display: grid;
+  flex: 1;
+  grid-template-columns: var(--tl-photo) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.el-tl-card__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.el-tl-card:has(.el-tl-card__link:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.el-tl-card__link:focus-visible {
+  outline: none;
+}
+.el-tl-card__photo {
+  position: relative;
+  width: var(--tl-photo);
+  height: var(--tl-photo);
+  overflow: hidden;
+  border-radius: var(--radius-button);
+  background: var(--photo-placeholder);
+}
+.el-tl-card__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.el-tl-card__title {
+  color: var(--color-text);
+  font-size: var(--text-tl-title);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.25;
+}
+.el-tl-card__meta {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--text-feat-meta);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The lime "In 40 min" / "Started 12 min ago" chip, in the text instead of on a photo */
+.el-card__chip.el-tl-card__chip {
+  position: static;
+  justify-self: start;
+  max-width: 100%;
+  margin-top: var(--space-1);
+}
+.el-card__save.el-tl-card__save {
+  position: relative;
+  z-index: 1;
+  top: auto;
+  right: auto;
+  flex: none;
+}
+/* Nothing on tonight */
+.el-tl-empty {
+  padding: var(--empty-padding);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  text-align: center;
+}
+.el-tl-empty h3 {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text);
+  font-size: var(--text-empty-title);
+  font-weight: var(--font-weight-semibold);
+}
+.el-tl-empty p {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+@media (max-width: 480px) {
+  .el-tl {
+    --tl-time-col: var(--tl-time-col-mobile);
+    --tl-photo: var(--tl-photo-mobile);
+  }
+  /* Too narrow for a price column: the price goes under the text */
+  .el-tl-card__link {
+    grid-template-columns: var(--tl-photo) minmax(0, 1fr);
+    row-gap: var(--space-1);
+  }
+  .el-tl-card__photo {
+    grid-row: span 2;
+  }
+  .el-tl-card__link > .el-card__free,
+  .el-tl-card__price {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

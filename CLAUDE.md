@@ -21,7 +21,7 @@ Web app for discovering small local events (by interest, mood, AI-style search).
 - Copy tone: lively, cool, assertive and inviting. Short sentences, address the user directly, no corporate phrasing. Examples: "Tonight in Madrid", "What's your vibe?", "Pick of the night", "Quiet night. Tomorrow is packed."
 - Visual direction: warm near-white background (not grey), pure white cards, near-black text, one purple brand accent, one warm coral accent used only for urgency. No gradients on buttons. Text contrast at least 4.5:1.
 - Display font (Bricolage Grotesque, --font-display) samo za naslov zaglavlja Explorea; sve ostalo Inter.
-- Lime (--color-live) samo za čipove uskoro/počelo (starts <2h, started <2h) i Now liniju na timelineu.
+- Zaglavlje bez vibea: kremasta kartica (--tint-any-bg) s dva reda: naslov + 'Don't stay in.' u sivom. Lime samo za čipove uskoro/počelo (unutar 60 min) i Now liniju.
 - Price is the strongest element on a card (bold, tabular numbers).
 - All styles (colors, radii, fonts) go through tokens defined in one place, never hard-coded per component.
 - Match the existing visual style (colors, radii, spacing in the CSS files). Reuse existing classes and components before adding new ones.

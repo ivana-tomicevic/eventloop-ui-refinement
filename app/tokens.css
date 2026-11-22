@@ -66,8 +66,8 @@
 
   /* Explore header tints (135deg gradient a -> b): neutral for "any vibe", then one pair per vibe.
      Very light: about 10% saturation or less; ink text 15.7:1+ and muted text 4.8:1+ on all. */
-  --tint-any-a: #f6f3ee;
-  --tint-any-b: #f1eee8;
+  --tint-any-bg: #f8e8d6; /* "any vibe": a flat cream card (ink 15.3:1) */
+  --hero-any-muted: #86817a; /* "Don't stay in." on the cream card: large text, 3.2:1 */
   --tint-date-night-a: #fff6ee;
   --tint-date-night-b: #fcedef;
   --tint-friends-night-a: #fff8e6;
@@ -190,6 +190,18 @@
   --empty-padding: 40px 24px;
   --section-gap: 26px; /* space above each page section */
   --results-gap: 32px; /* between Explore result sections */
+
+  /* Explore "List | Timeline" switch and the Timeline view (Tonight) */
+  --view-height: 36px; /* tap area is still 44px */
+  --tl-time-col: 56px;
+  --tl-time-col-mobile: 48px;
+  --tl-rail: 24px; /* column with the line and the dots */
+  --tl-dot: 8px;
+  --tl-photo: 72px;
+  --tl-photo-mobile: 56px;
+  --tl-hour-gap: 12px; /* extra space per hour with nothing on */
+  --text-tl-time: 13px;
+  --text-tl-title: 16px;
   --foryou-card-mobile: 78%; /* "Made for your vibe" card width when the row scrolls */
   --pill-gap: 10px;
   --icon-sm: 17px; /* icons inside buttons */
@@ -260,6 +272,9 @@
   --text-hero: 34px;
   --text-hero-mobile: 28px;
   --text-hero-sub: 16px;
+  --text-hero-aside: 28px; /* second title line, "any vibe" only */
+  --text-hero-aside-mobile: 22px;
+  --line-height-hero-aside: 1.15;
   --line-height-hero: 1.1;
   --tracking-hero: -0.02em;
   --hero-padding: 28px 32px;
@@ -282,21 +297,19 @@
   /* Mask (not a colour): the category row fades out on the right while chips are hidden */
   --fade-right: linear-gradient(to right, #000 calc(100% - var(--fade-width)), transparent);
 
-  --color-pill-idle: #e9e5de; /* "any vibe" pill on the header card (ink 14.6:1) */
-  --color-pill-idle-hover: #e2ddd4;
-  --color-pill-picked: rgb(255 255 255 / 0.7); /* a picked vibe's pill over its tint */
-  --color-pill-picked-hover: rgb(255 255 255 / 0.9);
-  --vibe-pick-gap: 6px;
-  --vibe-pick-padding: 6px 8px 6px 14px;
-  /* 44px pill at most: 30px line + 2 × 6px padding + 2 × 1px border */
-  --vibe-pick-line-height: 30px;
+  /* The vibe pill: smaller than the title, see-through white on the card in both states */
+  --color-pill: rgb(255 255 255 / 0.8);
+  --vibe-pick-height: 40px; /* tap area is still 44px */
+  --text-vibe-pick: 24px;
+  --tracking-vibe-pick: -0.015em;
+  --vibe-pick-gap: 6px; /* text <-> chevron / "×" */
+  --vibe-pick-padding: 0 12px 0 16px;
   --vibe-pick-icon: 20px; /* the picked vibe's icon */
   --vibe-pick-icon-gap: 8px;
-  --vibe-pick-chevron: 0.7em;
+  --vibe-pick-chevron: 16px;
   --vibe-clear-size: 22px; /* the "×" circle; its tap area is 44px */
-  --vibe-clear-icon: 12px;
+  --vibe-clear-icon: 13px;
   --vibe-clear-stroke: 1.5;
-  --vibe-pick-scale-narrow: 0.75em; /* phones: the longest vibe still fits on one line */
   --vibe-panel-width: 600px;
   --vibe-panel-offset: 8px; /* gap between the pill and the panel */
   --vibe-option-icon: 32px; /* icon circle in a panel row */
