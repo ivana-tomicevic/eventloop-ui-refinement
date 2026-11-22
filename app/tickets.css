@@ -69,6 +69,7 @@
   list-style: none;
 }
 .el-ticket {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -86,9 +87,27 @@
   transform: translateY(var(--card-hover-lift));
   box-shadow: var(--shadow-popover);
 }
-.el-ticket:focus-visible {
+/* The title link covers the whole card; the ring goes round the card */
+.el-ticket__link {
+  color: inherit;
+  text-decoration: none;
+}
+.el-ticket__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.el-ticket__link:focus-visible {
+  outline: none;
+}
+.el-ticket:has(.el-ticket__link:focus-visible) {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+/* An open calendar menu stays above the next ticket (and its calendar button, z-index 1) */
+.el-ticket:has(.el-cal__menu) {
+  z-index: 2;
 }
 @media (prefers-reduced-motion: reduce) {
   .el-ticket {
@@ -160,6 +179,34 @@
     padding-top: var(--space-3);
     border-top: 1px solid var(--color-border);
   }
+}
+
+/* ---------- "Add to calendar" (components/add-to-calendar.tsx) ---------- */
+/* Secondary button (.el-org__btn, 44px) + menu (.el-nav__menu); sits above the card's link */
+.el-cal {
+  position: relative;
+  z-index: 1;
+}
+.el-cal--wide {
+  justify-self: stretch;
+}
+.el-cal--wide .el-cal__button {
+  width: 100%;
+}
+.el-cal__menu {
+  z-index: 20;
+}
+.el-cal--wide .el-cal__menu {
+  left: 0;
+}
+.el-cal__menu a,
+.el-cal__menu button {
+  min-height: var(--tap-min);
+  text-decoration: none;
+}
+.el-cal__menu :focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
 }
 
 /* ---------- Confirmation ---------- */

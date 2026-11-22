@@ -11,6 +11,7 @@ import { ArrowLeft, Check, Minus, Plus } from "lucide-react";
 import SiteNav from "./site-nav";
 import OnboardingShell from "./onboarding-shell";
 import FieldError from "./field-error";
+import AddToCalendar from "./add-to-calendar";
 import { accountName, currentUserId } from "./auth";
 import {
   eventDate,
@@ -527,6 +528,7 @@ export function BookingConfirmed({
         <a className="el-details__cta el-join__submit" href="/my-tickets">
           See my tickets
         </a>
+        <AddToCalendar event={event} wide />
         <a className="el-shell__skip" href="/">
           Find more events
         </a>

@@ -13,6 +13,7 @@ import {
   type EventRecord,
 } from "./event-data";
 import { readBookings, ticketLabel, type Booking } from "./booking";
+import AddToCalendar from "./add-to-calendar";
 
 /** My Tickets: every demo booking made in this browser. Styles: app/tickets.css. */
 export default function MyTickets() {
@@ -47,7 +48,7 @@ export default function MyTickets() {
           <ul className="el-tickets">
             {items.map(({ booking, event }) => (
               <li key={booking.id}>
-                <a className="el-ticket" href={`/events/${event.id}`}>
+                <article className="el-ticket">
                   <div className="el-ticket__thumb">
                     <Image
                       src={eventImage(event)}
@@ -62,7 +63,14 @@ export default function MyTickets() {
                     />
                   </div>
                   <div className="el-ticket__body">
-                    <h2>{event.title}</h2>
+                    <h2>
+                      <a
+                        className="el-ticket__link"
+                        href={`/events/${event.id}`}
+                      >
+                        {event.title}
+                      </a>
+                    </h2>
                     <p>{eventLocation(event)}</p>
                     <p>{eventDate(event)}</p>
                     <p>{ticketLabel(booking.tickets, booking.free)}</p>
@@ -79,8 +87,9 @@ export default function MyTickets() {
                         {formatPrice(booking.total)}
                       </span>
                     )}
+                    <AddToCalendar event={event} />
                   </div>
-                </a>
+                </article>
               </li>
             ))}
           </ul>
