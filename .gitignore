@@ -32,3 +32,6 @@ out/
 .env
 .env.*
 !.env.example
+
+# original, full-size photos (kept locally, not in git)
+assets/photo-originals/

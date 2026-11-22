@@ -66,8 +66,17 @@
 
   /* Explore header tints (135deg gradient a -> b): neutral for "any vibe", then one pair per vibe.
      Very light: about 10% saturation or less; ink text 15.7:1+ and muted text 4.8:1+ on all. */
-  --tint-any-bg: #f8e8d6; /* "any vibe": a flat cream card (ink 15.3:1) */
-  --hero-any-muted: #86817a; /* "Don't stay in." on the cream card: large text, 3.2:1 */
+  /* "Any vibe": a faint sunset across the card, cream -> apricot -> a hint of peach (ink 14.1:1+) */
+  --color-header-any-from: #fbf1e2;
+  --color-header-any-mid: #f8e8d6;
+  --color-header-any-to: #f6ddd2;
+  --tint-any-bg: linear-gradient(
+    100deg,
+    var(--color-header-any-from) 0%,
+    var(--color-header-any-mid) 50%,
+    var(--color-header-any-to) 100%
+  );
+  --hero-any-muted: #68635c; /* "Don't stay in.": 4.6:1 on the darkest end, 5.3:1 on the lightest */
   --tint-date-night-a: #fff6ee;
   --tint-date-night-b: #fcedef;
   --tint-friends-night-a: #fff8e6;

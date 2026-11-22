@@ -6,10 +6,8 @@ import { CATEGORIES } from "./vibes";
 import {
   findVibe,
   hasVibe,
-  markVibeIntroSeen,
   readSessionVibe,
   saveSessionVibe,
-  vibeIntroSeen,
 } from "./moods";
 import { authUrl, isSignedIn, saveOrAskToSignIn, startHosting } from "./auth";
 import { readHostProfile } from "./host";
@@ -148,8 +146,6 @@ export default function EventloopScreen({
   const [vibeId, setVibeId] = useState("");
   /** "List | Timeline" (Tonight only). Remembered for this session; List by default. */
   const [view, setView] = useState<ExploreView>("list");
-  /** First visit: the vibe panel opens by itself, once per person. */
-  const [vibeIntro, setVibeIntro] = useState(false);
   const [saved, setSaved] = useState<string[]>([]);
   /** Footer "Host an event": sign up as a host, the host profile, or the workspace. */
   const [hostLink, setHostLink] = useState(
@@ -178,7 +174,6 @@ export default function EventloopScreen({
         if (sessionStorage.getItem(VIEW_KEY) === "timeline")
           setView("timeline");
       } catch {}
-      setVibeIntro(!vibeIntroSeen());
       if (isSignedIn())
         setHostLink(readHostProfile() ? "/organizer" : "/organizer/setup");
     }
@@ -414,12 +409,7 @@ export default function EventloopScreen({
               ) : (
                 <>
                   {activeTime.title} for{" "}
-                  <VibePicker
-                    value={vibeId}
-                    onChange={pickVibe}
-                    autoOpen={vibeIntro}
-                    onAutoOpen={markVibeIntroSeen}
-                  />
+                  <VibePicker value={vibeId} onChange={pickVibe} />
                 </>
               )}
             </h1>

@@ -21,14 +21,11 @@ Web app for discovering small local events (by interest, mood, AI-style search).
 - Copy tone: lively, cool, assertive and inviting. Short sentences, address the user directly, no corporate phrasing. Examples: "Tonight in Madrid", "What's your vibe?", "Pick of the night", "Quiet night. Tomorrow is packed."
 - Visual direction: warm near-white background (not grey), pure white cards, near-black text, one purple brand accent, one warm coral accent used only for urgency. No gradients on buttons. Text contrast at least 4.5:1.
 - Display font (Bricolage Grotesque, --font-display) samo za naslov zaglavlja Explorea; sve ostalo Inter.
-- Zaglavlje bez vibea: kremasta kartica (--tint-any-bg) s dva reda: naslov + 'Don't stay in.' u sivom. Lime samo za čipove uskoro/počelo (unutar 60 min) i Now liniju.
+- Zaglavlje bez vibea: kremasta kartica (--tint-any-bg) s dva reda: naslov + 'Don't stay in.' u sivom.
+- Lime (--color-live) samo za: čip na kartici/featured/timeline kartici kad događaj počinje za manje od 2 h ("Starting now", "In 40 min", "In 1 h 15 min") ili je počeo prije manje od 2 h ("Started 12 min ago"), te Now liniju (tačka, linija i oznaka "Now · 21:05") na Timelineu.
+- Pretraga i filteri na Exploreu: vrijeme (Tonight/Tomorrow/Weekend/All), područje, kategorija i vibe; List|Timeline samo na Tonight.
 - Price is the strongest element on a card (bold, tabular numbers).
 - All styles (colors, radii, fonts) go through tokens defined in one place, never hard-coded per component.
 - Match the existing visual style (colors, radii, spacing in the CSS files). Reuse existing classes and components before adding new ones.
 - Accessibility basics: real buttons/links, aria-labels on icon buttons, visible focus states.
 - Never commit or push; the user reviews the diff and commits herself.
-
-## Target design (agreed)
-- Explore: heading "Šta ti se radi večeras?", ONE search field that can take natural language, time toggle (Večeras / Sutra / Vikend), chips (Besplatno, Blizu mene), mood tiles, one featured event card, then a fixed 3-column grid.
-- Cards: category as plain text (not a clipped chip), unified date format (e.g. "Danas · 20:00"), price left and distance right, no shared/duplicate images.
-- Still missing: empty states, error states, organizer dashboard filled with real content, mobile polish.

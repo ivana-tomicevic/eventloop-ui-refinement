@@ -157,7 +157,7 @@
   align-items: stretch;
   margin-bottom: var(--explore-header-gap);
 }
-/* ---------- Header: title + vibe on a card, flat cream until a vibe is picked ---------- */
+/* ---------- Header: title + vibe on a card, a faint sunset until a vibe is picked ---------- */
 .el-hero {
   position: relative;
   margin-bottom: var(--explore-title-gap);
@@ -165,7 +165,7 @@
   border-radius: var(--radius-hero);
   background: var(--tint-any-bg);
 }
-/* The vibe's tint fades in over the cream (a gradient can't transition, its opacity can). */
+/* The vibe's tint fades in over the sunset (a gradient can't transition, its opacity can). */
 .el-hero::before {
   content: "";
   position: absolute;
@@ -924,6 +924,7 @@
   background: var(--color-surface);
   text-align: center;
 }
+.el-empty h1,
 .el-empty h2 {
   margin: 0 0 6px;
   color: var(--color-text);

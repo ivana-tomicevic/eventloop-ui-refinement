@@ -18,7 +18,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { eventPriceValue, type EventRecord } from "./event-data";
-import { currentUserId } from "./auth";
 
 export const VIBES = [
   {
@@ -107,20 +106,5 @@ export function saveSessionVibe(id: string) {
   try {
     if (id) sessionStorage.setItem(SESSION_KEY, id);
     else sessionStorage.removeItem(SESSION_KEY);
-  } catch {}
-}
-
-// The vibe panel opens by itself once per person (per account, or per browser when signed out).
-const introKey = () => `eventloop-vibe-intro:${currentUserId() || "guest"}`;
-export function vibeIntroSeen(): boolean {
-  try {
-    return Boolean(localStorage.getItem(introKey()));
-  } catch {
-    return true; // storage blocked: never pop the panel open
-  }
-}
-export function markVibeIntroSeen() {
-  try {
-    localStorage.setItem(introKey(), "1");
   } catch {}
 }

@@ -60,7 +60,7 @@ export default function EventDetails({ id }: { id: string }) {
         <SiteNav showSearch={false} />
         <div className="el-details">
           <div className="el-empty">
-            <h2>Event not found</h2>
+            <h1>Event not found</h1>
             <p>It may have ended or moved. Plenty more is on.</p>
             <a className="el-empty__cta" href="/">
               Back to Explore

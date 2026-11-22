@@ -25,14 +25,9 @@ const PANEL_ID = "vibe-panel";
 export default function VibePicker({
   value,
   onChange,
-  autoOpen = false,
-  onAutoOpen,
 }: {
   value: string;
   onChange: (id: string) => void;
-  /** Open once by itself (first visit). */
-  autoOpen?: boolean;
-  onAutoOpen?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<{ top: number; left: number } | null>(
@@ -56,14 +51,6 @@ export default function VibePicker({
       root.current?.closest<HTMLElement>(".el-explore-header") || document.body,
     );
   }, []);
-
-  useEffect(() => {
-    if (!autoOpen) return;
-    setOpen(true);
-    onAutoOpen?.();
-    // once, on the first render that asks for it
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoOpen]);
 
   // Desktop: under the pill, kept inside the page column. Phones: a bottom sheet (CSS).
   useLayoutEffect(() => {
