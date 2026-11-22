@@ -96,7 +96,7 @@ export default function AreaPicker({
         <button
           type="button"
           className="el-area-pick__clear"
-          aria-label="Clear neighbourhood"
+          aria-label="Clear area"
           onClick={() => {
             onChange("");
             button.current?.focus();

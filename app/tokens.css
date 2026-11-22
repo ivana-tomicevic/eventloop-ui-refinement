@@ -225,12 +225,17 @@
   --allset-photo-out: 140px; /* how far a photo reaches past the card edge */
 
   /* Vibe in Explore's title ("for [any vibe]") and its panel ("What kind of night?") */
-  /* Explore controls: title, row 1 (when + search), row 2 (neighbourhood | categories) */
-  --explore-stack-gap: var(--space-3); /* between the title and the two rows */
-  --explore-row-gap: var(--space-4); /* tabs <-> search */
-  --explore-header-gap: var(--space-5); /* controls -> first section */
-  --filter-divider-height: 24px;
+  /* Explore controls: title, search, filters (when | area), categories */
+  --search-height: 52px;
+  --explore-title-gap: 20px; /* title -> search */
+  --explore-row-gap: var(--space-4); /* search -> filters -> categories */
+  --explore-header-gap: var(--space-6); /* categories -> first section */
+  --category-chip-height: 40px; /* tap area is still 44px */
+  --text-filter: 15px; /* area control, panel rows */
   --area-list-width: 220px;
+  /* Dropdown panels (area list, vibe panel) */
+  --radius-popover: 20px;
+  --popover-padding: var(--space-2);
   --fade-width: 32px;
   /* Mask (not a colour): the category row fades out on the right while chips are hidden */
   --fade-right: linear-gradient(to right, #000 calc(100% - var(--fade-width)), transparent);
@@ -242,7 +247,7 @@
   --vibe-pick-chevron: 0.7em; /* chevron and "×" */
   --vibe-panel-width: 600px;
   --vibe-panel-offset: 8px; /* gap between the pill and the panel */
-  --vibe-option-icon: 40px; /* icon circle in a panel row */
+  --vibe-option-icon: 32px; /* icon circle in a panel row */
   --sheet-max-height: 85vh; /* phones: the panel as a bottom sheet */
   --z-popover: 20; /* under the header (30) */
   --z-sheet: 60;

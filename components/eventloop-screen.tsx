@@ -387,8 +387,33 @@ export default function EventloopScreen({
               </>
             )}
           </h1>
-          {/* Row 1: when + search (phones: search on top, then the tabs) */}
-          <div className="el-explore-row">
+          {/* Search: its own full-width row */}
+          <form
+            className="el-search-pill"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setActiveVibe(vibe.trim());
+            }}
+          >
+            <label htmlFor="explore-search" className="sr-only">
+              Search events
+            </label>
+            <Search aria-hidden="true" className="el-search-pill__icon" />
+            <input
+              id="explore-search"
+              type="search"
+              autoComplete="off"
+              value={vibe}
+              onChange={(e) => setVibe(e.target.value)}
+              placeholder='Try "chill jazz, free entry"'
+            />
+            <button type="submit" aria-label="Search">
+              <Sparkles aria-hidden="true" />
+            </button>
+          </form>
+          {/* Filters: when (tabs) left, neighbourhood right */}
+          <div className="el-filter-row">
             <div className="el-time-filter" role="group" aria-label="When">
               {timeOptions.map((o) => (
                 <button
@@ -401,56 +426,29 @@ export default function EventloopScreen({
                 </button>
               ))}
             </div>
-            <form
-              className="el-search-pill"
-              role="search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setActiveVibe(vibe.trim());
-              }}
-            >
-              <label htmlFor="explore-search" className="sr-only">
-                Search events
-              </label>
-              <Search aria-hidden="true" className="el-search-pill__icon" />
-              <input
-                id="explore-search"
-                type="search"
-                autoComplete="off"
-                value={vibe}
-                onChange={(e) => setVibe(e.target.value)}
-                placeholder='Try "chill jazz, free entry"'
-              />
-              <button type="submit" aria-label="Search">
-                <Sparkles aria-hidden="true" />
-              </button>
-            </form>
+            {!savedOnly && <AreaPicker value={area} onChange={setArea} />}
           </div>
-          {/* Row 2: neighbourhood | categories */}
+          {/* Categories: all eight in one row (phones: scrolls sideways) */}
           {!savedOnly && (
-            <div className="el-filter-row">
-              <AreaPicker value={area} onChange={setArea} />
-              <span className="el-filter-row__divider" aria-hidden="true" />
-              <div
-                ref={chipsRef}
-                className="el-filter-row__chips"
-                data-fade={chipsFade}
-                role="group"
-                aria-label="Category"
-              >
-                {CATEGORIES.map((v) => (
-                  <button
-                    type="button"
-                    key={v.id}
-                    className={`el-vibe el-vibe--${v.tone}`}
-                    aria-pressed={category === v.id}
-                    onClick={() => toggleCategoryChip(v.id)}
-                  >
-                    <v.icon aria-hidden="true" />
-                    {v.label}
-                  </button>
-                ))}
-              </div>
+            <div
+              ref={chipsRef}
+              className="el-category-row"
+              data-fade={chipsFade}
+              role="group"
+              aria-label="Category"
+            >
+              {CATEGORIES.map((v) => (
+                <button
+                  type="button"
+                  key={v.id}
+                  className={`el-vibe el-vibe--${v.tone}`}
+                  aria-pressed={category === v.id}
+                  onClick={() => toggleCategoryChip(v.id)}
+                >
+                  <v.icon aria-hidden="true" />
+                  {v.label}
+                </button>
+              ))}
             </div>
           )}
         </section>

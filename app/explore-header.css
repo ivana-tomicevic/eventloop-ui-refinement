@@ -155,11 +155,10 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--explore-stack-gap);
   margin-bottom: var(--explore-header-gap);
 }
 .el-explore-header h1 {
-  margin: 0;
+  margin: 0 0 var(--explore-title-gap);
   color: var(--color-text);
   font-size: var(--text-page-title);
   font-weight: var(--font-weight-medium);
@@ -272,74 +271,74 @@
   outline-offset: 2px;
 }
 
-/* ---------- Row 1: when (tabs) left, search fills the rest; both 48px ---------- */
-.el-explore-row {
-  display: flex;
-  align-items: stretch;
-  gap: var(--explore-row-gap);
+/* ---------- Explore rows: search, then when | area, then categories ---------- */
+.el-explore-header .el-search-pill {
+  min-height: var(--search-height);
 }
-.el-explore-row .el-time-filter {
-  flex: none;
-  align-self: stretch;
-  min-height: var(--field-height);
-  margin-top: 0;
-}
-.el-explore-row .el-search-pill {
-  flex: 1;
-  min-width: 0;
-}
-/* Phones and small tablets: search on top, the tabs under it (they scroll sideways, see Mobile) */
-@media (max-width: 767px) {
-  .el-explore-row {
-    flex-direction: column-reverse;
-    gap: var(--explore-stack-gap);
-  }
-}
-
-/* ---------- Row 2: neighbourhood picker | category chips ---------- */
 .el-filter-row {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-width: 0;
+  margin-top: var(--explore-row-gap);
 }
-.el-filter-row__divider {
+.el-filter-row .el-time-filter {
   flex: none;
-  width: 1px;
-  height: var(--filter-divider-height);
-  background: var(--color-border);
+  margin-top: 0;
 }
-/* One row; when it can't show every chip it scrolls sideways and fades out on the right.
-   The small padding keeps the chips' focus outline inside the scroll box. */
-.el-filter-row__chips {
+/* All eight chips in one row; when they don't fit it scrolls sideways and fades on the right.
+   The small padding keeps the focus outline and the 44px tap areas inside the scroll box. */
+.el-category-row {
   display: flex;
-  flex: 1;
   gap: var(--space-2);
-  min-width: 0;
-  margin: calc(-1 * var(--space-1));
+  margin: calc(var(--explore-row-gap) - var(--space-1)) calc(-1 * var(--space-1))
+    calc(-1 * var(--space-1));
   padding: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
 }
-.el-filter-row__chips::-webkit-scrollbar {
+.el-category-row::-webkit-scrollbar {
   display: none;
 }
-.el-filter-row__chips[data-fade="true"] {
+.el-category-row[data-fade="true"] {
   -webkit-mask-image: var(--fade-right);
   mask-image: var(--fade-right);
 }
+.el-category-row .el-vibe {
+  position: relative;
+  min-height: var(--category-chip-height);
+}
+.el-category-row .el-vibe::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--touch-target);
+  transform: translateY(-50%);
+}
+/* Wide screens: the chips spread from the search's left edge to its right edge
+   (natural widths, at least 8px apart). Narrower: the scrolling row above. */
+@media (min-width: 1024px) {
+  .el-category-row {
+    justify-content: space-between;
+  }
+  .el-category-row .el-vibe {
+    white-space: nowrap;
+  }
+}
 
-/* "Anywhere in Madrid ▾": the vibe control's look at chip size (components/area-picker.tsx) */
+/* "Anywhere in Madrid ▾": right edge of the filter row (components/area-picker.tsx) */
 .el-area-pick {
   position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
+  margin-left: auto;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   background: var(--color-field);
   color: var(--color-text);
-  font-size: var(--text-body);
+  font-size: var(--text-filter);
   font-weight: var(--font-weight-semibold);
   transition:
     background-color var(--field-transition),
@@ -348,6 +347,7 @@
 .el-area-pick:hover {
   background: var(--color-field-hover);
 }
+/* Focus: the muted 1px border, no ring, no outline */
 .el-area-pick:has(.el-area-pick__button:focus-visible) {
   border-color: var(--color-text-muted);
 }
@@ -414,16 +414,16 @@
     transition: none;
   }
 }
+/* The list: same look as the vibe panel. Opens under the control, aligned to its right edge. */
 .el-area-list {
   position: absolute;
   z-index: var(--z-popover);
   top: calc(100% + var(--space-2));
-  left: 0;
-  min-width: var(--area-list-width);
+  right: 0;
+  min-width: max(100%, var(--area-list-width));
   margin: 0;
-  padding: var(--space-1);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-button);
+  padding: var(--popover-padding);
+  border-radius: var(--radius-popover);
   background: var(--color-surface);
   box-shadow: var(--shadow-popover);
   list-style: none;
@@ -435,21 +435,36 @@
   gap: var(--space-3);
   min-height: var(--touch-target);
   padding: 0 var(--space-3);
-  border-radius: var(--space-2);
+  border-radius: var(--radius-button);
   color: var(--color-text);
   font-weight: var(--font-weight-regular);
   white-space: nowrap;
   cursor: pointer;
 }
-.el-area-list__option:hover {
-  background: var(--color-brand-soft);
-}
+/* Hover and keyboard focus: the field fill, no black frame, no browser outline */
+.el-area-list__option:hover,
 .el-area-list__option:focus {
-  outline: 2px solid var(--color-focus);
-  outline-offset: -2px;
+  outline: none;
+  background: var(--color-field);
 }
 .el-area-list__option[aria-selected="true"] {
   font-weight: var(--font-weight-semibold);
+}
+/* Phones: search, tabs, area, categories one under another */
+@media (max-width: 767px) {
+  .el-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--explore-row-gap);
+  }
+  .el-filter-row .el-area-pick {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+  .el-area-list {
+    right: auto;
+    left: 0;
+  }
 }
 
 /* ---------- Vibe chips (.vibes / .v in the reference) ---------- */
@@ -637,15 +652,16 @@
   }
 }
 
-/* The panel: under the pill on desktop (placed by the component), a bottom sheet on phones */
+/* The panel: under the pill on desktop (placed by the component), a bottom sheet on phones.
+   Same look as the area list. */
 .el-vibe-panel {
   position: absolute;
   z-index: var(--z-popover);
   top: calc(var(--vibe-panel-top, 100%) + var(--vibe-panel-offset));
   left: var(--vibe-panel-left, 0);
   width: min(var(--vibe-panel-width), 100%);
-  padding: var(--space-5);
-  border-radius: var(--radius-sheet);
+  padding: var(--popover-padding);
+  border-radius: var(--radius-popover);
   background: var(--color-surface);
   box-shadow: var(--shadow-popover);
 }
@@ -653,16 +669,15 @@
   display: none;
 }
 .el-vibe-panel__title {
-  margin: 0 0 var(--space-4);
+  margin: var(--space-2) var(--space-3) var(--space-2);
   color: var(--color-text);
-  font-size: var(--text-empty-title);
+  font-size: var(--text-filter);
   font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-title);
 }
 .el-vibe-panel__list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-1) var(--space-2);
+  gap: 0 var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -673,26 +688,23 @@
   gap: var(--space-3);
   width: 100%;
   min-height: var(--touch-target);
-  padding: var(--space-2);
-  border: 1px solid transparent;
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border: 0;
   border-radius: var(--radius-button);
   background: transparent;
   color: var(--color-text);
   font: inherit;
+  font-size: var(--text-filter);
   text-align: left;
   cursor: pointer;
 }
-.el-vibe-option:hover {
-  background: var(--color-brand-soft);
-}
-.el-vibe-option[aria-pressed="true"] {
-  border-color: var(--color-text);
-  background: var(--color-brand-soft);
-}
+/* Hover and keyboard focus: the field fill, no black frame, no browser outline */
+.el-vibe-option:hover,
 .el-vibe-option:focus-visible,
+.el-vibe-panel__text:hover,
 .el-vibe-panel__text:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  outline: none;
+  background: var(--color-field);
 }
 .el-vibe-option__icon {
   display: grid;
@@ -703,17 +715,28 @@
   border-radius: var(--radius-pill);
   background: var(--color-field);
 }
-.el-vibe-option__icon svg {
+.el-vibe-option:hover .el-vibe-option__icon,
+.el-vibe-option:focus-visible .el-vibe-option__icon {
+  background: var(--color-surface);
+}
+.el-vibe-option__icon svg,
+.el-vibe-option__check {
   width: var(--icon-sm);
   height: var(--icon-sm);
+}
+.el-vibe-option__check {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .el-vibe-option__text {
   display: grid;
   min-width: 0;
 }
 .el-vibe-option__label {
-  font-size: var(--text-body);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
+}
+.el-vibe-option[aria-pressed="true"] .el-vibe-option__label {
+  font-weight: var(--font-weight-semibold);
 }
 .el-vibe-option__hint {
   color: var(--color-text-muted);
@@ -723,8 +746,8 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-2);
-  margin-top: var(--space-4);
-  padding-top: var(--space-3);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
   border-top: 1px solid var(--color-border);
 }
 .el-vibe-panel__text {
@@ -735,12 +758,9 @@
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  font-size: var(--text-body);
+  font-size: var(--text-filter);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
-}
-.el-vibe-panel__text:hover {
-  background: var(--color-field);
 }
 @media (max-width: 720px) {
   .el-vibe-panel__scrim {
@@ -760,8 +780,8 @@
     width: 100%;
     max-height: var(--sheet-max-height);
     overflow-y: auto;
-    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
-    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    padding-bottom: calc(var(--popover-padding) + env(safe-area-inset-bottom, 0px));
+    border-radius: var(--radius-popover) var(--radius-popover) 0 0;
   }
   .el-vibe-panel__list {
     grid-template-columns: 1fr;
@@ -879,8 +899,7 @@
   .el-time-filter button[aria-pressed="true"]:focus-visible {
     outline-color: var(--color-on-brand);
   }
-  .el-vibe,
-  .el-area-pick {
+  .el-vibe {
     min-height: var(--touch-target);
   }
   /* One scrollable row that runs to the screen edge, no visible scrollbar. */

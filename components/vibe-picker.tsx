@@ -9,7 +9,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, X } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
 import { VIBES, findVibe } from "./moods";
 
 const FOCUSABLE = "button:not([disabled])";
@@ -233,6 +233,12 @@ export default function VibePicker({
                         <span className="el-vibe-option__label">{v.label}</span>
                         <span className="el-vibe-option__hint">{v.hint}</span>
                       </span>
+                      {v.id === value && (
+                        <Check
+                          className="el-vibe-option__check"
+                          aria-hidden="true"
+                        />
+                      )}
                     </button>
                   </li>
                 ))}
