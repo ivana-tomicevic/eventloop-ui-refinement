@@ -17,6 +17,7 @@ import ViewToggle, { type ExploreView } from "./view-toggle";
 import AreaPicker from "./area-picker";
 import EventCard from "./event-card";
 import FeaturedCard from "./featured-card";
+import ExploreRows from "./explore-rows";
 import {
   eventTiming,
   getEvents,
@@ -108,7 +109,9 @@ const dayStart = (d: Date, offset = 0, hour = 0) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate() + offset, hour);
 /** Half-open local-time range [from, to), or null for "All". */
 function timeRange(filter: TimeFilter, now: Date): [Date, Date] | null {
-  if (filter === "tonight") return [dayStart(now, 0, 17), dayStart(now, 1)];
+  // Before 17:00 the first tab reads "Today" and covers the whole day; from 17:00 it is "Tonight".
+  if (filter === "tonight")
+    return [dayStart(now, 0, now.getHours() < 17 ? 0 : 17), dayStart(now, 1)];
   if (filter === "tomorrow") return [dayStart(now, 1), dayStart(now, 2)];
   if (filter === "weekend") {
     // Nearest Saturday and Sunday; on a Sunday that is the current weekend.
@@ -138,7 +141,21 @@ export default function EventloopScreen({
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   /** The filter Explore opened on; "Clear filters" in the empty state returns to it. */
   const [defaultTime, setDefaultTime] = useState<TimeFilter>("all");
-  const activeTime = timeOptions.find((o) => o.id === timeFilter)!;
+  /** True before 17:00: "Tonight" reads "Today". Set after mount so the server and browser agree. */
+  const [early, setEarly] = useState(false);
+  const options = timeOptions.map((o) =>
+    o.id === "tonight" && early
+      ? {
+          ...o,
+          label: "Today",
+          title: "Today in Madrid",
+          more: "More today",
+          on: "Today",
+          when: "today",
+        }
+      : o,
+  );
+  const activeTime = options.find((o) => o.id === timeFilter)!;
   /** One category chip and one neighbourhood at a time ("" = none / anywhere). They filter. */
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
@@ -157,6 +174,7 @@ export default function EventloopScreen({
     const q = params.get("q") || "";
     const when = params.get("when");
     setEvents(list);
+    setEarly(new Date().getHours() < 17);
     setLoaded(true);
     // Explore opens on "Tonight" when something is on tonight, otherwise "All" — never an empty first view.
     // A search handed over from another page (?q=) starts on "All" so its results aren't hidden.
@@ -298,7 +316,16 @@ export default function EventloopScreen({
   ]);
   // Same rule on every tab: the first event that hasn't started yet is "Starting soon", the rest
   // (started ones too) go below, without duplicates.
-  const featured = savedOnly
+  // Tomorrow, Weekend and All show rows by intent instead of one grid, unless a search, vibe or
+  // chip is narrowing the list. Tonight keeps "Starting soon" and the List / Timeline.
+  const showRows =
+    !savedOnly &&
+    timeFilter !== "tonight" &&
+    !search &&
+    !activeVibe &&
+    !chipFilter &&
+    !picked;
+  const featured = savedOnly || showRows
     ? null
     : filtered.find((e) => eventTiming(e).state === "upcoming") || null;
   const others = featured ? filtered.filter((e) => e !== featured) : filtered;
@@ -464,7 +491,7 @@ export default function EventloopScreen({
           {/* Filters: when (tabs) left, neighbourhood right */}
           <div className="el-filter-row">
             <div className="el-time-filter" role="group" aria-label="When">
-              {timeOptions.map((o) => (
+              {options.map((o) => (
                 <button
                   type="button"
                   key={o.id}
@@ -549,7 +576,10 @@ export default function EventloopScreen({
         {loaded && !timeline && !filtered.length && !vibeEmpty && (
           <EmptyState {...empty} />
         )}
-        {loaded && !timeline && gridEvents.length > 0 && (
+        {loaded && showRows && filtered.length > 0 && (
+          <ExploreRows events={filtered} saved={saved} onSave={toggle} />
+        )}
+        {loaded && !showRows && !timeline && gridEvents.length > 0 && (
           <section className="el-results-section" aria-labelledby="grid-title">
             <div className="el-sec">
               <h2 id="grid-title">

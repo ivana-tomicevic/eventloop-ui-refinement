@@ -34,8 +34,8 @@ export const VIBES = [
   },
   {
     id: "solo",
-    label: "Solo & cool",
-    hint: "Easy to show up alone",
+    label: "Chill",
+    hint: "Relaxed, easy to settle in",
     icon: User,
   },
   {
