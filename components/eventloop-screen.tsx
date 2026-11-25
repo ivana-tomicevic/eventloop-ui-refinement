@@ -432,7 +432,7 @@ export default function EventloopScreen({
           >
             <h1 id="explore-title" aria-live="polite">
               {savedOnly ? (
-                activeTime.title
+                "Your saved events"
               ) : (
                 <>
                   {activeTime.title} for{" "}
