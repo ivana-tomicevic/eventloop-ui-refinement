@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import {
   authenticate,
   authUrl,
+  hasPendingSave,
   providerEmail,
   safeNext,
   type AuthResult,
@@ -81,6 +82,8 @@ export default function AuthFlow() {
   const [mode, setMode] = useState<Mode>("signup");
   const [next, setNext] = useState("/");
   const [host, setHost] = useState(false);
+  /** Why the visitor landed here, so the card can say so (heart tap or a ticket). */
+  const [reason, setReason] = useState<"save" | "tickets" | null>(null);
   const [values, setValues] = useState<Record<Field, string>>({
     name: "",
     email: "",
@@ -99,7 +102,11 @@ export default function AuthFlow() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     if (q.get("mode") === "login") setMode("login");
-    setNext(safeNext(q.get("next")));
+    const target = safeNext(q.get("next"));
+    setNext(target);
+    setReason(
+      hasPendingSave() ? "save" : /^\/checkout/.test(target) ? "tickets" : null,
+    );
     setHost(q.get("host") === "1");
   }, []);
   // After a switch (not on first load), focus the first field of the new mode.
@@ -226,9 +233,15 @@ export default function AuthFlow() {
             ? signup
               ? "Sign up, then set up your host profile."
               : "Log in to get back to your events."
-            : signup
-              ? "Save events and grab tickets in a tap."
-              : "Pick up where you left off."}
+            : reason
+              ? `${signup ? "Sign up" : "Log in"} ${
+                  reason === "save"
+                    ? "to save this event. We'll save it right away."
+                    : "to get your ticket."
+                }`
+              : signup
+                ? "Save events and grab tickets in a tap."
+                : "Pick up where you left off."}
         </span>
       </p>
       <div className="el-auth__social">
