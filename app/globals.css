@@ -17,11 +17,11 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--color-page); color: var(--color-text); font-family: var(--font-sans); }
+body { margin: 0; background: var(--page-background); color: var(--color-text); font-family: var(--font-sans); }
 button, a { font: inherit; }
 button { cursor: pointer; }
 
-.eventloop-shell { min-height: 100vh; background: var(--color-page); }
+.eventloop-shell { min-height: 100vh; background: var(--page-background); }
 .eventloop-content { width: min(100% - 48px, 1030px); margin: 0 auto; padding: 62px 0 100px; }
 
 @media (max-width: 700px) {

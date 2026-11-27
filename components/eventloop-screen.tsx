@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, Search } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import SiteNav from "./site-nav";
 import { CATEGORIES } from "./vibes";
 import {
+  VIBES,
   findVibe,
   hasVibe,
   readSessionVibe,
@@ -11,7 +12,7 @@ import {
 } from "./moods";
 import { authUrl, isSignedIn, saveOrAskToSignIn, startHosting } from "./auth";
 import { readHostProfile } from "./host";
-import VibePicker from "./vibe-picker";
+import MadridSkyline from "./madrid-skyline";
 import EventTimeline from "./event-timeline";
 import ViewToggle, { type ExploreView } from "./view-toggle";
 import AreaPicker from "./area-picker";
@@ -121,6 +122,23 @@ function timeRange(filter: TimeFilter, now: Date): [Date, Date] | null {
   }
   return null;
 }
+const dayFormat = new Intl.DateTimeFormat("en-GB", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+});
+const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
+/** The small date line under a When pill: "Thu 26 Nov", "28–29 Nov", "Any day". */
+function dateLabel(filter: TimeFilter, now: Date): string {
+  const range = timeRange(filter, now);
+  if (!range) return "Any day";
+  if (filter !== "weekend") return dayFormat.format(range[0]);
+  const sat = range[0];
+  const sun = dayStart(sat, 1);
+  return sat.getMonth() === sun.getMonth()
+    ? `${sat.getDate()}–${sun.getDate()} ${monthFormat.format(sun)}`
+    : `${sat.getDate()} ${monthFormat.format(sat)} – ${sun.getDate()} ${monthFormat.format(sun)}`;
+}
 function matchesTime(e: EventRecord, range: [Date, Date] | null) {
   if (!range) return true;
   const start = e.start ? new Date(e.start) : null;
@@ -143,6 +161,8 @@ export default function EventloopScreen({
   const [defaultTime, setDefaultTime] = useState<TimeFilter>("all");
   /** True before 17:00: "Tonight" reads "Today". Set after mount so the server and browser agree. */
   const [early, setEarly] = useState(false);
+  /** Today's date for the small date line under each When pill; set after mount (same reason). */
+  const [today, setToday] = useState<Date | null>(null);
   const options = timeOptions.map((o) =>
     o.id === "tonight" && early
       ? {
@@ -175,6 +195,7 @@ export default function EventloopScreen({
     const when = params.get("when");
     setEvents(list);
     setEarly(new Date().getHours() < 17);
+    setToday(new Date());
     setLoaded(true);
     // Explore opens on "Tonight" when something is on tonight, otherwise "All" — never an empty first view.
     // A search handed over from another page (?q=) starts on "All" so its results aren't hidden.
@@ -434,10 +455,7 @@ export default function EventloopScreen({
               {savedOnly ? (
                 "Your saved events"
               ) : (
-                <>
-                  {activeTime.title} for{" "}
-                  <VibePicker value={vibeId} onChange={pickVibe} />
-                </>
+                activeTime.title
               )}
             </h1>
             {/* "Any vibe": a second title line instead of a subtitle */}
@@ -463,32 +481,72 @@ export default function EventloopScreen({
               </p>
             )}
           </div>
-          {/* Search: its own full-width row */}
-          <form
-            className="el-search-pill"
-            role="search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setActiveVibe(vibe.trim());
-            }}
+          {!savedOnly && <MadridSkyline />}
+          {/* Search card: the text search, the area and the Search button, then the vibe strip.
+              On Explore it stands on the skyline's ground line. */}
+          <div
+            className={
+              "el-search-card" + (savedOnly ? "" : " el-search-card--on-skyline")
+            }
           >
-            <label htmlFor="explore-search" className="sr-only">
-              Search events
-            </label>
-            <Search aria-hidden="true" className="el-search-pill__icon" />
-            <input
-              id="explore-search"
-              type="search"
-              autoComplete="off"
-              value={vibe}
-              onChange={(e) => setVibe(e.target.value)}
-              placeholder='Try "chill jazz, free entry"'
-            />
-            <button type="submit" aria-label="Search">
-              <Sparkles aria-hidden="true" />
-            </button>
-          </form>
-          {/* Filters: when (tabs) left, neighbourhood right */}
+            <form
+              className="el-search-card__row"
+              role="search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setActiveVibe(vibe.trim());
+              }}
+            >
+              <div className="el-search-card__field">
+                <label htmlFor="explore-search">Search</label>
+                <input
+                  id="explore-search"
+                  type="search"
+                  autoComplete="off"
+                  value={vibe}
+                  onChange={(e) => setVibe(e.target.value)}
+                  placeholder='Try "chill jazz, free entry"'
+                />
+              </div>
+              {!savedOnly && <AreaPicker value={area} onChange={setArea} />}
+              <button type="submit" className="el-search-card__submit">
+                Search
+              </button>
+            </form>
+            {!savedOnly && (
+              <div
+                className="el-vibe-strip"
+                role="group"
+                aria-label="Vibe"
+              >
+                <span className="el-vibe-strip__label" aria-hidden="true">
+                  Vibe
+                </span>
+                <button
+                  type="button"
+                  className="el-vibe-strip__chip"
+                  aria-pressed={!vibeId}
+                  onClick={() => pickVibe("")}
+                >
+                  <Sparkles aria-hidden="true" />
+                  Any
+                </button>
+                {VIBES.map((v) => (
+                  <button
+                    type="button"
+                    key={v.id}
+                    className="el-vibe-strip__chip"
+                    aria-pressed={vibeId === v.id}
+                    onClick={() => pickVibe(vibeId === v.id ? "" : v.id)}
+                  >
+                    <v.icon aria-hidden="true" />
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* When: pills with the date under each */}
           <div className="el-filter-row">
             <div className="el-time-filter" role="group" aria-label="When">
               {options.map((o) => (
@@ -498,11 +556,11 @@ export default function EventloopScreen({
                   aria-pressed={timeFilter === o.id}
                   onClick={() => setTimeFilter(o.id)}
                 >
-                  {o.label}
+                  <span>{o.label}</span>
+                  {today && <small>{dateLabel(o.id, today)}</small>}
                 </button>
               ))}
             </div>
-            {!savedOnly && <AreaPicker value={area} onChange={setArea} />}
           </div>
           {/* Categories: all eight in one row (phones: scrolls sideways) */}
           {!savedOnly && (

@@ -25,12 +25,12 @@
   align-items: center;
   gap: var(--space-2);
   border-radius: var(--nav-mark-radius);
-  color: var(--color-text);
+  color: var(--color-accent); /* purple wordmark; the only place the accent is used */
   font-size: var(--text-logo);
   font-weight: var(--font-weight-medium);
 }
 .el-nav__mark {
-  display: grid;
+  display: none; /* the "e" mark replaces the wordmark on narrow phones only */
   place-items: center;
   width: var(--nav-mark-size);
   height: var(--nav-mark-size);
@@ -161,9 +161,9 @@
 .el-hero {
   position: relative;
   margin-bottom: var(--explore-title-gap);
-  padding: var(--hero-padding);
+  padding: 0; /* no card: the title sits straight on the page background */
   border-radius: var(--radius-hero);
-  background: var(--tint-any-bg);
+  background: transparent;
 }
 /* The vibe's tint fades in over the sunset (a gradient can't transition, its opacity can). */
 .el-hero::before {
@@ -175,6 +175,7 @@
   opacity: 0;
   transition: opacity var(--hero-transition);
   pointer-events: none;
+  display: none; /* the vibe tint card is off while the title has no card */
 }
 .el-hero--tinted::before {
   opacity: 1;
@@ -252,75 +253,6 @@
   letter-spacing: var(--tracking-hero);
   line-height: var(--line-height-hero-aside);
 }
-.el-search-pill {
-  display: flex;
-  align-items: center;
-  gap: var(--pill-gap);
-  min-height: var(--field-height);
-  padding: var(--pill-input-padding);
-  border: 1px solid transparent;
-  border-radius: var(--radius-pill);
-  background: var(--color-field);
-  transition: border-color var(--field-transition);
-}
-.el-search-pill:hover {
-  background: var(--color-field-hover);
-}
-/* Same focus as every field: white with a muted 1px border, no ring */
-.el-search-pill:focus-within {
-  border-color: var(--color-text-muted);
-  background: var(--color-surface);
-}
-@media (prefers-reduced-motion: reduce) {
-  .el-search-pill {
-    transition: none;
-  }
-}
-.el-search-pill__icon {
-  flex-shrink: 0;
-  width: var(--icon-md);
-  height: var(--icon-md);
-  color: var(--color-text-muted);
-}
-.el-search-pill input {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--color-text);
-  font: inherit;
-  font-size: var(--text-input);
-}
-.el-search-pill input::placeholder {
-  color: var(--color-text-muted);
-  opacity: 1;
-}
-.el-search-pill button {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: var(--control-icon-button);
-  height: var(--control-icon-button);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-  cursor: pointer;
-}
-.el-search-pill button svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
-.el-search-pill button:hover {
-  background: var(--color-brand-hover);
-}
-.el-search-pill button:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
 
 .el-time-filter {
   display: inline-flex;
@@ -359,9 +291,6 @@
 }
 
 /* ---------- Explore rows: search, then when | area, then categories ---------- */
-.el-explore-header .el-search-pill {
-  min-height: var(--search-height);
-}
 .el-filter-row {
   display: flex;
   align-items: center;
@@ -574,9 +503,10 @@
   align-items: center;
   gap: var(--vibe-icon-gap);
   padding: var(--vibe-padding);
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent; /* the soft shadow outlines the chip */
   border-radius: var(--radius-pill);
   background: var(--color-surface);
+  box-shadow: var(--shadow-chip);
   color: var(--color-text-secondary);
   font: inherit;
   font-size: var(--text-body);
@@ -893,7 +823,7 @@
   .el-nav__link,
   .el-nav__join,
   .el-nav__avatar-button,
-  .el-search-pill button,
+  .el-search-card__submit,
   .el-empty__cta,
   .el-sec__clear,
   .el-time-filter button
@@ -905,7 +835,7 @@
   .el-nav__link,
   .el-nav__join,
   .el-nav__avatar-button,
-  .el-search-pill button,
+  .el-search-card__submit,
   .el-empty__cta,
   .el-sec__clear,
   .el-time-filter button
@@ -984,7 +914,7 @@
   }
   /* The card spans the content width */
   .el-hero {
-    padding: var(--hero-padding-mobile);
+    padding: 0;
   }
   /* Segments and vibe chips: one row that scrolls sideways, no visible scrollbar, 44px tall. */
   .el-time-filter {
@@ -1037,6 +967,9 @@
   .el-time-filter button {
     padding-inline: var(--space-2);
   }
+  .el-nav__mark {
+    display: grid;
+  }
   .el-nav__wordmark {
     position: absolute;
     width: 1px;
@@ -1044,5 +977,218 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
+  }
+}
+
+/* ---------- Madrid skyline (components/madrid-skyline.tsx) ---------- */
+.el-skyline {
+  display: block;
+  /* spans the whole page width, wider than the content column */
+  width: 100vw;
+  max-width: none;
+  margin-inline: calc(50% - 50vw);
+  height: var(--skyline-height);
+  color: var(--color-skyline);
+}
+.eventloop-shell:has(.el-skyline) {
+  overflow-x: clip; /* 100vw includes the scrollbar; nothing may scroll sideways */
+}
+
+/* ---------- Search card: search | area | Search button, then the vibe strip ---------- */
+.el-search-card {
+  position: relative;
+  border-radius: var(--radius-search);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-search);
+}
+.el-search-card--on-skyline {
+  margin-top: calc(-1 * var(--search-overlap));
+}
+.el-search-card__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
+}
+.el-search-card__field {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+/* The divider only when the area picker follows (not on Saved) */
+.el-search-card__field:has(+ .el-area-pick) {
+  padding-right: var(--space-3);
+  border-right: 1px solid var(--color-border);
+}
+.el-search-card__field label {
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+  line-height: 1.3;
+}
+.el-search-card__field input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-input);
+  line-height: 1.4;
+}
+.el-search-card__field input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+/* Focus lands on the whole field, same as every other field: a muted underline, no ring */
+.el-search-card__field:focus-within label {
+  color: var(--color-text);
+}
+.el-search-card .el-area-pick {
+  margin-left: 0;
+  background: transparent;
+}
+.el-search-card .el-area-pick:hover {
+  background: var(--color-hover-warm);
+}
+.el-search-card__submit {
+  flex-shrink: 0;
+  padding: var(--space-3) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+.el-search-card__submit:hover {
+  background: var(--color-brand-hover);
+}
+.el-search-card__submit:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Vibe strip: one row inside the card, scrolls sideways, no visible scrollbar */
+.el-vibe-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.el-vibe-strip::-webkit-scrollbar {
+  display: none;
+}
+.el-vibe-strip__label {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+}
+.el-vibe-strip__chip {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-hover-warm);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-pill);
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.el-vibe-strip__chip svg {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+.el-vibe-strip__chip:hover {
+  color: var(--color-text);
+}
+.el-vibe-strip__chip[aria-pressed="true"] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+.el-vibe-strip__chip:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+/* 44px tap area without changing how the chip looks */
+.el-vibe-strip__chip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--tap-min);
+  transform: translateY(-50%);
+}
+
+/* ---------- When pills: separate white pills with the date under the name (Explore only;
+   the auth switch keeps the segmented look) ---------- */
+.el-filter-row .el-time-filter {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  gap: var(--space-2);
+}
+.el-filter-row .el-time-filter button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-chip);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-chip);
+  text-align: left;
+}
+.el-filter-row .el-time-filter button span {
+  color: inherit;
+  font-weight: var(--font-weight-medium);
+}
+.el-filter-row .el-time-filter button[aria-pressed="true"] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+.el-filter-row .el-time-filter button small {
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.3;
+}
+.el-filter-row .el-time-filter button[aria-pressed="true"] small {
+  color: color-mix(in srgb, var(--color-on-brand) 82%, transparent);
+}
+
+@media (max-width: 720px) {
+  .el-skyline {
+    height: var(--skyline-height-mobile);
+  }
+  /* Phones: the search and the Search button on one line, the area under them */
+  .el-search-card__row {
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-3) var(--space-2) var(--space-4);
+  }
+  .el-search-card__field:has(+ .el-area-pick) {
+    border-right: 0;
+  }
+  .el-search-card .el-area-pick {
+    order: 3;
+    flex: 1 1 100%;
+    margin: 0 0 0 calc(-1 * var(--space-2));
+  }
+  .el-vibe-strip {
+    padding-inline: var(--space-4);
   }
 }

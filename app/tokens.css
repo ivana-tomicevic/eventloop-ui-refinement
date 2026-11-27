@@ -17,8 +17,31 @@
  */
 @theme static {
   /* Surfaces */
-  --color-page: #fbfaf8; /* warm near-white page background */
+  --color-page: #fff7f2; /* warm peach-white page background */
   --color-surface: #ffffff; /* cards, header, inputs */
+  /* Page glow: a lavender wash at the very top that fades slowly into --color-page (many steps, so no visible edge).
+     The lavender sits as a see-through layer ON the peach, so the two never mix into a grey band. */
+  --color-page-glow: #ebe2fb;
+  --page-glow-height: 640px;
+  --page-glow: linear-gradient(
+    180deg,
+    var(--color-page-glow) 0%,
+    color-mix(in srgb, var(--color-page-glow) 94%, transparent) 8%,
+    color-mix(in srgb, var(--color-page-glow) 82%, transparent) 18%,
+    color-mix(in srgb, var(--color-page-glow) 66%, transparent) 30%,
+    color-mix(in srgb, var(--color-page-glow) 48%, transparent) 44%,
+    color-mix(in srgb, var(--color-page-glow) 30%, transparent) 58%,
+    color-mix(in srgb, var(--color-page-glow) 16%, transparent) 72%,
+    color-mix(in srgb, var(--color-page-glow) 6%, transparent) 86%,
+    transparent 100%
+  );
+  --page-background: var(--page-glow) top center / 100% var(--page-glow-height) no-repeat, var(--color-page);
+
+  /* Madrid skyline in the Explore header: soft ink, never pure black */
+  --color-skyline: #3a3646;
+  --skyline-height: 80px;
+  --skyline-height-mobile: 64px;
+  --search-overlap: 24px; /* the search card stands on the skyline's ground line */
 
   /* Text */
   --color-text: #15141a;
@@ -36,7 +59,7 @@
   --color-hover-warm: #f3f1ec; /* hover fill for ghost buttons */
   --color-on-brand: #ffffff;
 
-  /* Purple accent — ONLY for the logo mark. Do not use anywhere else. */
+  /* Purple accent — ONLY for the logo (wordmark; the "e" mark on narrow phones). Do not use anywhere else. */
   --color-accent: #6c47ff;
   --color-on-accent: #ffffff;
 
@@ -108,6 +131,8 @@
   --radius-button: 12px;
   --radius-pill: 9999px;
   --radius-sheet: 24px; /* onboarding card and modals */
+  --radius-search: 28px; /* Explore search card */
+  --radius-chip: 14px; /* When pills (Today, Tomorrow...) */
 
   /* Type */
   /* Display face: ONLY Explore's header title (and the vibe pill inside it). Everything else is Inter. */
@@ -139,12 +164,14 @@
   --font-weight-bold: 700;
 
   /* Shadows */
-  --shadow-card: 0 3px 10px rgb(21 20 26 / 0.06);
+  --shadow-card: 0 4px 18px rgb(60 40 110 / 0.07); /* every card at rest: soft, faintly violet so it blends with the page glow */
   --shadow-raised: 0 4px 18px rgb(21 20 26 / 0.04);
   --shadow-popover: 0 12px 30px rgb(21 20 26 / 0.11);
   /* For inputs that show focus on their wrapper: 2px gap, then a 2px ink ring */
   --shadow-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-focus);
   --shadow-sheet: 0 8px 32px rgb(21 20 26 / 0.06); /* onboarding card */
+  --shadow-search: 0 6px 22px rgb(60 40 110 / 0.1); /* Explore search card */
+  --shadow-chip: 0 1px 3px rgb(60 40 110 / 0.1); /* white chips; small, so scrolling rows don't clip it */
 
   /* shadcn/ui names, mapped onto the tokens above */
   --color-background: var(--color-page);
