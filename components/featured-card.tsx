@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import {
   bookingLabel,
   eventCategory,
@@ -16,7 +16,7 @@ import {
 
 /**
  * Featured "Pick of the night" card — docs/explore-reference.html (.card.feat).
- * Reuses the event card's chip, heart, price and Free pill classes. The whole card is one link;
+ * Reuses the event card's chip, save button and price classes. The whole card is one link;
  * The booking label is only styled like a button (a link can't contain another interactive element),
  * and the heart is a separate button laid over the image.
  */
@@ -67,11 +67,8 @@ export default function FeaturedCard({
           <p className="el-card__meta el-feat__meta">{eventLocation(event)}</p>
           {description && <p className="el-feat__desc">{description}</p>}
           <div className="el-card__footer">
-            {price === "Free" ? (
-              <span className="el-card__free">Free</span>
-            ) : (
-              <span className="el-card__price el-feat__price">{price}</span>
-            )}
+            {/* The price ("Free" or "€18") is the strongest thing in the footer: bold, tabular, 22px */}
+            <span className="el-card__price el-feat__price">{price}</span>
             <span className="el-feat__cta">{bookingLabel(event)}</span>
           </div>
         </div>
@@ -88,7 +85,7 @@ export default function FeaturedCard({
         aria-pressed={saved}
         onClick={() => onSave(event.id)}
       >
-        <Heart
+        <Bookmark
           size={17}
           strokeWidth={2}
           fill={saved ? "currentColor" : "none"}
