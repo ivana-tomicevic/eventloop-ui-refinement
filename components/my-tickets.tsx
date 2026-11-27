@@ -80,13 +80,9 @@ export default function MyTickets() {
                       <CircleCheck aria-hidden="true" />
                       Confirmed
                     </span>
-                    {booking.free ? (
-                      <span className="el-card__free">Free</span>
-                    ) : (
-                      <span className="el-card__price">
-                        {formatPrice(booking.total)}
-                      </span>
-                    )}
+                    <span className="el-card__price">
+                      {booking.free ? "Free" : formatPrice(booking.total)}
+                    </span>
                     <AddToCalendar event={event} />
                   </div>
                 </article>

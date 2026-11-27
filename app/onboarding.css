@@ -52,7 +52,6 @@
   justify-self: stretch;
   text-align: left;
 }
-.el-booking-done > .el-card__free,
 .el-booking-done__paid {
   margin: var(--space-4) 0 0;
 }
