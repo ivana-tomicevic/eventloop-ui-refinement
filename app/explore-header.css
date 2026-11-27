@@ -25,7 +25,7 @@
   align-items: center;
   gap: var(--space-2);
   border-radius: var(--nav-mark-radius);
-  color: var(--color-accent); /* purple wordmark; the only place the accent is used */
+  color: var(--color-logo); /* purple wordmark */
   font-size: var(--text-logo);
   font-weight: var(--font-weight-medium);
 }
@@ -35,9 +35,7 @@
   width: var(--nav-mark-size);
   height: var(--nav-mark-size);
   border-radius: var(--nav-mark-radius);
-  background: var(
-    --color-accent
-  ); /* the only place the purple accent is used */
+  background: var(--color-logo); /* same purple as the wordmark */
   color: var(--color-on-accent);
   font-size: var(--text-mark);
   line-height: 1;
@@ -141,10 +139,66 @@
   background: var(--color-brand-soft);
 }
 
+/* ---------- Explore hero band: the navbar, title and skyline, straight on the page colour ---------- */
+/* Full-bleed; the skyline is its last child, so it sits on the band's bottom edge. */
+.el-hero-band {
+  background: transparent; /* flat page colour shows through; no gradient */
+}
+/* The navbar is see-through over the band: no white bar, no bottom border */
+/* ...and it sits in the same column as the title and the search bar (same max-width, same left edge) */
+.el-hero-band .el-nav {
+  max-width: var(--content-max-width-padded);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+  border-bottom: 0;
+  background: transparent;
+}
+/* Same column as the page content below */
+.el-hero-band__inner {
+  max-width: var(--content-max-width-padded);
+  margin: 0 auto;
+  padding: var(--hero-band-padding-top) var(--page-gutter) 0;
+}
+/* Title block on the left, the hand-drawn Madrid illustration on the right, vertically centred */
+.el-hero-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--hero-band-title-gap);
+}
+.el-hero-row .el-hero {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+.el-madrid-illus {
+  display: block;
+  flex: 0 1 var(--illus-width);
+  width: 100%;
+  max-width: var(--illus-width);
+  min-width: 0;
+  height: auto;
+  aspect-ratio: 680 / 250;
+}
+/* Tablets: a smaller illustration so the title keeps its room */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .el-madrid-illus {
+    flex-basis: var(--illus-width-tablet);
+    max-width: var(--illus-width-tablet);
+  }
+}
+/* Phones: no illustration, the title takes the full width */
+@media (max-width: 639px) {
+  .el-madrid-illus {
+    display: none;
+  }
+}
+
 /* ---------- Page container ---------- */
 .eventloop-content.explore-content {
   width: 100%;
-  max-width: var(--page-max-width);
+  max-width: var(--content-max-width-padded);
   margin: 0 auto;
   padding: var(--page-padding);
 }
@@ -228,7 +282,7 @@
     transition: none;
   }
 }
-.el-explore-header h1 {
+.el-hero h1 {
   margin: 0;
   color: var(--color-text);
   font-family: var(--font-display);
@@ -245,7 +299,7 @@
 }
 /* "Don't stay in.": the second title line, only while it's "any vibe" (no subtitle then) */
 .el-hero__aside {
-  margin: var(--space-1) 0 0;
+  margin: 0;
   color: var(--hero-any-muted);
   font-family: var(--font-display);
   font-size: var(--text-hero-aside);
@@ -290,24 +344,15 @@
   outline-offset: 2px;
 }
 
-/* ---------- Explore rows: search, then when | area, then categories ---------- */
-.el-filter-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--explore-row-gap);
-}
-.el-filter-row .el-time-filter {
-  flex: none;
-  margin-top: 0;
-}
+/* ---------- Categories: one quiet row right above the first section heading ---------- */
 /* All eight chips in one row; when they don't fit it scrolls sideways and fades on the right.
    The small padding keeps the focus outline and the 44px tap areas inside the scroll box. */
 .el-category-row {
   display: flex;
   gap: var(--space-2);
-  margin: calc(var(--explore-row-gap) - var(--space-1)) calc(-1 * var(--space-1))
-    calc(-1 * var(--space-1));
+  /* search bar -> chips is the header's gap (32px); chips -> first section heading the same */
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-1))
+    calc(var(--explore-header-gap) - var(--space-1));
   padding: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
@@ -466,17 +511,7 @@
 .el-area-list__option[aria-selected="true"] {
   font-weight: var(--font-weight-semibold);
 }
-/* Phones: search, tabs, area, categories one under another */
 @media (max-width: 767px) {
-  .el-filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--explore-row-gap);
-  }
-  .el-filter-row .el-area-pick {
-    align-self: flex-start;
-    margin-left: 0;
-  }
   .el-area-list {
     right: auto;
     left: 0;
@@ -527,44 +562,21 @@
     transition: none;
   }
 }
-/* Hover (mouse only): just the icon takes its category accent. */
+/* Category icons: one colour for every category (warm secondary text), at rest, on hover and
+   when selected. A chip may still set --vibe-accent for its icon (onboarding's area chips use ink). */
 @media (hover: hover) {
   .el-vibe:hover svg {
-    color: var(--vibe-accent);
+    color: var(--vibe-accent, var(--color-text-secondary));
   }
 }
-/* Selected: stays white; accent icon, darker neutral border, medium primary text. */
+/* Selected: stays white; darker warm border, medium primary text. */
 .el-vibe[aria-pressed="true"] {
   border-color: var(--vibe-border-selected);
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
 }
 .el-vibe[aria-pressed="true"] svg {
-  color: var(--vibe-accent);
-}
-.el-vibe--music {
-  --vibe-accent: var(--cat-music-accent);
-}
-.el-vibe--arts {
-  --vibe-accent: var(--cat-arts-accent);
-}
-.el-vibe--sports {
-  --vibe-accent: var(--cat-sports-accent);
-}
-.el-vibe--outdoors {
-  --vibe-accent: var(--cat-outdoors-accent);
-}
-.el-vibe--workshops {
-  --vibe-accent: var(--cat-workshops-accent);
-}
-.el-vibe--learn {
-  --vibe-accent: var(--cat-learn-accent);
-}
-.el-vibe--social {
-  --vibe-accent: var(--cat-social-accent);
-}
-.el-vibe--food {
-  --vibe-accent: var(--cat-food-accent);
+  color: var(--vibe-accent, var(--color-text-secondary));
 }
 .el-vibe:focus-visible {
   outline: 2px solid var(--color-focus);
@@ -826,7 +838,9 @@
   .el-search-card__submit,
   .el-empty__cta,
   .el-sec__clear,
-  .el-time-filter button
+  .el-time-filter button,
+  .el-details__map,
+  .el-create__vibes .el-vibe
 ) {
   position: relative;
 }
@@ -838,7 +852,9 @@
   .el-search-card__submit,
   .el-empty__cta,
   .el-sec__clear,
-  .el-time-filter button
+  .el-time-filter button,
+  .el-details__map,
+  .el-create__vibes .el-vibe
 )::after {
   content: "";
   position: absolute;
@@ -906,7 +922,7 @@
     width: 100%;
     padding: var(--page-padding-mobile);
   }
-  .el-explore-header h1 {
+  .el-hero h1 {
     font-size: var(--text-hero-mobile);
   }
   .el-hero__aside {
@@ -915,6 +931,15 @@
   /* The card spans the content width */
   .el-hero {
     padding: 0;
+  }
+  .el-hero-band__inner {
+    padding: var(--hero-band-padding-top-mobile) var(--page-gutter-mobile) 0;
+  }
+  .el-hero-band .el-nav {
+    padding-inline: var(--page-gutter-mobile);
+  }
+  .el-hero-row {
+    margin-bottom: var(--hero-band-title-gap-mobile);
   }
   /* Segments and vibe chips: one row that scrolls sideways, no visible scrollbar, 44px tall. */
   .el-time-filter {
@@ -983,43 +1008,54 @@
 /* ---------- Madrid skyline (components/madrid-skyline.tsx) ---------- */
 .el-skyline {
   display: block;
-  /* spans the whole page width, wider than the content column */
-  width: 100vw;
+  /* full-bleed inside the hero band, flush with its bottom edge */
+  width: 100%;
   max-width: none;
-  margin-inline: calc(50% - 50vw);
   height: var(--skyline-height);
   color: var(--color-skyline);
 }
 .eventloop-shell:has(.el-skyline) {
-  overflow-x: clip; /* 100vw includes the scrollbar; nothing may scroll sideways */
+  overflow-x: clip; /* nothing may scroll sideways */
 }
 
-/* ---------- Search card: search | area | Search button, then the vibe strip ---------- */
+/* ---------- Search bar: search | When | Area | Vibe | Search (one pill; phones: a stacked card) ---------- */
+/* On Explore the hero row's bottom gap is the space above the bar, so the content adds none */
+.el-hero-band + .eventloop-content.explore-content {
+  padding-top: 0;
+}
 .el-search-card {
   position: relative;
-  border-radius: var(--radius-search);
+  z-index: var(--z-popover); /* its popovers open over the results below */
+  display: flex;
+  align-items: center;
+  min-height: var(--search-bar-height);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-6);
+  border-radius: var(--radius-pill);
   background: var(--color-surface);
   box-shadow: var(--shadow-search);
 }
-.el-search-card--on-skyline {
-  margin-top: calc(-1 * var(--search-overlap));
-}
-.el-search-card__row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
+/* Explore, laptop widths and up: the bar overhangs the column on both sides (still centred on it).
+   The text field takes the extra width; segments and Search keep their size.
+   Overhang = the room between the column and the screen edge minus --search-overhang-edge, capped
+   at --search-overhang: 24px at 1200px, the full 40px from 1232px. Saved has no band and keeps
+   the bar on the column. Below 1200px: no overhang. */
+@media (min-width: 1200px) {
+  .el-hero-band + .eventloop-content .el-search-card {
+    margin-inline: calc(
+      -1 *
+        min(
+          var(--search-overhang),
+          (100vw - var(--content-max-width)) / 2 - var(--search-overhang-edge)
+        )
+    );
+  }
 }
 .el-search-card__field {
   display: flex;
   flex: 1;
   min-width: 0;
   flex-direction: column;
-}
-/* The divider only when the area picker follows (not on Saved) */
-.el-search-card__field:has(+ .el-area-pick) {
-  padding-right: var(--space-3);
-  border-right: 1px solid var(--color-border);
+  padding-right: var(--space-4);
 }
 .el-search-card__field label {
   color: var(--color-text-muted);
@@ -1042,20 +1078,131 @@
   color: var(--color-text-muted);
   opacity: 1;
 }
-/* Focus lands on the whole field, same as every other field: a muted underline, no ring */
+/* Focus lands on the whole field, same as every other field: the label darkens, no ring */
 .el-search-card__field:focus-within label {
   color: var(--color-text);
 }
-.el-search-card .el-area-pick {
-  margin-left: 0;
-  background: transparent;
+.el-search-card__segs {
+  display: flex;
+  align-self: stretch;
 }
-.el-search-card .el-area-pick:hover {
-  background: var(--color-hover-warm);
+.el-search-card__seg {
+  position: relative;
+  display: flex;
+}
+/* Thin divider before each segment: search | When | Area | Vibe */
+.el-search-card__seg::before {
+  content: "";
+  position: absolute;
+  top: var(--space-3);
+  bottom: var(--space-3);
+  left: 0;
+  width: 1px;
+  background: var(--color-border);
+}
+/* Icon | label over the bold value | chevron */
+.el-search-card__seg-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: var(--search-seg-min-width);
+  min-height: var(--tap-min);
+  margin-inline: var(--space-1);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--hero-transition);
+}
+.el-search-card__seg-button:hover,
+.el-search-card__seg-button[aria-expanded="true"] {
+  background: var(--color-field-hover);
+}
+.el-search-card__seg-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-search-card__seg-button {
+    transition: none;
+  }
+}
+.el-search-card__seg-button > svg {
+  flex-shrink: 0;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--color-text-muted);
+}
+.el-search-card__seg-chevron {
+  margin-left: auto;
+  transition: transform var(--hero-transition);
+}
+.el-search-card__seg-button[aria-expanded="true"] .el-search-card__seg-chevron {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-search-card__seg-chevron {
+    transition: none;
+  }
+}
+.el-search-card__seg-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.el-search-card__seg-label {
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+  line-height: 1.3;
+}
+.el-search-card__seg-value {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The segment's list opens right under it, left-aligned, above the results (the bar has
+   z-index: var(--z-popover)); it shares .el-area-list's look but with the card shadow. */
+.el-search-card__list {
+  right: auto;
+  left: 0;
+  box-shadow: var(--shadow-card);
+}
+.el-search-card__list .el-area-list__option {
+  padding-block: var(--space-1);
+}
+.el-search-card__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.el-search-card__option small {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-meta);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.3;
+}
+.el-search-card__list svg {
+  flex-shrink: 0;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.el-search-card__option svg {
+  color: var(--color-text-secondary);
 }
 .el-search-card__submit {
   flex-shrink: 0;
-  padding: var(--space-3) var(--space-5);
+  min-height: var(--tap-min);
+  margin-left: var(--space-2);
+  padding: 0 var(--space-6);
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-brand);
@@ -1073,122 +1220,55 @@
   outline-offset: 2px;
 }
 
-/* Vibe strip: one row inside the card, scrolls sideways, no visible scrollbar */
-.el-vibe-strip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  border-top: 1px solid var(--color-border);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.el-vibe-strip::-webkit-scrollbar {
-  display: none;
-}
-.el-vibe-strip__label {
-  flex: none;
-  color: var(--color-text-muted);
-  font-size: var(--text-meta);
-}
-.el-vibe-strip__chip {
-  position: relative;
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 6px 12px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-hover-warm);
-  color: var(--color-text-secondary);
-  font: inherit;
-  font-size: var(--text-pill);
-  line-height: 1.2;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.el-vibe-strip__chip svg {
-  flex-shrink: 0;
-  width: 15px;
-  height: 15px;
-}
-.el-vibe-strip__chip:hover {
-  color: var(--color-text);
-}
-.el-vibe-strip__chip[aria-pressed="true"] {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-}
-.el-vibe-strip__chip:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
-/* 44px tap area without changing how the chip looks */
-.el-vibe-strip__chip::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: var(--tap-min);
-  transform: translateY(-50%);
-}
-
-/* ---------- When pills: separate white pills with the date under the name (Explore only;
-   the auth switch keeps the segmented look) ---------- */
-.el-filter-row .el-time-filter {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  gap: var(--space-2);
-}
-.el-filter-row .el-time-filter button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-chip);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-chip);
-  text-align: left;
-}
-.el-filter-row .el-time-filter button span {
-  color: inherit;
-  font-weight: var(--font-weight-medium);
-}
-.el-filter-row .el-time-filter button[aria-pressed="true"] {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-}
-.el-filter-row .el-time-filter button small {
-  color: var(--color-text-muted);
-  font-size: var(--text-meta);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.3;
-}
-.el-filter-row .el-time-filter button[aria-pressed="true"] small {
-  color: color-mix(in srgb, var(--color-on-brand) 82%, transparent);
-}
-
 @media (max-width: 720px) {
   .el-skyline {
     height: var(--skyline-height-mobile);
   }
-  /* Phones: the search and the Search button on one line, the area under them */
-  .el-search-card__row {
-    flex-wrap: wrap;
-    padding: var(--space-3) var(--space-3) var(--space-2) var(--space-4);
+  /* Phones: a stacked card. Search on top, the three segments in a row, Search full width. */
+  .el-search-card {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    padding: var(--space-2);
+    border-radius: var(--radius-search);
   }
-  .el-search-card__field:has(+ .el-area-pick) {
-    border-right: 0;
+  .el-search-card__field {
+    padding: var(--space-2) var(--space-3) var(--space-3);
+    border-bottom: 1px solid var(--color-border);
   }
-  .el-search-card .el-area-pick {
-    order: 3;
-    flex: 1 1 100%;
-    margin: 0 0 0 calc(-1 * var(--space-2));
+  /* The lists span the card's width, so they never run off a 390px screen */
+  .el-search-card__segs {
+    position: relative;
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    padding-block: var(--space-1);
   }
-  .el-vibe-strip {
-    padding-inline: var(--space-4);
+  .el-search-card__seg {
+    position: static;
+    min-width: 0;
+  }
+  .el-search-card__seg::before {
+    display: none;
+  }
+  .el-search-card__seg + .el-search-card__seg {
+    border-left: 1px solid var(--color-border);
+  }
+  .el-search-card__seg-button {
+    width: 100%;
+    min-width: 0;
+    gap: var(--space-1);
+    margin: 0;
+    padding: var(--space-2);
+    border-radius: var(--radius-button);
+  }
+  /* Full width of the card, right under the segment row; options keep their 44px height */
+  .el-search-card__list {
+    right: 0;
+    min-width: 0;
+  }
+  .el-search-card__submit {
+    width: 100%;
+    margin: var(--space-1) 0 0;
   }
 }

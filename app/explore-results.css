@@ -1,24 +1,82 @@
 /* Explore results: section titles (.sec), featured card (.feat) and grid (.grid) — docs/explore-reference.html.
    Tokens only: see app/tokens.css. The small card itself lives in app/event-card.css. */
 
-/* ---------- Section titles ---------- */
-.el-results-section + .el-results-section {
+/* ---------- Section headers: one pattern for every Explore section ----------
+   A row with the title left and a right slot (List | Timeline, a count, or "Show all 6 →"),
+   then the optional sub line underneath. 32px above every header, 14px from header to cards. */
+.el-results-section + .el-results-section,
+.el-results-section + .el-rows,
+.el-rows + .el-results-section {
   margin-top: var(--results-gap);
 }
 .el-sec {
   display: flex;
+  flex-wrap: wrap; /* phones: the right slot wraps under the title instead of overflowing */
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-3);
-  margin: 0 0 var(--space-3);
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--section-head-gap);
+}
+.el-sec:has(+ .el-sec__sub) {
+  margin-bottom: 0;
 }
 .el-sec h2 {
+  min-width: 0;
   margin: 0;
-  color: var(--color-text);
-  font-size: var(--text-section-label);
+  color: var(--color-title);
+  font-size: var(--text-section-head);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
-  line-height: 1.3;
+  line-height: var(--line-height-section-head);
+}
+.el-sec__sub {
+  margin: var(--section-sub-gap) 0 var(--section-head-gap);
+  color: var(--color-subtitle);
+  font-size: var(--text-section-sub);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}
+/* "Show all 6 →": quiet, no underline until hover or keyboard focus */
+.el-sec__more {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--space-1);
+  background: transparent;
+  color: var(--color-subtitle);
+  font: inherit;
+  font-size: var(--text-section-sub);
+  font-weight: var(--font-weight-regular);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.el-sec__more:hover,
+.el-sec__more:focus-visible {
+  text-decoration: underline;
+}
+.el-sec__more:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.el-sec__more svg {
+  flex-shrink: 0;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+/* 44px tall tap area without changing how it looks */
+.el-sec__more::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--tap-min);
+  transform: translateY(-50%);
 }
 .el-sec__aside {
   display: flex;
@@ -369,7 +427,6 @@
   .el-tl-card__photo {
     grid-row: span 2;
   }
-  .el-tl-card__link > .el-card__free,
   .el-tl-card__price {
     grid-column: 2;
     justify-self: start;

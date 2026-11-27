@@ -3,18 +3,7 @@
   display: grid;
   gap: var(--space-6);
 }
-.el-row__head h2 {
-  margin: 0;
-  color: var(--color-text);
-  font-size: var(--text-section-title);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.2;
-}
-.el-row__head p {
-  margin: var(--space-1) 0 var(--space-3);
-  color: var(--color-text-muted);
-  font-size: var(--text-body);
-}
+/* Row headers use the shared section header (.el-sec, .el-sec__sub in app/explore-results.css) */
 /* One row = three cards, no sideways scrolling (same columns as the grid) */
 .el-rail {
   display: grid;
@@ -83,7 +72,3 @@
   outline-offset: 2px;
 }
 
-/* "Show all" / "Change" sit right after the row description */
-.el-row__head .el-sec__clear {
-  margin-left: var(--space-2);
-}

@@ -1,8 +1,23 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
+import {
+  Calendar,
+  Check,
+  ChevronDown,
+  MapPin,
+  Smile,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 import SiteNav from "./site-nav";
-import { CATEGORIES } from "./vibes";
+import { CATEGORIES, NEIGHBOURHOODS } from "./vibes";
 import {
   VIBES,
   findVibe,
@@ -12,10 +27,10 @@ import {
 } from "./moods";
 import { authUrl, isSignedIn, saveOrAskToSignIn, startHosting } from "./auth";
 import { readHostProfile } from "./host";
-import MadridSkyline from "./madrid-skyline";
+import MadridIllustration from "./madrid-illustration";
 import EventTimeline from "./event-timeline";
 import ViewToggle, { type ExploreView } from "./view-toggle";
-import AreaPicker from "./area-picker";
+import { useDismiss } from "./use-dismiss";
 import EventCard from "./event-card";
 import FeaturedCard from "./featured-card";
 import ExploreRows from "./explore-rows";
@@ -28,6 +43,148 @@ import {
   type EventRecord,
 } from "./event-data";
 const VIEW_KEY = "eventloop-view";
+/** The Area segment's value when no neighbourhood is picked. */
+const ALL_MADRID = "All Madrid";
+type SegmentOption = {
+  value: string;
+  label: string;
+  /** Small second line in the list, e.g. the date under "Tomorrow". */
+  meta?: string;
+  icon?: LucideIcon;
+};
+/**
+ * One segment of the Explore search bar (When, Area, Vibe): a button that shows the current value
+ * and opens a small listbox. Arrows / Home / End move, Enter or Space picks, Escape or a click
+ * outside closes (focus back on the segment), Tab closes and stays on the segment.
+ * Styles: app/explore-header.css (.el-search-card__seg).
+ */
+function SearchSegment({
+  id,
+  icon: Icon,
+  label,
+  value,
+  options,
+  selected,
+  onPick,
+}: {
+  id: string;
+  /** Leading icon (decorative). */
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  options: SegmentOption[];
+  selected: string;
+  onPick: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const list = useRef<HTMLUListElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(open, root, close, button);
+  const listId = `search-${id}-list`;
+
+  // Opening puts focus on the picked option (or the first one).
+  useEffect(() => {
+    if (!open) return;
+    (
+      list.current?.querySelector<HTMLElement>('[aria-selected="true"]') ||
+      list.current?.querySelector<HTMLElement>('[role="option"]')
+    )?.focus();
+  }, [open]);
+
+  const choose = (next: string) => {
+    onPick(next);
+    setOpen(false);
+    button.current?.focus();
+  };
+
+  const onKeyDown = (e: ReactKeyboardEvent<HTMLUListElement>) => {
+    const items = [
+      ...(list.current?.querySelectorAll<HTMLElement>('[role="option"]') || []),
+    ];
+    const at = items.indexOf(document.activeElement as HTMLElement);
+    const go = (i: number) => {
+      e.preventDefault();
+      items[(i + items.length) % items.length]?.focus();
+    };
+    if (e.key === "ArrowDown") go(at + 1);
+    else if (e.key === "ArrowUp") go(at - 1);
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(items.length - 1);
+    else if ((e.key === "Enter" || e.key === " ") && at >= 0) {
+      e.preventDefault();
+      choose(items[at].dataset.value || "");
+    } else if (e.key === "Tab") {
+      // A listbox isn't a stop of its own: Tab closes it and leaves focus on the segment.
+      e.preventDefault();
+      setOpen(false);
+      button.current?.focus();
+    }
+  };
+
+  return (
+    <div ref={root} className="el-search-card__seg">
+      <button
+        ref={button}
+        type="button"
+        className="el-search-card__seg-button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={open ? listId : undefined}
+        onClick={() => setOpen((v) => !v)}
+        onKeyDown={(e) => {
+          // Enter / Space open it as a click; the arrow keys open it too.
+          if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+      >
+        <Icon aria-hidden="true" />
+        <span className="el-search-card__seg-text">
+          <span className="el-search-card__seg-label">{label}</span>
+          <span className="el-search-card__seg-value">{value}</span>
+        </span>
+        <ChevronDown
+          className="el-search-card__seg-chevron"
+          aria-hidden="true"
+        />
+      </button>
+      {open && (
+        <ul
+          ref={list}
+          id={listId}
+          className="el-area-list el-search-card__list"
+          role="listbox"
+          aria-label={label}
+          onKeyDown={onKeyDown}
+        >
+          {options.map((o) => (
+            <li
+              key={o.value || "any"}
+              role="option"
+              tabIndex={-1}
+              aria-selected={o.value === selected}
+              data-value={o.value}
+              className="el-area-list__option"
+              onClick={() => choose(o.value)}
+            >
+              <span className="el-search-card__option">
+                {o.icon && <o.icon aria-hidden="true" />}
+                <span>
+                  {o.label}
+                  {o.meta && <small>{o.meta}</small>}
+                </span>
+              </span>
+              {o.value === selected && <Check aria-hidden="true" />}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 type EmptyStateProps = {
   title: string;
   text: string;
@@ -268,6 +425,23 @@ export default function EventloopScreen({
       ).length;
     return { tomorrow: count("tomorrow"), weekend: count("weekend") };
   }, [events]);
+  /** Search button / Enter: once the results have rendered, scroll to the first results block
+   *  (section, row or empty state) and move focus to its heading. Counter so every press jumps. */
+  const [jump, setJump] = useState(0);
+  useEffect(() => {
+    if (!jump) return;
+    const target = document.querySelector<HTMLElement>(
+      ".explore-content :is(.el-results-section, .el-rows, .el-empty)",
+    );
+    if (!target) return;
+    const heading =
+      target.querySelector<HTMLElement>("h2, h3") || target;
+    if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // "instant", not "auto": html has scroll-behavior: smooth, which "auto" would follow.
+    target.scrollIntoView({ behavior: reduce ? "instant" : "smooth", block: "start" });
+    heading.focus({ preventScroll: true });
+  }, [jump]);
   const clearSearch = () => {
     setSearch("");
     setActiveVibe("");
@@ -364,7 +538,24 @@ export default function EventloopScreen({
     label: "Show all events",
     onClick: () => setTimeFilter("all"),
   };
-  const empty: EmptyStateProps = savedOnly
+  // Saved: a search or day with no match isn't "nothing saved" — offer to clear the filters instead.
+  const savedFiltered =
+    savedOnly &&
+    Boolean(search || activeVibe || timeFilter !== "all") &&
+    events.some((e) => e.status !== "Draft" && saved.includes(String(e.id)));
+  const empty: EmptyStateProps = savedFiltered
+    ? {
+        title: "Nothing matches that.",
+        text: "Try another word or day.",
+        action: {
+          label: "Clear filters",
+          onClick: () => {
+            clearSearch();
+            setTimeFilter("all");
+          },
+        },
+      }
+    : savedOnly
     ? {
         title: "No saved events yet.",
         text: "Tap the heart on any event to keep it here.",
@@ -441,151 +632,160 @@ export default function EventloopScreen({
       ))}
     </div>
   );
+  /* Title + vibe. A picked vibe puts them on a card tinted for that vibe. */
+  const hero = (
+    <div
+      className={"el-hero" + (picked ? " el-hero--tinted" : "")}
+      data-vibe={picked?.id}
+    >
+      <h1 id="explore-title" aria-live="polite">
+        {savedOnly ? (
+          "Your saved events"
+        ) : (
+          `${activeTime.title}.`
+        )}
+      </h1>
+      {/* "Any vibe": a second title line instead of a subtitle */}
+      {!savedOnly && !picked && (
+        <p className="el-hero__aside">{"Don't stay in."}</p>
+      )}
+      {loaded && picked && (
+        <p className="el-hero__sub" aria-live="polite">
+          {filtered.length > 0 ? (
+            `${count(filtered.length)}. ${picked.hint}.`
+          ) : (
+            <>
+              Nothing {activeTime.when}. Try another vibe.{" "}
+              <button
+                type="button"
+                className="el-sec__clear"
+                onClick={() => pickVibe("")}
+              >
+                Any vibe
+              </button>
+            </>
+          )}
+        </p>
+      )}
+    </div>
+  );
   return (
     <main className="eventloop-shell">
-      <SiteNav showSearch={false} />
+      {savedOnly ? (
+        <SiteNav showSearch={false} />
+      ) : (
+        /* Explore: the navbar, then a row with the title on the left and a hand-drawn Madrid
+           illustration on the right (hidden on phones), all on the flat page colour. */
+        <div className="el-hero-band">
+          <SiteNav showSearch={false} />
+          <div className="el-hero-band__inner">
+            <div className="el-hero-row">
+              {hero}
+              <MadridIllustration />
+            </div>
+          </div>
+        </div>
+      )}
       <div className="eventloop-content explore-content">
         <section className="el-explore-header" aria-labelledby="explore-title">
-          {/* Title + vibe. A picked vibe puts them on a card tinted for that vibe. */}
-          <div
-            className={"el-hero" + (picked ? " el-hero--tinted" : "")}
-            data-vibe={picked?.id}
+          {savedOnly && hero}
+          {/* Search bar: the text search, then When | Area | Vibe segments, then Search. */}
+          <form
+            className="el-search-card"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setActiveVibe(vibe.trim());
+              setJump((n) => n + 1);
+            }}
           >
-            <h1 id="explore-title" aria-live="polite">
-              {savedOnly ? (
-                "Your saved events"
-              ) : (
-                activeTime.title
+            <div className="el-search-card__field">
+              <label htmlFor="explore-search">Search</label>
+              <input
+                id="explore-search"
+                type="search"
+                autoComplete="off"
+                value={vibe}
+                onChange={(e) => setVibe(e.target.value)}
+                placeholder='Try "chill jazz, free entry"'
+              />
+            </div>
+            <div className="el-search-card__segs">
+              <SearchSegment
+                id="when"
+                icon={Calendar}
+                label="When"
+                value={timeFilter === "all" ? "Any day" : activeTime.label}
+                options={options.map((o) => ({
+                  value: o.id,
+                  label: o.label,
+                  meta: today ? dateLabel(o.id, today) : undefined,
+                }))}
+                selected={timeFilter}
+                onPick={(v) => setTimeFilter(v as TimeFilter)}
+              />
+              {!savedOnly && (
+                <>
+                  <SearchSegment
+                    id="area"
+                    icon={MapPin}
+                    label="Area"
+                    value={area || ALL_MADRID}
+                    options={["", ...NEIGHBOURHOODS].map((n) => ({
+                      value: n,
+                      label: n || ALL_MADRID,
+                    }))}
+                    selected={area}
+                    onPick={setArea}
+                  />
+                  {/* Picking the selected vibe again switches it off ("Any vibe") */}
+                  <SearchSegment
+                    id="vibe"
+                    icon={Smile}
+                    label="Vibe"
+                    value={picked?.label || "Any vibe"}
+                    options={[
+                      { value: "", label: "Any vibe", icon: Sparkles },
+                      ...VIBES.map((v) => ({
+                        value: v.id,
+                        label: v.label,
+                        icon: v.icon,
+                      })),
+                    ]}
+                    selected={vibeId}
+                    onPick={(id) => pickVibe(id === vibeId ? "" : id)}
+                  />
+                </>
               )}
-            </h1>
-            {/* "Any vibe": a second title line instead of a subtitle */}
-            {!savedOnly && !picked && (
-              <p className="el-hero__aside">{"Don't stay in."}</p>
-            )}
-            {loaded && picked && (
-              <p className="el-hero__sub" aria-live="polite">
-                {filtered.length > 0 ? (
-                  `${count(filtered.length)}. ${picked.hint}.`
-                ) : (
-                  <>
-                    Nothing {activeTime.when}. Try another vibe.{" "}
-                    <button
-                      type="button"
-                      className="el-sec__clear"
-                      onClick={() => pickVibe("")}
-                    >
-                      Any vibe
-                    </button>
-                  </>
-                )}
-              </p>
-            )}
-          </div>
-          {!savedOnly && <MadridSkyline />}
-          {/* Search card: the text search, the area and the Search button, then the vibe strip.
-              On Explore it stands on the skyline's ground line. */}
-          <div
-            className={
-              "el-search-card" + (savedOnly ? "" : " el-search-card--on-skyline")
-            }
-          >
-            <form
-              className="el-search-card__row"
-              role="search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setActiveVibe(vibe.trim());
-              }}
-            >
-              <div className="el-search-card__field">
-                <label htmlFor="explore-search">Search</label>
-                <input
-                  id="explore-search"
-                  type="search"
-                  autoComplete="off"
-                  value={vibe}
-                  onChange={(e) => setVibe(e.target.value)}
-                  placeholder='Try "chill jazz, free entry"'
-                />
-              </div>
-              {!savedOnly && <AreaPicker value={area} onChange={setArea} />}
-              <button type="submit" className="el-search-card__submit">
-                Search
-              </button>
-            </form>
-            {!savedOnly && (
-              <div
-                className="el-vibe-strip"
-                role="group"
-                aria-label="Vibe"
-              >
-                <span className="el-vibe-strip__label" aria-hidden="true">
-                  Vibe
-                </span>
-                <button
-                  type="button"
-                  className="el-vibe-strip__chip"
-                  aria-pressed={!vibeId}
-                  onClick={() => pickVibe("")}
-                >
-                  <Sparkles aria-hidden="true" />
-                  Any
-                </button>
-                {VIBES.map((v) => (
-                  <button
-                    type="button"
-                    key={v.id}
-                    className="el-vibe-strip__chip"
-                    aria-pressed={vibeId === v.id}
-                    onClick={() => pickVibe(vibeId === v.id ? "" : v.id)}
-                  >
-                    <v.icon aria-hidden="true" />
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          {/* When: pills with the date under each */}
-          <div className="el-filter-row">
-            <div className="el-time-filter" role="group" aria-label="When">
-              {options.map((o) => (
-                <button
-                  type="button"
-                  key={o.id}
-                  aria-pressed={timeFilter === o.id}
-                  onClick={() => setTimeFilter(o.id)}
-                >
-                  <span>{o.label}</span>
-                  {today && <small>{dateLabel(o.id, today)}</small>}
-                </button>
-              ))}
             </div>
-          </div>
-          {/* Categories: all eight in one row (phones: scrolls sideways) */}
-          {!savedOnly && (
-            <div
-              ref={chipsRef}
-              className="el-category-row"
-              data-fade={chipsFade}
-              role="group"
-              aria-label="Category"
-            >
-              {CATEGORIES.map((v) => (
-                <button
-                  type="button"
-                  key={v.id}
-                  className={`el-vibe el-vibe--${v.tone}`}
-                  aria-pressed={category === v.id}
-                  onClick={() => toggleCategoryChip(v.id)}
-                >
-                  <v.icon aria-hidden="true" />
-                  {v.label}
-                </button>
-              ))}
-            </div>
-          )}
+            <button type="submit" className="el-search-card__submit">
+              Search
+            </button>
+          </form>
         </section>
+        {/* Categories: one quiet row right above the first section heading (phones: scrolls sideways) */}
+        {!savedOnly && (
+          <div
+            ref={chipsRef}
+            className="el-category-row"
+            data-fade={chipsFade}
+            role="group"
+            aria-label="Category"
+          >
+            {CATEGORIES.map((v) => (
+              <button
+                type="button"
+                key={v.id}
+                className={`el-vibe el-vibe--${v.tone}`}
+                aria-pressed={category === v.id}
+                onClick={() => toggleCategoryChip(v.id)}
+              >
+                <v.icon aria-hidden="true" />
+                {v.label}
+              </button>
+            ))}
+          </div>
+        )}
         {/* First section: "Starting soon / Next up / Best match" in the List, or the Timeline on
             Tonight. One section, so the "List | Timeline" switch stays the same element (and keeps
             focus) when the view changes. */}

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import EventCard from "./event-card";
 import { eventPriceValue, type EventRecord } from "./event-data";
 import {
@@ -37,13 +38,12 @@ function Row({
 }) {
   return (
     <section className="el-row" aria-labelledby={id}>
-      <div className="el-row__head">
+      {/* The shared section header: title + right slot, then the sub line (app/explore-results.css) */}
+      <div className="el-sec">
         <h2 id={id}>{title}</h2>
-        <p>
-          {text}
-          {action}
-        </p>
+        {action && <span className="el-sec__aside">{action}</span>}
       </div>
+      <p className="el-sec__sub">{text}</p>
       {children}
     </section>
   );
@@ -128,15 +128,23 @@ export default function ExploreRows({
     </div>
   );
 
-  const toggle = (id: string, list: EventRecord[]) =>
+  /** "Show all 6 →": a quiet action in the row header. It opens the rest of the row in place,
+   *  so it is a button with aria-expanded; the label names the section. */
+  const toggle = (id: string, list: EventRecord[], title: string) =>
     list.length > ROW_MAX ? (
       <button
         type="button"
-        className="el-sec__clear"
+        className="el-sec__more"
         aria-expanded={Boolean(open[id])}
+        aria-label={
+          open[id]
+            ? `Show fewer events: ${title}`
+            : `Show all ${list.length} events: ${title}`
+        }
         onClick={() => setOpen((o) => ({ ...o, [id]: !o[id] }))}
       >
         {open[id] ? "Show fewer" : `Show all ${list.length}`}
+        <ArrowRight aria-hidden="true" />
       </button>
     ) : undefined;
 
@@ -147,7 +155,7 @@ export default function ExploreRows({
           id="row-solo"
           title="No plus-one needed"
           text="Come on your own, or bring a friend."
-          action={toggle("solo", solo)}
+          action={toggle("solo", solo, "No plus-one needed")}
         >
           {rail(solo, "solo")}
         </Row>
@@ -157,7 +165,7 @@ export default function ExploreRows({
           id="row-cheap"
           title="Free or under €5"
           text="Good nights that don't cost much."
-          action={toggle("cheap", cheap)}
+          action={toggle("cheap", cheap, "Free or under €5")}
         >
           {rail(cheap, "cheap")}
         </Row>
@@ -167,7 +175,7 @@ export default function ExploreRows({
         title="Close to you"
         text={
           near ? (
-            <>Nearest first · {near.label} · </>
+            <>Nearest first · {near.label}</>
           ) : (
             "Find what is on near you."
           )
@@ -182,12 +190,7 @@ export default function ExploreRows({
               >
                 Change
               </button>
-              {nearList.length > ROW_MAX && (
-                <>
-                  {" · "}
-                  {toggle("near", nearList)}
-                </>
-              )}
+              {toggle("near", nearList, "Close to you")}
             </>
           ) : undefined
         }
