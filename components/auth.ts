@@ -109,6 +109,9 @@ export function saveOrAskToSignIn(id: string | number): string[] | null {
   return null;
 }
 
+/** True while a heart tap waits for sign-in (the auth page says why the visitor is there). */
+export const hasPendingSave = () => read(PENDING_SAVE_KEY) !== null;
+
 export type Provider = "google" | "apple";
 const PROVIDER_NAMES: Record<Provider, string> = {
   google: "Google user",

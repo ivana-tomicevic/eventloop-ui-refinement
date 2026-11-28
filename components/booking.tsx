@@ -270,11 +270,9 @@ function Total({ total }: { total: number }) {
   return (
     <div className="el-join__total">
       <span>Total</span>
-      {total === 0 ? (
-        <span className="el-card__free">Free</span>
-      ) : (
-        <span className="el-card__price">{formatPrice(total)}</span>
-      )}
+      <span className="el-card__price">
+        {total === 0 ? "Free" : formatPrice(total)}
+      </span>
     </div>
   );
 }
@@ -517,7 +515,9 @@ export function BookingConfirmed({
       </p>
       <EventSummary event={event} />
       {booking.free ? (
-        <span className="el-card__free">Free</span>
+        <p className="el-booking-done__paid">
+          <span className="el-card__price">Free</span>
+        </p>
       ) : (
         <p className="el-booking-done__paid">
           Paid{" "}

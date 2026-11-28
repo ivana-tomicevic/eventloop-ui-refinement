@@ -6,7 +6,7 @@ import {
   CalendarDays,
   Clock3,
   ExternalLink,
-  Heart,
+  Bookmark,
   Languages,
   Ticket,
 } from "lucide-react";
@@ -141,7 +141,7 @@ export default function EventDetails({ id }: { id: string }) {
               if (next) setSaved(next.includes(String(event.id)));
             }}
           >
-            <Heart
+            <Bookmark
               size={17}
               strokeWidth={2}
               fill={saved ? "currentColor" : "none"}
@@ -179,11 +179,9 @@ export default function EventDetails({ id }: { id: string }) {
           </p>
           {/* Price + main action. On phones this bar sticks to the bottom of the screen. */}
           <div className="el-details__action">
-            {free ? (
-              <span className="el-card__free">Free</span>
-            ) : (
-              <span className="el-card__price el-feat__price">{price}</span>
-            )}
+            <span className="el-card__price el-feat__price">
+              {free ? "Free" : price}
+            </span>
             {timing.state === "upcoming" ? (
               <a
                 className="el-details__cta"

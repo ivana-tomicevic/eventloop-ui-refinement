@@ -21,6 +21,7 @@ type Form = {
   price: string; // euros, "0" = Free
   description: string;
   image: string; // data URL or /path
+  soloFriendly: boolean;
 };
 type Field = keyof Form;
 type Errors = Partial<Record<Field, string>>;
@@ -35,6 +36,7 @@ const empty: Form = {
   price: "",
   description: "",
   image: "",
+  soloFriendly: false,
 };
 const ORDER: Field[] = [
   "title",
@@ -94,6 +96,7 @@ function toEvent(
     summary: f.description.trim().split(/(?<=[.!?])\s/)[0] || undefined,
     description: f.description.trim() || undefined,
     image: f.image || undefined,
+    soloFriendly: f.soloFriendly || undefined,
     status,
     ownerId: base?.ownerId || currentUserId(),
     deleted: false,
@@ -126,6 +129,7 @@ export default function CreateEventPage() {
       price: existing.price ?? "",
       description: existing.description || existing.summary || "",
       image: existing.image || "",
+      soloFriendly: Boolean(existing.soloFriendly),
     });
   }, []);
 
@@ -141,7 +145,7 @@ export default function CreateEventPage() {
       venue: form.venue.trim() || "Venue",
       neighbourhood: form.neighbourhood || "Neighbourhood",
       // Neutral placeholder until a photo is added (not another event's photo)
-      image: form.image || "/eventloop-gallery-card.jpg",
+      image: form.image || "/photos/cover-placeholder.svg",
     }),
     [form, editing],
   );
@@ -350,6 +354,22 @@ export default function CreateEventPage() {
               />
               {error("image")}
             </div>
+
+            <label className="el-create__check">
+              <input
+                type="checkbox"
+                checked={form.soloFriendly}
+                onChange={(e) => set("soloFriendly", e.target.checked)}
+              />
+              <span>
+                <strong>Welcome people coming alone</strong>
+                <span className="el-join__hint">
+                  Encourage guests to come on their own. They can meet others
+                  who share the interest, and your event will be shown in
+                  &ldquo;No plus-one needed&rdquo;.
+                </span>
+              </span>
+            </label>
 
             <div role="alert">
               {saveFailed && (
