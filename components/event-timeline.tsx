@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import {
   eventCategory,
   eventImage,
@@ -108,11 +108,7 @@ export default function EventTimeline({
                 </span>
               )}
             </span>
-            {price === "Free" ? (
-              <span className="el-card__free">Free</span>
-            ) : (
-              <span className="el-card__price el-tl-card__price">{price}</span>
-            )}
+            <span className="el-card__price el-tl-card__price">{price}</span>
           </a>
           <button
             className={
@@ -126,7 +122,7 @@ export default function EventTimeline({
             aria-pressed={isSaved}
             onClick={() => onSave(e.id)}
           >
-            <Heart
+            <Bookmark
               size={17}
               strokeWidth={2}
               fill={isSaved ? "currentColor" : "none"}

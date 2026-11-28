@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import {
   eventCategory,
   eventDate,
@@ -75,11 +75,8 @@ export default function EventCard({
           <h3 className="el-card__title">{event.title}</h3>
           <p className="el-card__meta">{eventLocation(event)}</p>
           <div className="el-card__footer">
-            {price === "Free" ? (
-              <span className="el-card__free">Free</span>
-            ) : (
-              <span className="el-card__price">{price}</span>
-            )}
+            {/* "Free" or "€18": the same bold ink price either way */}
+            <span className="el-card__price">{price}</span>
           </div>
           {note && <p className="el-card__note">{note}</p>}
         </div>
@@ -95,7 +92,7 @@ export default function EventCard({
           aria-pressed={saved}
           onClick={() => onSave(event.id)}
         >
-          <Heart
+          <Bookmark
             size={17}
             strokeWidth={2}
             fill={saved ? "currentColor" : "none"}

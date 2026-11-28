@@ -5,10 +5,11 @@
   flex-direction: column;
   height: 100%;
   min-width: 0;
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent; /* the shadow outlines the card */
   border-radius: var(--radius-card);
   background: var(--color-surface);
   color: var(--color-text);
+  box-shadow: var(--shadow-card);
   transition:
     transform 200ms ease,
     box-shadow 200ms ease;
@@ -94,6 +95,7 @@
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-surface);
+  box-shadow: var(--shadow-save);
   color: var(--color-text);
   cursor: pointer;
 }
@@ -111,8 +113,11 @@
   width: var(--card-save-icon);
   height: var(--card-save-icon);
 }
+/* Saved: the same bookmark filled with ink (fill="currentColor") on a soft peach circle, so a row of
+   saved cards stays light. Ink on peach 14.8:1. No red: coral is for urgency only. */
 .el-card__save--active {
-  color: var(--color-saved);
+  background: var(--color-saved-bg);
+  color: var(--color-text);
 }
 .el-card__save:focus-visible {
   outline: 2px solid var(--color-focus);
@@ -128,9 +133,10 @@
 .el-card__body :where(p, h3) {
   margin: 0;
 }
+/* "Sports", "Arts": 12px, medium, warm secondary ink (6.7:1 on the white card), no uppercase */
 .el-card__category {
   margin-bottom: var(--card-line-gap);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: var(--text-category);
   font-weight: var(--font-weight-medium);
 }
@@ -162,14 +168,6 @@
   font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
-}
-.el-card__free {
-  padding: var(--pill-padding);
-  border-radius: var(--radius-pill);
-  background: var(--color-free-soft);
-  color: var(--color-free);
-  font-size: var(--text-pill);
-  font-weight: var(--font-weight-medium);
 }
 
 /* Optional bottom row inside the card, outside the link (organizer status + actions) */
