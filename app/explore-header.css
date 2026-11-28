@@ -124,6 +124,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  min-height: var(--tap-min);
   padding: var(--space-2) var(--space-3);
   border: 0;
   border-radius: var(--space-2);
@@ -1270,5 +1271,19 @@
   .el-search-card__submit {
     width: 100%;
     margin: var(--space-1) 0 0;
+  }
+}
+/* Narrow phones (~390px): drop the leading icon, tighten padding and the chevron so the values
+   ("All Madrid", "Any vibe", "Tomorrow") show in full. Text sizes and the 44px height stay. */
+@media (max-width: 420px) {
+  .el-search-card__seg-button {
+    padding-inline: var(--space-2) var(--space-1);
+  }
+  .el-search-card__seg-button > svg:first-child {
+    display: none;
+  }
+  .el-search-card__seg-button > .el-search-card__seg-chevron {
+    width: var(--icon-xs);
+    height: var(--icon-xs);
   }
 }
