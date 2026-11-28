@@ -11,37 +11,79 @@
  *   on-brand    #FFFFFF on brand (ink) 18.3:1, on brand-hover 14.3:1
  *   brand       #15141A as text on brand-soft 15.8:1 (text-muted on brand-soft 4.9:1)
  *   on-accent   #FFFFFF on accent (logo) 5.3:1
- *   saved       #E5484D heart icon on white 3.9:1 (non-text, needs 3:1)
+ *   saved       ink bookmark on --color-saved-bg (peach) 14.8:1; outline bookmark on white 18.3:1
  *   free        #0B6B43 on free-soft 5.6:1
- *   hot         #FFE3A3 is a BACKGROUND only, with on-hot #4A3200 text (9.6:1).
+ *   hot         #FFE1D2 (peach) is a BACKGROUND only, with on-hot ink text (14.8:1).
  */
 @theme static {
   /* Surfaces */
-  --color-page: #fbfaf8; /* warm near-white page background */
+  --color-page: #fff8f5; /* warm peach-white page background */
   --color-surface: #ffffff; /* cards, header, inputs */
+  /* Every screen, the Explore hero included: one flat warm colour, no gradient.
+     Contrast on it: text 17.4:1, logo 5.9:1, hero-any-muted 5.7:1, text-secondary 6.2:1, text-muted 5.4:1. */
+  --page-background: var(--color-page);
+
+  /* Explore hero band: no background of its own; navbar, title and illustration sit on the page colour */
+  --hero-band-padding-top: 40px; /* navbar -> heading */
+  --hero-band-padding-top-mobile: 24px;
+  --hero-band-title-gap: 28px; /* title row -> search bar */
+  --hero-band-title-gap-mobile: 20px;
+
+  /* Madrid: the silhouette colour (small illustration next to the title, and the unused full-bleed
+     skyline in components/madrid-skyline.tsx). Decorative, aria-hidden, so no text contrast needed. */
+  --color-skyline: #c3b0ba;
+  --skyline-height: 112px;
+  --skyline-height-mobile: 90px;
+  /* Small Madrid illustration (components/madrid-mini.tsx, not used on Explore any more) */
+  --color-illustration-sun: #ffe1d2;
+  --color-illustration-arch: #ffe9de;
+  --color-illustration-tree: #a995a1;
+  /* Hand-drawn Madrid next to the Explore title (components/madrid-illustration.tsx).
+     Decorative, aria-hidden: ink outlines over soft pastel fills on a peach sun. */
+  --color-illus-line: #3a3646;
+  --color-illus-sun: #ffe1d2;
+  --color-illus-sun-glow: #fff0e8;
+  --color-illus-rose: #f4b6b9;
+  --color-illus-apricot: #ffd2a0;
+  --color-illus-mauve: #cdb2d9;
+  --color-illus-coral: #f8b79a;
+  --color-illus-blush: #e0a9be;
+  --color-illus-bear: #c9a38f;
+  --illus-width: 440px; /* desktop */
+  --illus-width-tablet: 300px; /* 640-1024px */
+  --search-bar-height: 64px; /* Explore search bar (desktop) */
+  --search-overhang: 40px; /* Explore search bar reaches this far past the column on each side (full from ~1280px) */
+  --search-overhang-edge: 16px; /* ...but always keeps at least this much room to the screen edge (1200-1280px) */
+  --search-seg-min-width: 128px; /* When / Area / Vibe segments, so the bar doesn't jump as values change */
 
   /* Text */
   --color-text: #15141a;
   --color-text-muted: #6b6760; /* warm grey */
-  --color-text-secondary: #5f5c66; /* nav links, unselected segments (6.6:1 on surface) */
+  /* Explore section headers: a softer title, and the sub line + "Show all" (11.5:1 and 5.5:1 on page) */
+  --color-title: #3a343a;
+  --color-subtitle: #6d6366;
+  --color-text-secondary: #645a5c; /* warm: nav links, unselected segments, category icons (6.7:1 on surface, 6.3:1 on page, 5.7:1 on brand-soft) */
 
-  /* Borders */
-  --color-border: #ece9e4;
-  --color-border-strong: #d9d4cc; /* inputs, secondary buttons */
+  /* Borders: warm neutrals that sit with the blush page (were cold greys #ece9e4 / #d9d4cc) */
+  --color-border: #eadfd8; /* dividers, card and section lines */
+  --color-border-strong: #dccbc2; /* inputs, secondary buttons */
 
   /* Brand = ink: primary buttons, selected segments/filters, active items */
   --color-brand: #15141a;
   --color-brand-hover: #2a2933;
-  --color-brand-soft: #efeef1; /* selected chips/hover; pair with an ink border when selected */
+  --color-brand-soft: #f3ece8; /* warm; selected chips/hover; pair with an ink border when selected */
   --color-hover-warm: #f3f1ec; /* hover fill for ghost buttons */
   --color-on-brand: #ffffff;
 
-  /* Purple accent — ONLY for the logo mark. Do not use anywhere else. */
+  /* Purple accent — ONLY for the logo (wordmark; the "e" mark on narrow phones). Do not use anywhere else. */
   --color-accent: #6c47ff;
   --color-on-accent: #ffffff;
+  /* Logo: the wordmark and the "e" mark. A deeper purple than the accent so it reads on the hero
+     (5.3:1 on the darkest sunset stop, 6.2:1 on white; white "e" on it 6.2:1). */
+  --color-logo: #5f3bf0;
 
-  /* Saved (filled heart) */
-  --color-saved: #e5484d;
+  /* Saved bookmark: filled ink icon on a soft peach circle (ink on it 14.8:1). Unsaved: outline on white. */
+  --color-saved-bg: var(--color-illus-sun);
 
   /* Form errors (text, 5.1:1 on surface) */
   --color-error: #c4282d;
@@ -57,8 +99,10 @@
   /* Focus ring: ink, drawn with a 2px gap */
   --color-focus: #15141a;
 
-  /* "Hot" warm yellow — urgency badges only (the "Tonight" date chip). Background only, always with on-hot text (9.6:1). */
-  --color-hot: #ffe3a3;
+  /* "Hot": the "Tonight · 19:00" date chip on cards (and the matching confetti piece).
+     A warm peach from the Madrid illustration, not yellow. Background only, always with on-hot (ink) text, 14.8:1. */
+  --color-chip-time: var(--color-illus-sun);
+  --color-hot: var(--color-chip-time);
   /* Lime: ONLY live / soon states — card chips (starts or started < 2h).
      Always with on-live (ink) text, 14.9:1. Never lime text. */
   --color-live: #d6f55b;
@@ -97,9 +141,10 @@
   --tint-golden-hour-b: #fff1de;
   --tint-try-new-a: #edf7fa;
   --tint-try-new-b: #ecf3fc;
-  --color-on-hot: #4a3200;
+  --color-on-hot: var(--color-text); /* ink on the peach time chip, 14.8:1 */
 
-  /* "Free" pill: free text on free-soft (5.6:1) */
+  /* Success green: organizer "Published" status and notice icon, ticket "Confirmed" (5.6:1 on free-soft).
+     Not used for prices: "Free" is shown as bold ink text like every other price. */
   --color-free: #0b6b43;
   --color-free-soft: #ddf3e7;
 
@@ -108,6 +153,8 @@
   --radius-button: 12px;
   --radius-pill: 9999px;
   --radius-sheet: 24px; /* onboarding card and modals */
+  --radius-search: 28px; /* Explore search card */
+  --radius-chip: 14px; /* When pills (Today, Tomorrow...) */
 
   /* Type */
   /* Display face: ONLY Explore's header title (and the vibe pill inside it). Everything else is Inter. */
@@ -123,10 +170,15 @@
   --text-empty-title: 18px;
   --text-section-label: 15px; /* small section headings ("Preview" in Create an event) */
   --tracking-title: -0.4px;
-  --text-section-title: 24px;
+  /* One header for every Explore section (title + right slot, then the sub line) */
+  --text-section-head: 19px;
+  --line-height-section-head: 1.25;
+  --text-section-sub: 13px;
+  --section-sub-gap: 3px; /* title -> sub line */
+  --section-head-gap: 14px; /* header -> cards */
   --text-card-title: 15px;
   --text-meta: 12px;
-  --text-category: 11px;
+  --text-category: 12px;
   --text-chip: 11px;
   --text-pill: 12px;
   --text-price: 18px;
@@ -139,12 +191,20 @@
   --font-weight-bold: 700;
 
   /* Shadows */
-  --shadow-card: 0 3px 10px rgb(21 20 26 / 0.06);
-  --shadow-raised: 0 4px 18px rgb(21 20 26 / 0.04);
-  --shadow-popover: 0 12px 30px rgb(21 20 26 / 0.11);
+  /* Every card at rest: white on the page is only ~1.06:1, so the shadow is the edge (no outlines).
+     A tight layer draws the edge, a soft one gives depth; warm brown so it sits with the blush page. */
+  --shadow-card: 0 1px 2px rgb(90 50 40 / 0.08), 0 6px 20px rgb(90 50 40 / 0.1);
+  --shadow-raised: 0 4px 18px rgb(90 50 40 / 0.04);
+  --shadow-popover: 0 12px 30px rgb(90 50 40 / 0.11);
   /* For inputs that show focus on their wrapper: 2px gap, then a 2px ink ring */
   --shadow-focus: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-focus);
-  --shadow-sheet: 0 8px 32px rgb(21 20 26 / 0.06); /* onboarding card */
+  --shadow-sheet: 0 8px 32px rgb(90 50 40 / 0.06); /* onboarding card */
+  --shadow-search: 0 6px 22px rgb(90 50 40 / 0.1); /* Explore search card */
+  /* White category pills: one faint edge, quieter than --shadow-search so the search bar stays the
+     loudest control. Reaches 3px (offset + blur), inside the scrolling row's 4px (--space-1) padding. */
+  --shadow-chip: 0 1px 2px rgb(90 50 40 / 0.06);
+  /* The bookmark circle on a card photo: a soft ring so it separates from light photos too */
+  --shadow-save: 0 0 0 1px rgb(90 50 40 / 0.08), 0 1px 3px rgb(90 50 40 / 0.18);
 
   /* shadcn/ui names, mapped onto the tokens above */
   --color-background: var(--color-page);
@@ -185,8 +245,14 @@
   --nav-mark-size: 24px;
   --nav-mark-radius: 8px;
   --avatar-size: 32px;
-  --page-max-width: 1040px;
-  --page-padding: 32px 24px 56px;
+  --page-max-width: 1040px; /* organizer screens */
+  /* Explore / Saved column: the visible width of the logo..avatar, title, search bar, chips,
+     sections and grid. The wrappers add --page-gutter on each side, so below
+     1120px + 2 x gutter the column shrinks and keeps that side padding. */
+  --content-max-width: 1120px;
+  --content-max-width-padded: calc(var(--content-max-width) + 2 * var(--page-gutter));
+  --page-gutter: 24px;
+  --page-padding: 32px var(--page-gutter) 56px;
   --page-gutter-mobile: 16px;
   --page-padding-mobile: 20px var(--page-gutter-mobile) 40px;
   --title-gap: 14px; /* h1 -> pill, pill -> segments */
@@ -214,23 +280,18 @@
   --foryou-card-mobile: 78%; /* "Made for your vibe" card width when the row scrolls */
   --pill-gap: 10px;
   --icon-sm: 17px; /* icons inside buttons */
+  --icon-xs: 14px; /* the arrow after "Show all" */
   --icon-md: 19px; /* search glass */
   --text-mark: 13px; /* the "e" in the logo mark */
 
   /* Vibe chips */
   --vibe-padding: 9px 15px;
   --vibe-icon-gap: 6px;
-  --vibe-border-selected: #b9b4ab; /* slightly darker neutral border on a selected chip */
+  --vibe-border-selected: #bba79d; /* slightly darker warm border on a selected chip */
   --vibe-transition: 150ms ease;
-  /* Category accents — ONLY for the vibe chip icon (hover + selected). Non-text, on white. */
-  --cat-music-accent: #6c47ff;
-  --cat-arts-accent: #d6336c;
+  /* Category chips: every icon uses --color-text-secondary (no per-category colours).
+     The blue below is kept only for one booking-success confetti piece (app/onboarding.css). */
   --cat-sports-accent: #2f6bff;
-  --cat-outdoors-accent: #1f9d55;
-  --cat-workshops-accent: #e8890c;
-  --cat-learn-accent: #0e9f9a;
-  --cat-social-accent: #e5533c;
-  --cat-food-accent: #a8643a;
 
   /* Event card (docs/explore-reference.html) */
   --card-media-ratio: 16 / 10;
@@ -278,13 +339,13 @@
 
   /* Vibe in Explore's title ("for [any vibe]") and its panel ("What kind of night?") */
   /* Explore header: the title, and the tinted card it sits on once a vibe is picked */
-  --text-hero: 34px;
-  --text-hero-mobile: 28px;
+  --text-hero: 44px;
+  --text-hero-mobile: 32px;
   --text-hero-sub: 16px;
-  --text-hero-aside: 28px; /* second title line, "any vibe" only */
-  --text-hero-aside-mobile: 22px;
-  --line-height-hero-aside: 1.15;
-  --line-height-hero: 1.1;
+  --text-hero-aside: var(--text-hero); /* second title line ("Don't stay in."), "any vibe" only */
+  --text-hero-aside-mobile: var(--text-hero-mobile);
+  --line-height-hero-aside: 1.05;
+  --line-height-hero: 1.05;
   --tracking-hero: -0.02em;
   --hero-padding: 28px 32px;
   --hero-padding-mobile: 20px;

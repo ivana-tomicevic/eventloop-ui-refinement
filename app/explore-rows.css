@@ -1,0 +1,74 @@
+/* Explore rows (Tomorrow / Weekend / All). Tokens only: see app/tokens.css. */
+.el-rows {
+  display: grid;
+  gap: var(--space-6);
+}
+/* Row headers use the shared section header (.el-sec, .el-sec__sub in app/explore-results.css) */
+/* One row = three cards, no sideways scrolling (same columns as the grid) */
+.el-rail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+@media (max-width: 900px) {
+  .el-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .el-rail {
+    grid-template-columns: 1fr;
+  }
+}
+/* "Close to you": ask and picker states */
+.el-near {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.el-near h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-empty-title);
+  font-weight: var(--font-weight-medium);
+}
+.el-near p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+.el-near .el-near__label {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+.el-near__note {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+.el-near__actions,
+.el-near__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.el-near__chip {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-body);
+  cursor: pointer;
+}
+.el-near__chip:hover {
+  background: var(--color-brand-soft);
+}
+.el-near__chip:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
